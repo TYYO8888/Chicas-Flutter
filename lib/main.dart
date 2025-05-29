@@ -1,6 +1,10 @@
 // This is the main starting point of our app!
 import 'package:flutter/material.dart';
 import 'package:qsr_app/screens/menu_screen.dart'; // Import the MenuScreen
+import 'package:qsr_app/screens/cart_screen.dart'; // Import the CartScreen
+import 'package:qsr_app/services/cart_service.dart'; // Import the CartService
+
+final CartService cartService = CartService();
 // We'll use this later for managing data
 
 // This is the main function that runs when the app starts.
@@ -68,6 +72,22 @@ class HomeScreen extends StatelessWidget {
                 textStyle: TextStyle(fontSize: 18),
               ),
               child: Text('Start Ordering'),
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to the cart screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CartScreen(cartService: cartService)),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                textStyle: TextStyle(fontSize: 18),
+              ),
+              child: Text('View Cart'),
             ),
             // TODO: Placeholder for future Revel Systems API integration.
             // This is where we will add code to connect to the Revel Systems API

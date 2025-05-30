@@ -130,6 +130,7 @@ class MenuService {
             price: 5.00,
             imageUrl: 'assets/sides.png', // Replace with actual image URL
             category: 'Sides',
+            sizes: {'Regular': 5.00, 'Large': 7.50},
           ),
           MenuItem(
             name: 'Waffle Fries',
@@ -137,27 +138,31 @@ class MenuService {
             price: 5.00,
             imageUrl: 'assets/sides.png', // Replace with actual image URL
             category: 'Sides',
+            sizes: {'Regular': 5.00, 'Large': 7.50},
           ),
           MenuItem(
             name: 'Cajun Waffle Fries',
             description: '',
-            price: 5.00,
-            imageUrl: 'assets/sides.png', // Replace with actual image URL
-            category: 'Sides',
-          ),
-          MenuItem(
-            name: 'Sour Cream + Onion Waffle Fries',
-            description: '+\$0.75',
             price: 5.75,
             imageUrl: 'assets/sides.png', // Replace with actual image URL
             category: 'Sides',
+            sizes: {'Regular': 5.75, 'Large': 8.25},
+          ),
+          MenuItem(
+            name: 'Sour Cream + Onion Waffle Fries',
+            description: '',
+            price: 5.75,
+            imageUrl: 'assets/sides.png', // Replace with actual image URL
+            category: 'Sides',
+            sizes: {'Regular': 5.75, 'Large': 8.25},
           ),
           MenuItem(
             name: 'Deep Fried Pickles',
-            description: '+\$3',
+            description: '',
             price: 8.00,
             imageUrl: 'assets/sides.png', // Replace with actual image URL
             category: 'Sides',
+            sizes: {'Regular': 8.00, 'Large': 11.00},
           ),
         ];
       case 'Fixin\'s':
@@ -166,20 +171,6 @@ class MenuService {
             name: 'Dill Pickles 8 oz',
             description: '',
             price: 2.50,
-            imageUrl: 'assets/fixins.png', // Replace with actual image URL
-            category: 'Fixin\'s',
-          ),
-          MenuItem(
-            name: 'Pickled Jalapenos 8 oz',
-            description: '',
-            price: 2.50,
-            imageUrl: 'assets/fixins.png', // Replace with actual image URL
-            category: 'Fixin\'s',
-          ),
-          MenuItem(
-            name: 'Brioche Bun',
-            description: '',
-            price: 1.00,
             imageUrl: 'assets/fixins.png', // Replace with actual image URL
             category: 'Fixin\'s',
           ),
@@ -193,34 +184,6 @@ class MenuService {
             imageUrl: 'assets/sauces.png', // Replace with actual image URL
             category: 'Sauces',
           ),
-          MenuItem(
-            name: 'Sweet Heat Sauce',
-            description: '',
-            price: 1.25,
-            imageUrl: 'assets/sauces.png', // Replace with actual image URL
-            category: 'Sauces',
-          ),
-          MenuItem(
-            name: 'Buffalo Sauce',
-            description: '',
-            price: 1.25,
-            imageUrl: 'assets/sauces.png', // Replace with actual image URL
-            category: 'Sauces',
-          ),
-          MenuItem(
-            name: 'Chipotle Aioli',
-            description: '',
-            price: 1.25,
-            imageUrl: 'assets/sauces.png', // Replace with actual image URL
-            category: 'Sauces',
-          ),
-          MenuItem(
-            name: 'Hot Honey Sauce',
-            description: '',
-            price: 1.25,
-            imageUrl: 'assets/sauces.png', // Replace with actual image URL
-            category: 'Sauces',
-          ),
         ];
       case 'CREW Combos':
         return [
@@ -228,20 +191,6 @@ class MenuService {
             name: 'Crew Pack 1',
             description: '(\$45 serves 2-3): 2x Sandwiches, 1x Chicken Bites, 2x Sides [R], 2x Sauces, 2x Drinks',
             price: 45.00,
-            imageUrl: 'assets/crew_combos.png', // Replace with actual image URL
-            category: 'CREW Combos',
-          ),
-          MenuItem(
-            name: 'Crew Pack 2',
-            description: '(\$65 serves 3-4): 1x Chicken Bites, 1x Whole Wings, 4x Chicken Pieces [Bone-In], 2x Sides [L], 1x 8 oz Pickles/Pickled Jalapenos, 4x Sauces, 4x Drinks',
-            price: 65.00,
-            imageUrl: 'assets/crew_combos.png', // Replace with actual image URL
-            category: 'CREW Combos',
-          ),
-          MenuItem(
-            name: 'Crew Pack 3',
-            description: '(\$85 serves 4-5): 2x Sandwiches, 2x Chicken Bites, 1x Whole Wings, 3x Sides [L], 1x 8 oz Pickles/Pickled Jalapenos, 5x Sauces, 5x Drinks',
-            price: 85.00,
             imageUrl: 'assets/crew_combos.png', // Replace with actual image URL
             category: 'CREW Combos',
           ),

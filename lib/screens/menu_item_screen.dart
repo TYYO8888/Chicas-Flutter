@@ -18,6 +18,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
   late Future<List<MenuItem>> _menuItemsFuture;
   final MenuService _menuService = MenuService();
   String? _selectedHeatLevel;
+  Map<String, String> _selectedSizes = {};
 
   @override
   void initState() {
@@ -71,6 +72,33 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        if (menuItem.sizes != null)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Choose your size:'),
+                              Wrap(
+                                children: menuItem.sizes!.keys.map((size) {
+                                  return Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Radio<String>(
+                                        value: size,
+                                        groupValue: _selectedSizes[menuItem.name],
+                                        onChanged: (String? value) {
+                                          setState(() {
+                                            _selectedSizes[menuItem.name] = value!;
+                                            menuItem.price = menuItem.sizes![size]!;
+                                          });
+                                        },
+                                      ),
+                                      Text('$size (\$${menuItem.sizes![size]!.toStringAsFixed(2)})'),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ),
                         if (menuItem.name == 'The OG' ||
                             menuItem.name == 'OG Whole Wings' ||
                             menuItem.name == 'OG Bites' ||

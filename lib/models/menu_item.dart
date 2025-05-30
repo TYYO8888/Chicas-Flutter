@@ -4,6 +4,7 @@ class MenuItem {
   final double price;
   final String imageUrl;
   final String category;
+  String? heatLevel;
 
   MenuItem({
     required this.name,
@@ -11,5 +12,6 @@ class MenuItem {
     required this.price,
     required this.imageUrl,
     required this.category,
+    this.heatLevel,
   });
 }

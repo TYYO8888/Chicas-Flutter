@@ -65,13 +65,14 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
   }
 
   void _addToCart(MenuItem menuItem) {
+    String? selectedSize = _selectedSizes[menuItem.name];
     if (menuItem.allowsSauceSelection &&
         (menuItem.selectedSauces == null ||
             menuItem.selectedSauces!.length != menuItem.includedSauceCount)) {
       // Show sauce selection dialog if sauces haven't been selected
       _handleSauceSelection(menuItem).then((_) {
         if (menuItem.selectedSauces?.length == menuItem.includedSauceCount) {
-          cartService.addToCart(menuItem);
+          cartService.addToCart(menuItem, selectedSize: selectedSize);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('${menuItem.name} added to cart'),
@@ -81,7 +82,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
         }
       });
     } else {
-      cartService.addToCart(menuItem);
+      cartService.addToCart(menuItem, selectedSize: selectedSize);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${menuItem.name} added to cart'),

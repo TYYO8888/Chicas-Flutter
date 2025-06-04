@@ -6,7 +6,7 @@ class CartService {
 
   Cart get cart => _cart;
 
-  void addToCart(MenuItem menuItem, {Map<String, List<MenuItem>>? customizations}) {
+  void addToCart(MenuItem menuItem, {String? selectedSize, Map<String, List<MenuItem>>? customizations}) {
     // For crew packs or customizable items, always add as a new item
     if (customizations != null) {
       _cart.items.add(CartItem(
@@ -17,14 +17,14 @@ class CartService {
     } else {
       // For regular items, check if they exist and update quantity
       final existingItem = _cart.items.firstWhere(
-        (item) => item.menuItem.name == menuItem.name && item.customizations == null,
+        (item) => item.menuItem.name == menuItem.name && item.customizations == null && item.selectedSize == selectedSize,
         orElse: () => CartItem(menuItem: MenuItem(name: '', description: '', price: 0, imageUrl: '', category: ''), quantity: 0),
       );
 
       if (existingItem.menuItem.name != '') {
         existingItem.quantity++;
       } else {
-        _cart.items.add(CartItem(menuItem: menuItem, quantity: 1));
+        _cart.items.add(CartItem(menuItem: menuItem, quantity: 1, selectedSize: selectedSize));
       }
     }
   }

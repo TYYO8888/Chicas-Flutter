@@ -112,15 +112,25 @@ class _CartScreenState extends State<CartScreen> {
                                                   style: const TextStyle(
                                                     fontStyle: FontStyle.italic,
                                                   ),
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                    Column(
-                                      children: [
-                                        Row(
+                                               ),
+                                             ),
+                                           ),
+                                         if (cartItem.selectedSize != null)
+                                           Padding(
+                                             padding: const EdgeInsets.only(top: 4.0),
+                                             child: Text(
+                                               'Size: ${cartItem.selectedSize}',
+                                               style: const TextStyle(
+                                                 fontStyle: FontStyle.italic,
+                                               ),
+                                             ),
+                                           ),
+                                       ],
+                                     ),
+                                   ),
+                                   Column(
+                                     children: [
+                                       Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             IconButton(

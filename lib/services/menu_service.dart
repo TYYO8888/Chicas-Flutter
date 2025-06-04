@@ -8,39 +8,44 @@ class MenuService {
       case 'Sandwiches':
         return [
           MenuItem(
-            name: 'The OG',
-            description: 'Choose your heat level! Nashville-spiced served on Texas toast (sub Texas toast for brioche bun +\$1)',
+            name: 'The OG Sando',
+            description: 'Choose your heat level! Nashville-spiced',
             price: 13.00,
             imageUrl: 'assets/sandwiches.png', // Replace with actual image URL
             category: 'Sandwiches',
+            sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
           ),
           MenuItem(
             name: 'Sweet Heat Sando',
-            description: 'Sweet heat sauce topped with pickled jalapeños, served on a toasted brioche bun',
+            description: 'Sweet heat sauce topped with pickled jalapeños',
             price: 13.00,
             imageUrl: 'assets/sandwiches.png', // Replace with actual image URL
             category: 'Sandwiches',
+            sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
           ),
           MenuItem(
             name: 'Crispy Buffalo Sando',
-            description: 'Buffalo sauce topped with slaw and Chica\'s sauce, served on a toasted brioche bun',
+            description: 'Buffalo sauce topped with slaw and Chica\'s sauce',
             price: 13.00,
             imageUrl: 'assets/sandwiches.png', // Replace with actual image URL
             category: 'Sandwiches',
+            sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
           ),
           MenuItem(
             name: 'Jalapeno Popper Sando',
-            description: 'Topped with chipotle aioli, pickled jalapeños, served on a toasted brioche bun',
+            description: 'Topped with chipotle aioli, pickled jalapeños',
             price: 13.00,
             imageUrl: 'assets/sandwiches.png', // Replace with actual image URL
             category: 'Sandwiches',
+            sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
           ),
           MenuItem(
             name: 'Hot Honey Sando',
-            description: 'Hot honey sauce topped with pickled jalapeños, served on a toasted brioche bun',
+            description: 'Hot honey sauce topped with pickled jalapeños',
             price: 13.00,
             imageUrl: 'assets/sandwiches.png', // Replace with actual image URL
             category: 'Sandwiches',
+            sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
           ),
         ];
       case 'Whole Wings':

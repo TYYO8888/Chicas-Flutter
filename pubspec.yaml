@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  http: ^1.1.0 # For making API calls to Revel Systems
+  http: ^1.4.0 # For making API calls to Revel Systems
   provider: ^6.0.0 # For managing the app's state
 
 dev_dependencies:

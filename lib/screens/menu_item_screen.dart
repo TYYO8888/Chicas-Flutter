@@ -28,7 +28,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
     _menuItemsFuture = _menuService.getMenuItems(widget.category);
   }
 
-  Future<void> _handleCrewPackSelection(MenuItem crewPack) async {
+ Future<void> _handleCrewPackSelection(MenuItem crewPack) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -37,8 +37,25 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
     );
 
     if (result != null) {
+      // Extract the selected items and bun types from the result
+      final selectedItems = result['selectedItems'] as Map<String, List<MenuItem>>;
+      final selectedBunTypes = result['selectedBunTypes'] as Map<String, String>;
+
+      // Update the price of the crew pack based on the selected bun types
+      double totalPrice = crewPack.price;
+      for (var sandwich in selectedItems['Sandwiches'] ?? []) {
+        sandwich.selectedBunType = selectedBunTypes[sandwich.name];
+        if (sandwich.selectedBunType == 'Brioche Bun') {
+          totalPrice += 1.0;
+        }
+      }
+
       // Add the crew pack with its selected items to the cart
-      cartService.addToCart(crewPack, customizations: result);
+      cartService.addToCart(crewPack, customizations: selectedItems);
+
+      // Update the crew pack price
+      crewPack.price = totalPrice;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${crewPack.name} added to cart'),

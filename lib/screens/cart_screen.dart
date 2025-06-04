@@ -125,6 +125,16 @@ class _CartScreenState extends State<CartScreen> {
                                                ),
                                              ),
                                            ),
+                                         if (cartItem.menuItem.selectedBunType != null)
+                                           Padding(
+                                             padding: const EdgeInsets.only(top: 4.0),
+                                             child: Text(
+                                               'Bun: ${cartItem.menuItem.selectedBunType}',
+                                               style: const TextStyle(
+                                                 fontStyle: FontStyle.italic,
+                                               ),
+                                             ),
+                                           ),
                                        ],
                                      ),
                                    ),

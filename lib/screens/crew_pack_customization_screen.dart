@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
 import '../services/menu_service.dart';
 import '../widgets/sauce_selection_dialog.dart';
+import '../models/crew_pack_selection.dart';
 
 class CrewPackCustomizationScreen extends StatefulWidget {
   final MenuItem crewPack;
@@ -16,18 +17,25 @@ class _CrewPackCustomizationScreenState extends State<CrewPackCustomizationScree
   final MenuService _menuService = MenuService();
   final Map<String, List<MenuItem>> _categoryItems = {};
   final Map<String, List<MenuItem>> _selectedItems = {};
+  final Map<String, CrewPackCustomization> _crewPackSelections = {};
+  final List<String> _availableBuns = ['Regular Bun', 'Brioche Bun'];
 
   @override
   void initState() {
     super.initState();
     _loadCategoryItems();
-    _initializeSelectedItems();
+    _initializeSelections();
   }
 
-  void _initializeSelectedItems() {
+  void _initializeSelections() {
     if (widget.crewPack.customizationCounts != null) {
-      for (var category in widget.crewPack.customizationCounts!.keys) {
-        _selectedItems[category] = [];
+      for (var entry in widget.crewPack.customizationCounts!.entries) {
+        _selectedItems[entry.key] = [];
+        if (entry.key == 'Sandwiches') {
+          _crewPackSelections[entry.key] = CrewPackCustomization(
+            maxSelections: entry.value
+          );
+        }
       }
     }
   }
@@ -40,13 +48,50 @@ class _CrewPackCustomizationScreenState extends State<CrewPackCustomizationScree
   }
 
   bool _canAddMore(String category) {
+    if (category == 'Sandwiches') {
+      return _crewPackSelections[category]?.canAddMore() ?? false;
+    }
     final maxCount = widget.crewPack.customizationCounts?[category] ?? 0;
     final currentCount = _selectedItems[category]?.length ?? 0;
     return currentCount < maxCount;
   }
 
+  Future<void> _selectBunType(String category, MenuItem sandwich) async {
+    final selectedBun = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text('Select Bun Type for ${sandwich.name}'),
+          children: _availableBuns.map((bun) {
+            return SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, bun);
+              },
+              child: Text(bun),
+            );
+          }).toList(),
+        );
+      },
+    );
+
+    if (selectedBun != null) {
+      setState(() {
+        double bunPrice = selectedBun == 'Brioche Bun' ? 1.0 : 0.0;
+        _crewPackSelections[category]?.addSelection(
+          CrewPackSelection(
+            sandwichId: sandwich.id,
+            bunType: selectedBun,
+            price: sandwich.price + bunPrice,
+          ),
+        );
+      });
+    }
+  }
+
   void _addItem(String category, MenuItem item) {
-    if (_canAddMore(category)) {
+    if (category == 'Sandwiches') {
+      _selectBunType(category, item);
+    } else if (_canAddMore(category)) {
       setState(() {
         _selectedItems[category]?.add(item);
       });
@@ -56,6 +101,12 @@ class _CrewPackCustomizationScreenState extends State<CrewPackCustomizationScree
   void _removeItem(String category, MenuItem item) {
     setState(() {
       _selectedItems[category]?.remove(item);
+    });
+  }
+
+  void _removeSelection(String category, int index) {
+    setState(() {
+      _crewPackSelections[category]?.removeSelection(index);
     });
   }
 
@@ -77,15 +128,20 @@ class _CrewPackCustomizationScreenState extends State<CrewPackCustomizationScree
 
   bool _isValid() {
     if (widget.crewPack.customizationCounts == null) return false;
-    
-    // Check if all categories have the required number of selections
+
     for (var entry in widget.crewPack.customizationCounts!.entries) {
-      if ((_selectedItems[entry.key]?.length ?? 0) != entry.value) {
-        return false;
+      if (entry.key == 'Sandwiches') {
+        final selections = _crewPackSelections[entry.key]?.selections.length ?? 0;
+        if (selections != entry.value) {
+          return false;
+        }
+      } else {
+        if ((_selectedItems[entry.key]?.length ?? 0) != entry.value) {
+          return false;
+        }
       }
     }
 
-    // Check if sauces are selected
     if (widget.crewPack.allowsSauceSelection &&
         (widget.crewPack.selectedSauces == null ||
             widget.crewPack.selectedSauces!.length !=
@@ -94,6 +150,100 @@ class _CrewPackCustomizationScreenState extends State<CrewPackCustomizationScree
     }
 
     return true;
+  }
+
+  Widget _buildCategorySection(String category) {
+    final selectedCount = category == 'Sandwiches'
+        ? _crewPackSelections[category]?.selections.length ?? 0
+        : _selectedItems[category]?.length ?? 0;
+    final maxCount = widget.crewPack.customizationCounts?[category] ?? 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'CHOOSE $maxCount ${category.toUpperCase()}',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Colors.deepOrange,
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        Text(
+          '($selectedCount/$maxCount selected)',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 8),
+        if (category == 'Sandwiches') ...[
+          // Show selected sandwiches
+          ..._crewPackSelections[category]?.selections.asMap().entries.map((entry) {
+            final index = entry.key;
+            final selection = entry.value;
+            final sandwich = _categoryItems[category]?.firstWhere(
+              (item) => item.id == selection.sandwichId,
+              orElse: () => MenuItem(name: '', description: '', price: 0, category: ''),
+            );            return ListTile(
+              title: Text(sandwich?.name ?? 'Unknown Sandwich'),
+              subtitle: Text('Bun: ${selection.bunType}'),
+              trailing: IconButton(
+                icon: const Icon(Icons.remove_circle_outline),
+                onPressed: () => _removeSelection(category, index),
+              ),
+            );
+          }) ?? [],
+
+          // Show available sandwiches
+          if (_canAddMore(category))
+            ..._categoryItems[category]?.map((sandwich) {
+              final itemCount = _crewPackSelections[category]?.selections
+                  .where((s) => s.sandwichId == sandwich.id)
+                  .length ?? 0;
+              
+              return ListTile(
+                title: Text(sandwich.name),
+                subtitle: Text('Selected: $itemCount'),
+                trailing: ElevatedButton(
+                  onPressed: _canAddMore(category)
+                      ? () => _selectBunType(category, sandwich)
+                      : null,
+                  child: const Text('Add'),
+                ),
+              );
+            }) ?? [],
+        ] else ...[
+          // Other categories (sides, drinks, etc.)
+          ..._categoryItems[category]?.map((item) {
+            final itemCount = _selectedItems[category]
+                    ?.where((selected) => selected.id == item.id)
+                    .length ??
+                0;
+
+            return ListTile(
+              title: Text(item.name),
+              subtitle: Text('Selected: $itemCount'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle_outline),
+                    onPressed: itemCount > 0
+                        ? () => _removeItem(category, item)
+                        : null,
+                  ),
+                  Text('$itemCount'),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline),
+                    onPressed: _canAddMore(category)
+                        ? () => _addItem(category, item)
+                        : null,
+                  ),
+                ],
+              ),
+            );
+          }) ?? [],
+        ],
+        const Divider(height: 32),
+      ],
+    );
   }
 
   @override
@@ -138,88 +288,27 @@ class _CrewPackCustomizationScreenState extends State<CrewPackCustomizationScree
               ],
 
               // Existing category selections
-              ...widget.crewPack.customizationCategories?.map((category) {
-                    final selectedCount = _selectedItems[category]?.length ?? 0;
-                    final maxCount = widget.crewPack.customizationCounts?[category] ?? 0;
+              ...widget.crewPack.customizationCategories?.map(_buildCategorySection) ?? [],
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'CHOOSE $maxCount ${category.toUpperCase()}',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Colors.deepOrange,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        Text(
-                          '($selectedCount/$maxCount selected)',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        const SizedBox(height: 8),
-                        ..._categoryItems[category]?.map((item) {
-                              final isSelected =
-                                  _selectedItems[category]?.contains(item) ?? false;
-                              final itemCount = _selectedItems[category]
-                                      ?.where((selected) => selected.name == item.name)
-                                      .length ??
-                                  0;
-
-                              return ListTile(
-                                title: Text(item.name),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.remove_circle_outline),
-                                      onPressed: isSelected
-                                          ? () => _removeItem(category, item)
-                                          : null,
-                                    ),
-                                    Text('$itemCount'),
-                                    IconButton(
-                                      icon: const Icon(Icons.add_circle_outline),
-                                      onPressed: _canAddMore(category)
-                                          ? () => _addItem(category, item)
-                                          : null,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }) ??
-                            [],
-                        const SizedBox(height: 16),
-                      ],
-                    );
-                  }) ??
-                  [],
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: _isValid()
-                    ? () {
-                        // Return the selected items to the previous screen
-                        Navigator.pop(context, _selectedItems);
-                      }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrange,
-                  foregroundColor: Colors.white,
-                ),
-                child: Text(
-                  'Add to Cart (\$${widget.crewPack.price.toStringAsFixed(2)})',
+              const SizedBox(height: 24),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _isValid()
+                      ? () {
+                          final customizations = Map<String, List<MenuItem>>.from(_selectedItems);
+                          Navigator.pop(context, {
+                            'sandwiches': _crewPackSelections['Sandwiches'],
+                            'customizations': customizations,
+                            'sauces': widget.crewPack.selectedSauces,
+                          });
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  ),
+                  child: const Text('Add to Cart'),
                 ),
               ),
             ],

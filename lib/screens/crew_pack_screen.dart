@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
 import '../services/menu_service.dart';
+import '../services/cart_service.dart';
+import '../screens/crew_pack_customization_screen.dart';
 
 class CrewPackScreen extends StatefulWidget {
   final MenuItem crewPack;
@@ -13,8 +15,8 @@ class CrewPackScreen extends StatefulWidget {
 
 class _CrewPackScreenState extends State<CrewPackScreen> {
   final MenuService _menuService = MenuService();
+  final CartService _cartService = CartService();
   Map<String, List<MenuItem>> _categoryItems = {};
-  Map<String, List<MenuItem>> _selectedItems = {};
 
   @override
   void initState() {
@@ -29,38 +31,24 @@ class _CrewPackScreenState extends State<CrewPackScreen> {
     }
     setState(() {
       _categoryItems = items;
-      // Initialize selected items map      for (var entry in (widget.crewPack.customizationCounts as Map<String, int>?)?.entries ?? []) {
-        _selectedItems[entry.key] = [];
-      }
     });
   }
 
-  bool _canAddMore(String category) {
-    int maxCount = widget.crewPack.customizationCounts?[category] ?? 0;
-    int currentCount = _selectedItems[category]?.length ?? 0;
-    return currentCount < maxCount;
-  }
+  Future<void> _startCustomization() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CrewPackCustomizationScreen(crewPack: widget.crewPack),
+      ),
+    );
 
-  void _addItem(String category, MenuItem item) {
-    if (_canAddMore(category)) {
-      setState(() {
-        _selectedItems[category]?.add(item);
-      });
+    if (result != null && mounted) {
+      _cartService.addToCart(
+        widget.crewPack,
+        crewPackCustomization: result['sandwiches'],
+      );
+      Navigator.pop(context); // Return to the menu screen
     }
-  }
-
-  void _removeItem(String category, MenuItem item) {
-    setState(() {
-      _selectedItems[category]?.remove(item);
-    });
-  }
-
-  bool _isValid() {    for (var entry in (widget.crewPack.customizationCounts as Map<String, int>?)?.entries ?? []) {
-      if ((_selectedItems[entry.key]?.length ?? 0) != entry.value) {
-        return false;
-      }
-    }
-    return true;
   }
 
   @override
@@ -75,92 +63,73 @@ class _CrewPackScreenState extends State<CrewPackScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Display crew pack image if available
+              if (widget.crewPack.imageUrl.isNotEmpty)
+                Center(
+                  child: Image.network(
+                    widget.crewPack.imageUrl,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              const SizedBox(height: 16),
+              
+              // Crew pack description
               Text(
                 widget.crewPack.description,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 24),
-              Text(
-                'Please make your selections for each component of the pack below.',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 16),
-              ...widget.crewPack.customizationCategories?.map((category) {
-                    int selectedCount = _selectedItems[category]?.length ?? 0;
-                    int maxCount = widget.crewPack.customizationCounts?[category] ?? 0;
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'CHOOSE $maxCount ${category.toUpperCase()}',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Colors.deepOrange,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        Text(
-                          '($selectedCount/$maxCount selected)',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        const SizedBox(height: 8),
-                        ..._categoryItems[category]?.map((item) {
-                              bool isSelected =
-                                  _selectedItems[category]?.contains(item) ?? false;
-                              return ListTile(
-                                title: Text(item.name),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.remove_circle_outline),
-                                      onPressed: isSelected
-                                          ? () => _removeItem(category, item)
-                                          : null,
-                                    ),
-                                    Text('${_selectedItems[category]?.where((selected) => selected.name == item.name).length ?? 0}'),
-                                    IconButton(
-                                      icon: const Icon(Icons.add_circle_outline),
-                                      onPressed: _canAddMore(category)
-                                          ? () => _addItem(category, item)
-                                          : null,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }) ??
-                            [],
-                        const SizedBox(height: 16),
-                      ],
-                    );
-                  }) ??
-                  [],
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: _isValid()
-                    ? () {
-                        Navigator.pop(context, _selectedItems);
-                      }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrange,
-                  foregroundColor: Colors.white,
+              // Price
+              Text(
+                'Price: \$${widget.crewPack.price.toStringAsFixed(2)}',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: Colors.deepOrange,
+                  fontWeight: FontWeight.bold,
                 ),
-                child: Text(
-                  'Add to Cart (\$${widget.crewPack.price.toStringAsFixed(2)})',
+              ),
+              const SizedBox(height: 24),
+
+              // Customization instructions
+              Text(
+                'This Crew Pack includes:',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+
+              // List included items
+              ...widget.crewPack.customizationCounts?.entries.map((entry) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    '• ${entry.value} ${entry.key}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                );
+              }) ?? [],
+
+              if (widget.crewPack.allowsSauceSelection)
+                Text(
+                  '• ${widget.crewPack.includedSauceCount} Sauces',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+
+              const SizedBox(height: 32),
+
+              // Start customization button
+              Center(
+                child: ElevatedButton(
+                  onPressed: _startCustomization,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                  ),
+                  child: const Text('Start Customization'),
                 ),
               ),
             ],

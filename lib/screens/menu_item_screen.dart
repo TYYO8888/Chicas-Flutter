@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:qsr_app/models/menu_item.dart';
 import 'package:qsr_app/services/cart_service.dart';
 import 'package:qsr_app/services/menu_service.dart';
+import 'package:qsr_app/widgets/sauce_selection_dialog.dart';
+import 'package:qsr_app/screens/crew_pack_customization_screen.dart';
 
 final CartService cartService = CartService();
 
 class MenuItemScreen extends StatefulWidget {
   final String category;
 
-  MenuItemScreen({required this.category});
+  const MenuItemScreen({super.key, required this.category});
 
   @override
   _MenuItemScreenState createState() => _MenuItemScreenState();
@@ -18,12 +20,75 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
   late Future<List<MenuItem>> _menuItemsFuture;
   final MenuService _menuService = MenuService();
   String? _selectedHeatLevel;
-  Map<String, String> _selectedSizes = {};
+  final Map<String, String> _selectedSizes = {};
 
   @override
   void initState() {
     super.initState();
     _menuItemsFuture = _menuService.getMenuItems(widget.category);
+  }
+
+  Future<void> _handleCrewPackSelection(MenuItem crewPack) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CrewPackCustomizationScreen(crewPack: crewPack),
+      ),
+    );
+
+    if (result != null) {
+      // Add the crew pack with its selected items to the cart
+      cartService.addToCart(crewPack, customizations: result);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${crewPack.name} added to cart'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleSauceSelection(MenuItem menuItem) async {
+    final result = await showDialog<List<String>>(
+      context: context,
+      builder: (BuildContext context) => SauceSelectionDialog(
+        maxSauces: menuItem.includedSauceCount,
+        initialSelections: menuItem.selectedSauces,
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        menuItem.selectedSauces = result;
+      });
+    }
+  }
+
+  void _addToCart(MenuItem menuItem) {
+    if (menuItem.allowsSauceSelection &&
+        (menuItem.selectedSauces == null ||
+            menuItem.selectedSauces!.length != menuItem.includedSauceCount)) {
+      // Show sauce selection dialog if sauces haven't been selected
+      _handleSauceSelection(menuItem).then((_) {
+        if (menuItem.selectedSauces?.length == menuItem.includedSauceCount) {
+          cartService.addToCart(menuItem);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${menuItem.name} added to cart'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      });
+    } else {
+      cartService.addToCart(menuItem);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${menuItem.name} added to cart'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   @override
@@ -33,7 +98,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
         title: Text(widget.category),
         backgroundColor: Theme.of(context).primaryColor,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -49,25 +114,25 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
               itemBuilder: (context, index) {
                 final menuItem = menuItems[index];
                 return Card(
-                  margin: EdgeInsets.all(8.0),
+                  margin: const EdgeInsets.all(8.0),
                   child: Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           menuItem.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 4.0),
+                        const SizedBox(height: 4.0),
                         Text(menuItem.description),
-                        SizedBox(height: 4.0),
+                        const SizedBox(height: 4.0),
                         Text(
                           '\$${menuItem.price.toStringAsFixed(2)}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.bold,
                           ),
@@ -76,7 +141,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Choose your size:'),
+                              const Text('Choose your size:'),
                               Wrap(
                                 children: menuItem.sizes!.keys.map((size) {
                                   return Row(
@@ -99,91 +164,25 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                               ),
                             ],
                           ),
-                        if (menuItem.name == 'The OG' ||
-                            menuItem.name == 'OG Whole Wings' ||
-                            menuItem.name == 'OG Bites' ||
-                            widget.category == 'Chicken Pieces')
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Choose your heat level:'),
-                              Row(
-                                children: [
-                                  Radio<String>(
-                                    value: 'Plain',
-                                    groupValue: _selectedHeatLevel,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        _selectedHeatLevel = value;
-                                        menuItem.heatLevel = value;
-                                      });
-                                    },
-                                  ),
-                                  Text('Plain'),
-                                  Radio<String>(
-                                    value: 'Mild (No Heat)',
-                                    groupValue: _selectedHeatLevel,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        _selectedHeatLevel = value;
-                                        menuItem.heatLevel = value;
-                                      });
-                                    },
-                                  ),
-                                  Text('Mild (No Heat)'),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Radio<String>(
-                                    value: 'Medium (Hot)',
-                                    groupValue: _selectedHeatLevel,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        _selectedHeatLevel = value;
-                                        menuItem.heatLevel = value;
-                                      });
-                                    },
-                                  ),
-                                  Text('Medium (Hot)'),
-                                  Radio<String>(
-                                    value: 'Medium/Hot (Very Hot)',
-                                    groupValue: _selectedHeatLevel,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        _selectedHeatLevel = value;
-                                        menuItem.heatLevel = value;
-                                      });
-                                    },
-                                  ),
-                                  Text('Medium/Hot (Very Hot)'),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Radio<String>(
-                                    value: 'Hot AF (Extremely Hot)',
-                                    groupValue: _selectedHeatLevel,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        _selectedHeatLevel = value;
-                                        menuItem.heatLevel = value;
-                                      });
-                                    },
-                                  ),
-                                  Text('Hot AF (Extremely Hot)'),
-                                ],
-                              ),
-                            ],
+                        const SizedBox(height: 8.0),
+                        if (widget.category == 'CREW Combos')
+                          ElevatedButton(
+                            onPressed: () => _handleCrewPackSelection(menuItem),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepOrange,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Customize Pack'),
+                          )
+                        else
+                          ElevatedButton(
+                            onPressed: () => _addToCart(menuItem),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepOrange,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Add to Cart'),
                           ),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Add the item to the cart
-                            cartService.addItem(menuItem);
-                            print('${menuItem.name} added to cart with heat level: ${menuItem.heatLevel}');
-                          },
-                          child: Text('Add to Cart'),
-                        ),
                       ],
                     ),
                   ),
@@ -195,7 +194,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
               child: Text('Error: ${snapshot.error}'),
             );
           } else {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }

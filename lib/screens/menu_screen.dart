@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:qsr_app/screens/menu_item_screen.dart'; // Import the MenuItemScreen
-import 'package:qsr_app/models/menu_item.dart'; // Import the MenuItem model
+// Import the MenuItem model
 
 class MenuScreen extends StatelessWidget {
   // Placeholder menu categories
-  final List<String> menuCategories = [
+  final List<String> menuCategories = const [
     'CREW Combos',
     'Whole Wings',
     'Chicken Bites',
@@ -16,22 +16,24 @@ class MenuScreen extends StatelessWidget {
     'Beverages',
   ];
 
+  const MenuScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Menu'),
+        title: const Text('Menu'),
         backgroundColor: Theme.of(context).primaryColor,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context); // Navigate back to the previous screen
           },
         ),
       ),
       body: GridView.builder(
-        padding: EdgeInsets.all(16.0),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        padding: const EdgeInsets.all(16.0),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, // Show 2 categories per row
           crossAxisSpacing: 16.0,
           mainAxisSpacing: 16.0,
@@ -59,7 +61,7 @@ class MenuScreen extends StatelessWidget {
                     color: Colors.grey.withOpacity(0.3),
                     spreadRadius: 2,
                     blurRadius: 5,
-                    offset: Offset(0, 3), // changes position of shadow
+                    offset: const Offset(0, 3), // changes position of shadow
                   ),
                 ],
               ),
@@ -73,10 +75,10 @@ class MenuScreen extends StatelessWidget {
                     width: 100,
                     fit: BoxFit.cover,
                   ),
-                  SizedBox(height: 8.0),
+                  const SizedBox(height: 8.0),
                   Text(
                     category,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),

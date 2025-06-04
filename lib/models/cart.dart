@@ -3,10 +3,12 @@ import 'package:qsr_app/models/menu_item.dart';
 class CartItem {
   final MenuItem menuItem;
   int quantity;
+  Map<String, List<MenuItem>>? customizations;
 
   CartItem({
     required this.menuItem,
-    required this.quantity,
+    this.quantity = 1,
+    this.customizations,
   });
 }
 

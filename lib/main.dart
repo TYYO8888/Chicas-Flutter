@@ -9,12 +9,14 @@ final CartService cartService = CartService();
 
 // This is the main function that runs when the app starts.
 void main() {
-  runApp(MyApp()); // We tell Flutter to run our main app widget, MyApp.
+  runApp(const MyApp()); // We tell Flutter to run our main app widget, MyApp.
 }
 
 // MyApp is like the main container for our whole app.
 // It sets up the basic look and feel using Material Design.
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     // MaterialApp is like the main building block for a Material Design app.
@@ -26,7 +28,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.red).copyWith(secondary: Colors.yellow), // A secondary color (like a sunny yellow!)
         visualDensity: VisualDensity.adaptivePlatformDensity, // Makes the app look good on different devices
       ),
-      home: HomeScreen(), // This is the first screen the user will see
+      home: const HomeScreen(), // This is the first screen the user will see
     );
   }
 }
@@ -34,13 +36,15 @@ class MyApp extends StatelessWidget {
 // HomeScreen is the first screen of our app.
 // It's a simple screen that welcomes the user.
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Scaffold is like a basic structure for a screen in Material Design.
     // It provides a place for the app bar, the main content, and other things.
     return Scaffold(
       appBar: AppBar( // This is the bar at the top of the screen
-        title: Text('My QSR App'), // The title shown in the app bar
+        title: const Text('My QSR App'), // The title shown in the app bar
         backgroundColor: Theme.of(context).primaryColor, // Use the primary color for the app bar
       ),
       body: Center( // Center widget puts its child widget in the middle of the screen
@@ -56,24 +60,24 @@ class HomeScreen extends StatelessWidget {
                 color: Theme.of(context).primaryColor, // Use the primary color for the text
               ),
             ),
-            SizedBox(height: 20.0), // Add some space between the text and the button
+            const SizedBox(height: 20.0), // Add some space between the text and the button
             // This is a button that the user can tap to start ordering.
             ElevatedButton(
               onPressed: () {
                 // Navigate to the menu screen
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MenuScreen()),
+                  MaterialPageRoute(builder: (context) => const MenuScreen()),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.secondary,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                textStyle: TextStyle(fontSize: 18),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                textStyle: const TextStyle(fontSize: 18),
               ),
-              child: Text('Start Ordering'),
+              child: const Text('Start Ordering'),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () {
                 // Navigate to the cart screen
@@ -84,10 +88,10 @@ class HomeScreen extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.secondary,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                textStyle: TextStyle(fontSize: 18),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                textStyle: const TextStyle(fontSize: 18),
               ),
-              child: Text('View Cart'),
+              child: const Text('View Cart'),
             ),
             // TODO: Placeholder for future Revel Systems API integration.
             // This is where we will add code to connect to the Revel Systems API

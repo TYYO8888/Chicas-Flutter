@@ -6,30 +6,53 @@ class CartService {
 
   Cart get cart => _cart;
 
-  void addItem(MenuItem menuItem) {
-    // Check if the item is already in the cart
-    final existingItem = _cart.items.firstWhere(
-      (item) => item.menuItem.name == menuItem.name,
-      orElse: () => CartItem(menuItem: MenuItem(name: '', description: '', price: 0, imageUrl: '', category: ''), quantity: 0), // Return a dummy CartItem if not found
-    );
-
-    if (existingItem.menuItem.name != '') {
-      // If the item is already in the cart, increase the quantity
-      existingItem.quantity++;
+  void addToCart(MenuItem menuItem, {Map<String, List<MenuItem>>? customizations}) {
+    // For crew packs or customizable items, always add as a new item
+    if (customizations != null) {
+      _cart.items.add(CartItem(
+        menuItem: menuItem,
+        quantity: 1,
+        customizations: customizations,
+      ));
     } else {
-      // If the item is not in the cart, add it to the cart with quantity 1
-      _cart.items.add(CartItem(menuItem: menuItem, quantity: 1));
+      // For regular items, check if they exist and update quantity
+      final existingItem = _cart.items.firstWhere(
+        (item) => item.menuItem.name == menuItem.name && item.customizations == null,
+        orElse: () => CartItem(menuItem: MenuItem(name: '', description: '', price: 0, imageUrl: '', category: ''), quantity: 0),
+      );
+
+      if (existingItem.menuItem.name != '') {
+        existingItem.quantity++;
+      } else {
+        _cart.items.add(CartItem(menuItem: menuItem, quantity: 1));
+      }
     }
   }
 
-  void removeItem(MenuItem menuItem) {
-    _cart.items.removeWhere((item) => item.menuItem.name == menuItem.name);
+  void removeItem(MenuItem menuItem, {Map<String, List<MenuItem>>? customizations}) {
+    if (customizations != null) {
+      // For customized items, remove the specific customized version
+      _cart.items.removeWhere((item) =>
+          item.menuItem.name == menuItem.name &&
+          item.customizations == customizations);
+    } else {
+      // For regular items, remove all non-customized versions
+      _cart.items.removeWhere((item) =>
+          item.menuItem.name == menuItem.name &&
+          item.customizations == null);
+    }
   }
 
-  void updateQuantity(MenuItem menuItem, int quantity) {
+  void updateQuantity(MenuItem menuItem, int quantity,
+      {Map<String, List<MenuItem>>? customizations}) {
     final existingItem = _cart.items.firstWhere(
-      (item) => item.menuItem.name == menuItem.name,
-      orElse: () => CartItem(menuItem: MenuItem(name: '', description: '', price: 0, imageUrl: '', category: ''), quantity: 0), // Return a dummy CartItem if not found
+      (item) =>
+          item.menuItem.name == menuItem.name &&
+          item.customizations == customizations,
+      orElse: () => CartItem(
+          menuItem: MenuItem(
+              name: '', description: '', price: 0, imageUrl: '', category: ''),
+          quantity: 0),
     );
 
     if (existingItem.menuItem.name != '') {

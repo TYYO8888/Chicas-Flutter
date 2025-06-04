@@ -6,6 +6,11 @@ class MenuItem {
   final String category;
   String? heatLevel;
   Map<String, double>? sizes;
+  Map<String, int>? customizationCounts; // How many items of each type can be selected
+  List<String>? customizationCategories; // Which categories can be selected from
+  bool allowsSauceSelection;
+  int includedSauceCount;
+  List<String>? selectedSauces;
 
   MenuItem({
     required this.name,
@@ -15,5 +20,10 @@ class MenuItem {
     required this.category,
     this.heatLevel,
     this.sizes,
+    this.customizationCounts,
+    this.customizationCategories,
+    this.allowsSauceSelection = false,
+    this.includedSauceCount = 0,
+    this.selectedSauces,
   });
 }

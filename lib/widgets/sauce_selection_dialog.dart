@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SauceSelectionDialog extends StatefulWidget {
-  final int maxSauces;
+  final int? maxSauces;
   final List<String>? initialSelections;
 
   const SauceSelectionDialog({
@@ -34,13 +34,16 @@ class _SauceSelectionDialogState extends State<SauceSelectionDialog> {
   }
 
   bool _canAddMore() {
-    return _selectedSauces.length < widget.maxSauces;
+    if (widget.maxSauces == null) return true;
+    return _selectedSauces.length < widget.maxSauces!;
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Select Sauces (${_selectedSauces.length}/${widget.maxSauces})'),
+      title: Text(widget.maxSauces != null
+          ? 'Select Sauces (${_selectedSauces.length}/${widget.maxSauces})'
+          : 'Select Sauces (${_selectedSauces.length})'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -49,46 +52,29 @@ class _SauceSelectionDialogState extends State<SauceSelectionDialog> {
             return ListTile(
               title: Text(sauce),
               trailing: isSelected
-                  ? IconButton(
-                      icon: const Icon(Icons.remove_circle_outline),
-                      onPressed: () {
-                        setState(() {
-                          _selectedSauces.remove(sauce);
-                        });
-                      },
-                    )
-                  : IconButton(
-                      icon: const Icon(Icons.add_circle_outline),
-                      onPressed: _canAddMore()
-                          ? () {
-                              setState(() {
-                                _selectedSauces.add(sauce);
-                              });
-                            }
-                          : null,
-                    ),
+                  ? Icon(Icons.check_circle, color: Colors.green[700])
+                  : null,
+              onTap: () {
+                setState(() {
+                  if (isSelected) {
+                    _selectedSauces.remove(sauce);
+                  } else if (_canAddMore()) {
+                    _selectedSauces.add(sauce);
+                  }
+                });
+              },
             );
           }).toList(),
         ),
       ),
       actions: [
         TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancel'),
+          onPressed: () => Navigator.pop(context),
+          child: const Text('CANCEL'),
         ),
-        ElevatedButton(
-          onPressed: _selectedSauces.length == widget.maxSauces
-              ? () {
-                  Navigator.of(context).pop(_selectedSauces);
-                }
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepOrange,
-            foregroundColor: Colors.white,
-          ),
-          child: const Text('Confirm'),
+        TextButton(
+          onPressed: () => Navigator.pop(context, _selectedSauces),
+          child: const Text('CONFIRM'),
         ),
       ],
     );

@@ -16,10 +16,8 @@ class MenuItemScreen extends StatefulWidget {
   _MenuItemScreenState createState() => _MenuItemScreenState();
 }
 
-class _MenuItemScreenState extends State<MenuItemScreen> {
-  late Future<List<MenuItem>> _menuItemsFuture;
+class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<MenuItem>> _menuItemsFuture;
   final MenuService _menuService = MenuService();
-  String? _selectedHeatLevel;
   final Map<String, String> _selectedSizes = {};
 
   @override
@@ -111,15 +109,12 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return Scaffold(      appBar: AppBar(
         title: Text(widget.category),
         backgroundColor: Theme.of(context).primaryColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.of(context).maybePop(),
         ),
       ),
       body: FutureBuilder<List<MenuItem>>(

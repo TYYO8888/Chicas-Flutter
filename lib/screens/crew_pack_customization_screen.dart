@@ -181,7 +181,14 @@ class _CrewPackCustomizationScreenState extends State<CrewPackCustomizationScree
             final selection = entry.value;
             final sandwich = _categoryItems[category]?.firstWhere(
               (item) => item.id == selection.sandwichId,
-              orElse: () => MenuItem(name: '', description: '', price: 0, category: ''),
+              orElse: () => MenuItem(
+                id: 'placeholder',
+                name: '',
+                description: '',
+                price: 0,
+                imageUrl: 'assets/placeholder.png',
+                category: '',
+              ),
             );            return ListTile(
               title: Text(sandwich?.name ?? 'Unknown Sandwich'),
               subtitle: Text('Bun: ${selection.bunType}'),

@@ -38,9 +38,11 @@ class CartService {
             item.crewPackCustomization == null,
         orElse: () => CartItem(
           menuItem: MenuItem(
+            id: 'placeholder',
             name: '',
             description: '',
             price: 0,
+            imageUrl: 'assets/placeholder.png',
             category: '',
           ),
           quantity: 0,
@@ -95,9 +97,11 @@ class CartService {
           item.crewPackCustomization == crewPackCustomization,
       orElse: () => CartItem(
         menuItem: MenuItem(
+          id: 'placeholder',
           name: '',
           description: '',
           price: 0,
+          imageUrl: 'assets/placeholder.png',
           category: '',
         ),
         quantity: 0,

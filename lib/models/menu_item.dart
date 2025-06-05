@@ -5,28 +5,60 @@ class MenuItem {
   double price;
   final String imageUrl;
   final String category;
-  String? heatLevel;
-  String? selectedBunType; // Add this line
-  Map<String, double>? sizes;
-  Map<String, int>? customizationCounts; // How many items of each type can be selected
-  List<String>? customizationCategories; // Which categories can be selected from
+  final bool isSpecial;
+  
+  // Sauce selection properties
   bool allowsSauceSelection;
-  int includedSauceCount;
   List<String>? selectedSauces;
+  int? includedSauceCount;
+
+  // Bun selection properties
+  String? selectedBunType;
+
+  // Size options
+  Map<String, double>? sizes;
+
+  // Crew pack customization properties
+  Map<String, int>? customizationCounts;
+  List<String>? customizationCategories;
+  Map<String, dynamic>? customizations;
 
   MenuItem({
-    String? id,
+    required this.id,
     required this.name,
     required this.description,
     required this.price,
-    this.imageUrl = '',
+    required this.imageUrl,
     required this.category,
-    this.heatLevel,
+    this.isSpecial = false,
+    this.allowsSauceSelection = false,
+    this.selectedSauces,
+    this.includedSauceCount,
+    this.selectedBunType,
     this.sizes,
     this.customizationCounts,
     this.customizationCategories,
-    this.allowsSauceSelection = false,
-    this.includedSauceCount = 0,
-    this.selectedSauces,
-  }) : id = id ?? name.toLowerCase().replaceAll(' ', '_');
+    this.customizations,
+  });
+
+  // Clone method for creating copies of menu items
+  MenuItem clone() {
+    return MenuItem(
+      id: id,
+      name: name,
+      description: description,
+      price: price,
+      imageUrl: imageUrl,
+      category: category,
+      isSpecial: isSpecial,
+      allowsSauceSelection: allowsSauceSelection,
+      selectedSauces: selectedSauces != null ? List.from(selectedSauces!) : null,
+      includedSauceCount: includedSauceCount,
+      selectedBunType: selectedBunType,
+      sizes: sizes != null ? Map.from(sizes!) : null,
+      customizationCounts: customizationCounts != null ? Map.from(customizationCounts!) : null,
+      customizationCategories: customizationCategories != null ? List.from(customizationCategories!) : null,
+      customizations: customizations != null ? Map.from(customizations!) : null,
+    );
+  }
 }

@@ -17,12 +17,14 @@ class _MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0; // Start with Home/Offers selected
   final CartService _cartService = CartService();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  late final PageController _pageController;
 
   late final List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: _selectedIndex);
     _pages = [
       const HomeScreen(), // Home/Offers page
       CartScreen(cartService: _cartService), // Cart page
@@ -39,15 +41,22 @@ class _MainLayoutState extends State<MainLayout> {
       setState(() {
         _selectedIndex = index;
       });
+      // Jump to the selected page
+      _pageController.jumpToPage(index);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
-      body: IndexedStack(
-        index: _selectedIndex,
+      key: _scaffoldKey,      body: PageView(
+        physics: const NeverScrollableScrollPhysics(),
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
         children: _pages,
       ),
       endDrawer: const NavigationMenuDrawer(),

@@ -3,6 +3,7 @@ import '../models/menu_item.dart';
 import '../services/menu_service.dart';
 import '../widgets/sauce_selection_dialog.dart';
 import '../models/crew_pack_selection.dart';
+import '../widgets/custom_bottom_nav_bar.dart';
 
 class CrewPackCustomizationScreen extends StatefulWidget {
   final MenuItem crewPack;
@@ -314,6 +315,14 @@ class _CrewPackCustomizationScreenState extends State<CrewPackCustomizationScree
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        selectedIndex: 2, // Menu section
+        onItemSelected: (index) {
+          if (index != 2) { // If not menu
+            Navigator.pop(context); // Return to main layout
+          }
+        },
       ),
     );
   }

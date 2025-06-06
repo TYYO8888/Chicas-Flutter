@@ -32,12 +32,6 @@ class _SauceSelectionDialogState extends State<SauceSelectionDialog> {
       _selectedSauces.addAll(widget.initialSelections!);
     }
   }
-
-  bool _canAddMore() {
-    if (widget.maxSauces == null) return true;
-    return _selectedSauces.length < widget.maxSauces!;
-  }
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -53,13 +47,24 @@ class _SauceSelectionDialogState extends State<SauceSelectionDialog> {
               title: Text(sauce),
               trailing: isSelected
                   ? Icon(Icons.check_circle, color: Colors.green[700])
-                  : null,
-              onTap: () {
+                  : null,              onTap: () {
                 setState(() {
                   if (isSelected) {
+                    // If already selected, just remove it
                     _selectedSauces.remove(sauce);
-                  } else if (_canAddMore()) {
-                    _selectedSauces.add(sauce);
+                  } else {
+                    // If we have a max sauce limit of 1, replace the current selection
+                    if (widget.maxSauces == 1) {
+                      _selectedSauces.clear();
+                      _selectedSauces.add(sauce);
+                    } else if (widget.maxSauces == null || _selectedSauces.length < widget.maxSauces!) {
+                      // If we have no limit or haven't reached the limit, add the sauce
+                      _selectedSauces.add(sauce);
+                    } else {
+                      // If we've reached the limit, remove the first sauce and add the new one
+                      _selectedSauces.removeAt(0);
+                      _selectedSauces.add(sauce);
+                    }
                   }
                 });
               },

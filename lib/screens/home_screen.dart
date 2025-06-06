@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../utils/animation_utils.dart';
 import '../widgets/custom_carousel.dart';
 import '../widgets/navigation_menu_drawer.dart';
-import '../layouts/main_layout.dart';
 import '../widgets/hot_deals_section.dart';
 import '../widgets/personalized_recommendations_section.dart';
+import '../widgets/animated_cart_button.dart';
+import '../screens/menu_item_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -21,19 +24,21 @@ class _HomeScreenState extends State<HomeScreen> {
       'title': 'Nashville Hot Chicken',
       'subtitle': 'Feel the heat!',
       'color': '#FF5722',
+      'category': 'Chicken Pieces',
     },
     {
       'title': 'Crew Pack Special',
       'subtitle': 'Perfect for sharing',
       'color': '#F4511E',
+      'category': 'CREW Combos',
     },
     {
       'title': 'Fresh Sides',
       'subtitle': 'Complete your meal',
       'color': '#E64A19',
+      'category': 'Sides',
     },
   ];
-
   Widget _buildCarouselItem(Map<String, String> item) {
     return Container(
       decoration: BoxDecoration(
@@ -46,6 +51,14 @@ class _HomeScreenState extends State<HomeScreen> {
             Color(int.parse(item['color']!.replaceAll('#', '0xFF'))).withOpacity(0.8),
           ],
         ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Color(int.parse(item['color']!.replaceAll('#', '0xFF'))).withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Stack(
         children: [
@@ -60,8 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
+              children: [                Text(
                   item['title']!,
                   style: const TextStyle(
                     color: Colors.white,
@@ -69,7 +81,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
-                ),
+                ).animate(onPlay: (controller) => controller.repeat())
+                  .shimmer(duration: const Duration(seconds: 2)),
                 const SizedBox(height: 8),
                 Text(
                   item['subtitle']!,
@@ -78,6 +91,35 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontSize: 18,
                   ),
                   textAlign: TextAlign.center,
+                ).animate()
+                  .fadeIn(delay: const Duration(milliseconds: 300))
+                  .slideY(
+                    begin: 0.2,
+                    end: 0,
+                    curve: GSAPCurves.backOut,
+                  ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MenuItemScreen(category: item['category']!),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Color(int.parse(item['color']!.replaceAll('#', '0xFF'))),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  child: const Text(
+                    'Order Now',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
@@ -97,16 +139,42 @@ class _HomeScreenState extends State<HomeScreen> {
           // TODO: Implement refresh logic
         },
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: Column(            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Animated Cart Button
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: AnimatedCartButton(
+                    itemCount: 0, // TODO: Get from CartService
+                    onPressed: () {
+                      // TODO: Navigate to cart
+                    },
+                  ).animate()
+                    .fadeIn(duration: AnimationDurations.normal)
+                    .slideY(
+                      begin: -0.5,
+                      end: 0,
+                      duration: AnimationDurations.normal,
+                      curve: GSAPCurves.backOut,
+                    ),
+                ),
+              ),
+              
               // Carousel Header
               CustomCarousel(
                 height: 300,
                 items: carouselItems.map((item) => _buildCarouselItem(item)).toList(),
-              ),
-              
-              // Smart Ordering Tips
+              ).animate()
+                .fadeIn(duration: AnimationDurations.normal)
+                .slideX(
+                  begin: -0.25,
+                  end: 0,
+                  duration: AnimationDurations.normal,
+                  curve: GSAPCurves.power2InOut,
+                ),
+                // Smart Ordering Tips
               Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -119,7 +187,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.bold,
                         color: Colors.brown,
                       ),
-                    ),
+                    ).animate()
+                      .fadeIn()
+                      .slideX(
+                        begin: -0.2,
+                        end: 0,
+                        duration: AnimationDurations.normal,
+                        curve: GSAPCurves.power2InOut,
+                      ),
                     const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -134,14 +209,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      child: Column(
+                      child: const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          BulletPoint(text: 'Use the online menu and place your order'),
-                          BulletPoint(text: 'Select a pickup store for faster service'),
-                          BulletPoint(text: 'Place an order without downloading an app'),
-                          BulletPoint(text: 'Skip the queue and collect at your preferred time'),
-                          BulletPoint(text: 'Save favorite combinations of items'),
+                        children: [
+                          BulletPoint(index: 0, text: 'Use the online menu and place your order'),
+                          BulletPoint(index: 1, text: 'Select a pickup store for faster service'),
+                          BulletPoint(index: 2, text: 'Place an order without downloading an app'),
+                          BulletPoint(index: 3, text: 'Skip the queue and collect at your preferred time'),
+                          BulletPoint(index: 4, text: 'Save favorite combinations of items'),
                         ],
                       ),
                     ),
@@ -168,8 +243,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class BulletPoint extends StatelessWidget {
   final String text;
+  final int index;
 
-  const BulletPoint({Key? key, required this.text}) : super(key: key);
+  const BulletPoint({
+    Key? key,
+    required this.text,
+    required this.index,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -178,12 +258,28 @@ class BulletPoint extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('• ', style: TextStyle(fontSize: 16)),
-          Expanded(
-            child: Text(text, style: const TextStyle(fontSize: 16)),
+          Text('• ',
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ],
-      ),
-    );
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ],      ),
+    ).animate()
+      .fadeIn(delay: Duration(milliseconds: index * 200))
+      .slideX(
+        begin: 0.2,
+        end: 0,
+        delay: Duration(milliseconds: index * 200),
+        duration: AnimationDurations.normal,
+        curve: GSAPCurves.backOut,
+      );
   }
 }

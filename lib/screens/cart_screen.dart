@@ -14,16 +14,14 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return Scaffold(      appBar: AppBar(
         title: const Text('Cart'),
         backgroundColor: Theme.of(context).primaryColor,
-        leading: IconButton(
+        automaticallyImplyLeading: false, // Don't show back button by default
+        leading: Navigator.canPop(context) ? IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ) : null,
       ),
       body: Column(
         children: [

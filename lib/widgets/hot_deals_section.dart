@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
 import '../services/recommendation_service.dart';
 import '../widgets/deal_card.dart';
+import '../screens/menu_item_screen.dart';
 
 class HotDealsSection extends StatefulWidget {
   const HotDealsSection({Key? key}) : super(key: key);
@@ -87,9 +88,15 @@ class _HotDealsSectionState extends State<HotDealsSection> {
                   child: Padding(
                     padding: const EdgeInsets.only(right: 16),
                     child: DealCard(
-                      deal: _deals[index],
-                      onTap: () {
-                        // TODO: Handle deal selection
+                      deal: _deals[index],                      onTap: () {
+                        if (_deals[index].category.isNotEmpty) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MenuItemScreen(category: _deals[index].category),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ),

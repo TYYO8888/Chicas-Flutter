@@ -30,26 +30,25 @@ class DealCard extends StatelessWidget {
               ),
               child: Stack(
                 children: [
-                  if (deal.imageUrl != null)
-                    Positioned.fill(
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                        child: Image.asset(
-                          deal.imageUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.deepOrange[100],
-                              child: const Icon(
-                                Icons.fastfood,
-                                size: 48,
-                                color: Colors.white,
-                              ),
-                            );
-                          },
-                        ),
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                      child: Image.asset(
+                        deal.imageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.deepOrange[100],
+                            child: const Icon(
+                              Icons.fastfood,
+                              size: 48,
+                              color: Colors.white,
+                            ),
+                          );
+                        },
                       ),
                     ),
+                  ),
                   if (deal.isSpecial ?? false)
                     Positioned(
                       top: 8,

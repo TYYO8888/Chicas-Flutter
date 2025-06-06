@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
 import '../services/recommendation_service.dart';
 import '../widgets/deal_card.dart';
+import '../screens/menu_item_screen.dart';
 
 class PersonalizedRecommendationsSection extends StatefulWidget {
   const PersonalizedRecommendationsSection({Key? key}) : super(key: key);
@@ -95,16 +96,22 @@ class _PersonalizedRecommendationsSectionState
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               scrollDirection: Axis.horizontal,
-              itemCount: _recommendations.length,
-              itemBuilder: (context, index) {
+              itemCount: _recommendations.length,              itemBuilder: (context, index) {
+                final recommendation = _recommendations[index];
                 return SizedBox(
                   width: 300, // Fixed width for each card
                   child: Padding(
                     padding: const EdgeInsets.only(right: 16),
                     child: DealCard(
-                      deal: _recommendations[index],
-                      onTap: () {
-                        // TODO: Handle recommendation selection
+                      deal: _recommendations[index],                      onTap: () {
+                        if (recommendation.category.isNotEmpty) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MenuItemScreen(category: recommendation.category),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ),

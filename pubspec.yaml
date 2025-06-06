@@ -15,6 +15,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   http: ^1.4.0 # For making API calls to Revel Systems
   provider: ^6.0.0 # For managing the app's state
+  flutter_animate: ^4.5.0 # For GSAP-like animations
+  flutter_staggered_animations: ^1.1.1 # For staggered list animations
+  visibility_detector: ^0.4.0+2 # For scroll-triggered animations
+  animations: ^2.0.11 # For page transitions
 
 dev_dependencies:
   flutter_test:

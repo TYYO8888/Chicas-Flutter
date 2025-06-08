@@ -150,11 +150,31 @@ class NavigationMenuDrawer extends StatelessWidget {
                 // Menu Items - Using constrained height to prevent overflow
                 ...ListTile.divideTiles(
                   context: context,
-                  tiles: [
-                    ListTile(
+                  tiles: [                    ListTile(
                       leading: const Icon(Icons.person_outline),
                       title: const Text('My Account'),
                       onTap: () => _navigateToComingSoon(context, 'My Account'),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.local_fire_department),
+                      title: const Text('Special Offers'),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.deepOrange,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'NEW',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                      onTap: () => _navigateToComingSoon(context, 'Special Offers'),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.location_on_outlined),
+                      title: const Text('Find a Restaurant'),
+                      onTap: () => _navigateToComingSoon(context, 'Restaurant Locator'),
                     ),
                     ListTile(
                       leading: const Icon(Icons.card_giftcard),
@@ -168,19 +188,14 @@ class NavigationMenuDrawer extends StatelessWidget {
                     ),
                     ListTile(
                       leading: const Icon(Icons.card_giftcard),
-                      title: const Text('Gift Card'),
-                      onTap: () => _navigateToComingSoon(context, 'Gift Card'),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.location_on_outlined),
-                      title: const Text('Find a Restaurant'),
-                      onTap: () => _navigateToComingSoon(context, 'Restaurant Locator'),
+                      title: const Text('Gift Cards'),
+                      onTap: () => _navigateToComingSoon(context, 'Gift Cards'),
                     ),
                     ListTile(
                       leading: const Icon(Icons.help_outline),
-                      title: const Text('Support'),
+                      title: const Text('Support & FAQ'),
                       onTap: () => _navigateToComingSoon(context, 'Support'),
-                    ),                  ],
+                    ),],
                 ),
 
                 const SizedBox(height: 16),

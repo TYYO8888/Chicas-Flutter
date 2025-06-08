@@ -31,3 +31,32 @@ flutter:
   assets:
     - assets/
     - assets/CC-Penta-3.png
+
+  fonts:
+    - family: SofiaRoughBlackThree
+      fonts:
+        - asset: assets/fonts/SofiaRoughBlackThree.ttf
+          weight: 900
+    
+    - family: MontserratBlack
+      fonts:
+        - asset: assets/fonts/Montserrat-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Montserrat-BlackItalic.ttf
+          weight: 900
+          style: italic
+    
+    - family: SofiaSans
+      fonts:
+        - asset: assets/fonts/SofiaSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/SofiaSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/SofiaSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/SofiaSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/SofiaSans-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/SofiaSans-Black.ttf
+          weight: 900

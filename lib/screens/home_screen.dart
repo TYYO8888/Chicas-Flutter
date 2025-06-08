@@ -138,29 +138,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onRefresh: () async {
           // TODO: Implement refresh logic
         },
-        child: SingleChildScrollView(
-          child: Column(            crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: SingleChildScrollView(          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Animated Cart Button
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: AnimatedCartButton(
-                    itemCount: 0, // TODO: Get from CartService
-                    onPressed: () {
-                      // TODO: Navigate to cart
-                    },
-                  ).animate()
-                    .fadeIn(duration: AnimationDurations.normal)
-                    .slideY(
-                      begin: -0.5,
-                      end: 0,
-                      duration: AnimationDurations.normal,
-                      curve: GSAPCurves.backOut,
-                    ),
-                ),
-              ),
               
               // Carousel Header
               CustomCarousel(

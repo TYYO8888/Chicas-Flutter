@@ -19,14 +19,58 @@ class MyApp extends StatelessWidget {
     // It sets up things like the app's title, theme, and the first screen to show.
     return MaterialApp(
       title: "Chica's Chicken", // The name of our app
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData( // This is where we set the colors and look of our app
-        primarySwatch: Colors.deepOrange, // The main color of our app (like a bright red!)
+      debugShowCheckedModeBanner: false,      theme: ThemeData(
+        // Brand Colors from style guide
+        primaryColor: const Color(0xFFFF5C22), // Chica Orange
         scaffoldBackgroundColor: Colors.white,
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(
+            fontFamily: 'SofiaRoughBlackThree',
+            color: Colors.black,
+          ),
+          displayMedium: TextStyle(
+            fontFamily: 'SofiaRoughBlackThree',
+            color: Colors.black,
+          ),
+          displaySmall: TextStyle(
+            fontFamily: 'SofiaRoughBlackThree',
+            color: Colors.black,
+          ),
+          headlineLarge: TextStyle(
+            fontFamily: 'MontserratBlack',
+            color: Colors.black,
+          ),
+          bodyLarge: TextStyle(
+            fontFamily: 'SofiaSans',
+            color: Colors.black,
+          ),
+          bodyMedium: TextStyle(
+            fontFamily: 'SofiaSans',
+            color: Colors.black,
+          ),
+        ),
+        colorScheme: const ColorScheme(
+          primary: Color(0xFFFF5C22), // Chica Orange
+          secondary: Color(0xFF9B1C24), // Spice Red (Pantone 7625 C)
+          background: Colors.white,
+          surface: Colors.white,
+          onBackground: Colors.black,
+          onSurface: Colors.black,
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          brightness: Brightness.light,
+          error: Color(0xFF9B1C24),
+          onError: Colors.white,
+        ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           elevation: 0,
+          titleTextStyle: TextStyle(
+            fontFamily: 'SofiaRoughBlackThree',
+            color: Colors.black,
+            fontSize: 24,
+          ),
         ),
       ),
       initialRoute: '/',

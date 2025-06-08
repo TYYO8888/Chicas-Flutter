@@ -26,8 +26,19 @@ class CustomBottomNavBar extends StatelessWidget {
       child: SafeArea(
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 60),
-          child: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
+          child: BottomNavigationBar(            type: BottomNavigationBarType.fixed,
+            selectedLabelStyle: const TextStyle(
+              fontFamily: 'MontserratBlack',
+              fontSize: 12,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontFamily: 'MontserratBlack',
+              fontSize: 12,
+            ),
+            selectedItemColor: const Color(0xFFFF5C22), // Chica Orange
+            unselectedItemColor: Colors.black54,
+            elevation: 0,
+            backgroundColor: Colors.white,
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.local_offer),
@@ -35,34 +46,27 @@ class CustomBottomNavBar extends StatelessWidget {
                 label: 'HOME',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart),
-                activeIcon: Icon(Icons.shopping_cart, size: 28),
-                label: 'CART',
-              ),
-              BottomNavigationBarItem(
                 icon: Icon(Icons.restaurant_menu),
                 activeIcon: Icon(Icons.restaurant_menu, size: 28),
                 label: 'MENU',
-              ),
-              BottomNavigationBarItem(
+              ),              BottomNavigationBarItem(
                 icon: Icon(Icons.qr_code_scanner),
                 activeIcon: Icon(Icons.qr_code_scanner, size: 28),
                 label: 'SCAN',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.shopping_cart),
+                activeIcon: Icon(Icons.shopping_cart, size: 28),
+                label: 'CART',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.more_horiz),
                 activeIcon: Icon(Icons.more_horiz, size: 28),
                 label: 'MORE',
               ),
-            ],
-            currentIndex: selectedIndex,
-            selectedItemColor: Colors.red[700],
-            unselectedItemColor: Colors.grey[600],
+            ],            currentIndex: selectedIndex,
             selectedFontSize: 12,
             unselectedFontSize: 12,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-            elevation: 0,
-            backgroundColor: Colors.white,
             onTap: onItemSelected,
           ),
         ),

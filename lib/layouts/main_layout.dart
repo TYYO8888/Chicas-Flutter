@@ -24,12 +24,11 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: _selectedIndex);
-    _pages = [
+    _pageController = PageController(initialPage: _selectedIndex);    _pages = [
       const HomeScreen(), // Home/Offers page
-      CartScreen(cartService: _cartService), // Cart page
       const MenuScreen(), // Menu page
       const Scaffold(body: Center(child: Text('Scan Coming Soon'))), // Scan page placeholder
+      CartScreen(cartService: _cartService), // Cart page
       const Scaffold(body: Center(child: Text('More Options'))), // More page placeholder
     ];
   }

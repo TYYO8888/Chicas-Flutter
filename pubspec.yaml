@@ -36,6 +36,12 @@ dependencies:
   dio: ^5.4.0 # Advanced HTTP client
   web_socket_channel: ^2.4.0 # WebSocket support for real-time notifications
 
+  # Offline storage
+  hive: ^2.2.3 # NoSQL local database
+  hive_flutter: ^1.1.0 # Hive Flutter integration
+  sqflite: ^2.3.0 # SQLite local database
+  path: ^1.8.3 # Path utilities
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -8,7 +8,7 @@ const { logger } = require('../utils/logger');
 
 const router = express.Router();
 
-// 📋 Menu Data (converted from your Flutter MenuService)
+// 📋 Menu Data (Based on Official Chica's Chicken Menu)
 // In production, this would come from a database
 const menuData = {
   categories: [
@@ -16,10 +16,10 @@ const menuData = {
     { id: 'whole-wings', name: 'Whole Wings', displayOrder: 2 },
     { id: 'chicken-pieces', name: 'Chicken Pieces', displayOrder: 3 },
     { id: 'chicken-bites', name: 'Chicken Bites', displayOrder: 4 },
-    { id: 'sides', name: 'Sides', displayOrder: 5 },
-    { id: 'fixins', name: "Fixin's", displayOrder: 6 },
-    { id: 'sauces', name: 'Sauces', displayOrder: 7 },
-    { id: 'crew-combos', name: 'CREW Combos', displayOrder: 8 },
+    { id: 'crew-packs', name: 'Crew Packs', displayOrder: 5 },
+    { id: 'sides', name: 'Sides', displayOrder: 6 },
+    { id: 'fixins', name: "Fixin's", displayOrder: 7 },
+    { id: 'sauces', name: 'Sauces', displayOrder: 8 },
     { id: 'beverages', name: 'Beverages', displayOrder: 9 }
   ],
   
@@ -28,89 +28,77 @@ const menuData = {
       {
         id: 'og_sando',
         name: 'The OG Sando',
-        description: 'Choose your heat level! Nashville-spiced',
+        description: 'Choose your heat level! Nashville-spiced chicken breast served on Texas toast with pickles and mayo',
         price: 13.00,
         imageUrl: 'assets/sandwiches.png',
         category: 'sandwiches',
         available: true,
-        sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 },
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
         nutritionInfo: { calories: 650, protein: 35, carbs: 45, fat: 28 }
       },
       {
         id: 'sweet_heat_sando',
         name: 'Sweet Heat Sando',
-        description: 'Sweet heat sauce topped with pickled jalapeños',
+        description: 'Nashville-spiced chicken breast with sweet heat sauce, pickled jalapeños, and mayo on Texas toast',
         price: 13.00,
         imageUrl: 'assets/sandwiches.png',
         category: 'sandwiches',
-        available: true,
-        sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 }
+        available: true
       },
       {
         id: 'buffalo_sando',
         name: 'Crispy Buffalo Sando',
-        description: "Buffalo sauce topped with slaw and Chica's sauce",
+        description: "Nashville-spiced chicken breast with buffalo sauce, coleslaw, and Chica's sauce on Texas toast",
         price: 13.00,
         imageUrl: 'assets/sandwiches.png',
         category: 'sandwiches',
-        available: true,
-        sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 }
+        available: true
       },
       {
         id: 'jalapeno_sando',
-        name: 'Jalapeno Popper Sando',
-        description: 'Topped with chipotle aioli, pickled jalapeños',
+        name: 'Jalapeño Popper Sando',
+        description: 'Nashville-spiced chicken breast with chipotle aioli, pickled jalapeños, and cream cheese on Texas toast',
         price: 13.00,
         imageUrl: 'assets/sandwiches.png',
         category: 'sandwiches',
-        available: true,
-        sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 }
+        available: true
       },
       {
         id: 'hot_honey_sando',
         name: 'Hot Honey Sando',
-        description: 'Hot honey sauce topped with pickled jalapeños',
+        description: 'Nashville-spiced chicken breast with hot honey sauce, pickled jalapeños, and mayo on Texas toast',
         price: 13.00,
         imageUrl: 'assets/sandwiches.png',
         category: 'sandwiches',
-        available: true,
-        sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 }
+        available: true
       }
     ],
     
     'whole-wings': [
       {
-        id: 'ilb_plus_wings',
-        name: 'ILB+',
-        description: "Includes one side of Chica's sauce",
-        price: 18.00,
-        imageUrl: 'assets/whole_wings.png',
-        category: 'whole-wings',
-        available: true,
-        allowsSauceSelection: true,
-        includedSauceCount: 1
-      },
-      {
         id: 'og_wings',
         name: 'OG Whole Wings',
-        description: 'Choose your heat level! Nashville-spiced served on white bread, topped with pickles',
+        description: 'Choose your heat level! Nashville-spiced whole wings served on white bread with pickles',
         price: 16.00,
         imageUrl: 'assets/whole_wings.png',
         category: 'whole-wings',
         available: true,
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
         allowsSauceSelection: true,
-        includedSauceCount: 1
+        includedSauceCount: 1,
+        sizes: { '6 Wings': 16.00, '12 Wings': 28.00, '18 Wings': 40.00 }
       },
       {
         id: 'lemon_pepper_wings',
         name: 'Lemon Pepper Wings',
-        description: 'Lemon pepper seasoning',
+        description: 'Whole wings seasoned with lemon pepper, served on white bread with pickles',
         price: 16.00,
         imageUrl: 'assets/whole_wings.png',
         category: 'whole-wings',
         available: true,
         allowsSauceSelection: true,
-        includedSauceCount: 1
+        includedSauceCount: 1,
+        sizes: { '6 Wings': 16.00, '12 Wings': 28.00, '18 Wings': 40.00 }
       }
     ],
 
@@ -118,33 +106,36 @@ const menuData = {
       {
         id: '2pc_chicken',
         name: '2 Pieces',
-        description: "Served on white bread, topped with pickles, includes one Chica's sauce",
+        description: "Choose your heat level! Nashville-spiced chicken pieces served on white bread with pickles, includes one Chica's sauce",
         price: 13.00,
         imageUrl: 'assets/chicken_pieces.png',
         category: 'chicken-pieces',
         available: true,
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
         allowsSauceSelection: true,
         includedSauceCount: 1
       },
       {
         id: '3pc_chicken',
         name: '3 Pieces',
-        description: "Served on white bread, topped with pickles, includes one Chica's sauce",
+        description: "Choose your heat level! Nashville-spiced chicken pieces served on white bread with pickles, includes one Chica's sauce",
         price: 18.00,
         imageUrl: 'assets/chicken_pieces.png',
         category: 'chicken-pieces',
         available: true,
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
         allowsSauceSelection: true,
         includedSauceCount: 1
       },
       {
         id: '4pc_chicken',
         name: '4 Pieces',
-        description: "Served on white bread, topped with pickles, includes two Chica's sauces",
+        description: "Choose your heat level! Nashville-spiced chicken pieces served on white bread with pickles, includes two Chica's sauces",
         price: 22.00,
         imageUrl: 'assets/chicken_pieces.png',
         category: 'chicken-pieces',
         available: true,
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
         allowsSauceSelection: true,
         includedSauceCount: 2
       }
@@ -154,35 +145,107 @@ const menuData = {
       {
         id: 'og_bites',
         name: 'OG Bites',
-        description: 'Choose your heat level! Nashville-spiced',
+        description: 'Choose your heat level! Nashville-spiced chicken bites with one sauce',
         price: 12.50,
         imageUrl: 'assets/chicken_bites.png',
         category: 'chicken-bites',
         available: true,
-        allowsSauceSelection: true,
-        includedSauceCount: 1
-      },
-      {
-        id: 'sweet_heat_bites',
-        name: 'Sweet Heat Bites',
-        description: 'Sweet heat sauce topped with pickled jalapeños',
-        price: 12.50,
-        imageUrl: 'assets/chicken_bites.png',
-        category: 'chicken-bites',
-        available: true,
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
         allowsSauceSelection: true,
         includedSauceCount: 1
       },
       {
         id: 'buffalo_bites',
         name: 'Buffalo Bites',
-        description: 'Buffalo sauce',
+        description: 'Crispy chicken bites tossed in buffalo sauce',
         price: 12.50,
         imageUrl: 'assets/chicken_bites.png',
         category: 'chicken-bites',
         available: true,
         allowsSauceSelection: true,
         includedSauceCount: 1
+      },
+      {
+        id: 'lemon_pepper_bites',
+        name: 'Lemon Pepper Bites',
+        description: 'Crispy chicken bites seasoned with lemon pepper',
+        price: 12.50,
+        imageUrl: 'assets/chicken_bites.png',
+        category: 'chicken-bites',
+        available: true,
+        allowsSauceSelection: true,
+        includedSauceCount: 1
+      },
+      {
+        id: 'hot_honey_bites',
+        name: 'Hot Honey Bites',
+        description: 'Crispy chicken bites drizzled with hot honey sauce',
+        price: 12.50,
+        imageUrl: 'assets/chicken_bites.png',
+        category: 'chicken-bites',
+        available: true,
+        allowsSauceSelection: true,
+        includedSauceCount: 1
+      }
+    ],
+
+    'crew-packs': [
+      {
+        id: 'crew_pack_1',
+        name: 'Crew Pack 1',
+        description: '($45 serves 2-3): 2x Sandwiches, 1x Chicken Bites, 2x Sides [R], 2x Sauces, 2x Drinks',
+        price: 45.00,
+        imageUrl: 'assets/crew_packs.png',
+        category: 'crew-packs',
+        available: true,
+        serves: '2-3',
+        customizationCounts: {
+          'Sandwiches': 2,
+          'Chicken Bites': 1,
+          'Sides': 2,
+          'Sauces': 2,
+          'Beverages': 2,
+        },
+        customizationCategories: ['Sandwiches', 'Chicken Bites', 'Sides', 'Sauces', 'Beverages'],
+        requiresCustomization: true
+      },
+      {
+        id: 'crew_pack_2',
+        name: 'Crew Pack 2',
+        description: '($65 serves 4-5): 3x Sandwiches, 2x Chicken Bites, 3x Sides [R], 3x Sauces, 3x Drinks',
+        price: 65.00,
+        imageUrl: 'assets/crew_packs.png',
+        category: 'crew-packs',
+        available: true,
+        serves: '4-5',
+        customizationCounts: {
+          'Sandwiches': 3,
+          'Chicken Bites': 2,
+          'Sides': 3,
+          'Sauces': 3,
+          'Beverages': 3,
+        },
+        customizationCategories: ['Sandwiches', 'Chicken Bites', 'Sides', 'Sauces', 'Beverages'],
+        requiresCustomization: true
+      },
+      {
+        id: 'crew_pack_3',
+        name: 'Crew Pack 3',
+        description: '($85 serves 6-7): 4x Sandwiches, 3x Chicken Bites, 4x Sides [R], 4x Sauces, 4x Drinks',
+        price: 85.00,
+        imageUrl: 'assets/crew_packs.png',
+        category: 'crew-packs',
+        available: true,
+        serves: '6-7',
+        customizationCounts: {
+          'Sandwiches': 4,
+          'Chicken Bites': 3,
+          'Sides': 4,
+          'Sauces': 4,
+          'Beverages': 4,
+        },
+        customizationCategories: ['Sandwiches', 'Chicken Bites', 'Sides', 'Sauces', 'Beverages'],
+        requiresCustomization: true
       }
     ],
 
@@ -190,7 +253,7 @@ const menuData = {
       {
         id: 'crinkle_fries',
         name: 'Crinkle Cut Fries',
-        description: 'Crispy crinkle cut fries',
+        description: 'Crispy seasoned crinkle cut fries',
         price: 5.00,
         imageUrl: 'assets/sides.png',
         category: 'sides',
@@ -198,14 +261,73 @@ const menuData = {
         sizes: { 'Regular': 5.00, 'Large': 7.50 }
       },
       {
-        id: 'mac_cheese',
-        name: 'Mac & Cheese',
-        description: 'Creamy three-cheese blend',
-        price: 5.00,
+        id: 'waffle_fries',
+        name: 'Waffle Fries',
+        description: 'Golden waffle-cut fries with perfect seasoning',
+        price: 5.50,
         imageUrl: 'assets/sides.png',
         category: 'sides',
         available: true,
-        sizes: { 'Regular': 5.00, 'Large': 7.50 }
+        sizes: { 'Regular': 5.50, 'Large': 8.00 }
+      },
+      {
+        id: 'cajun_waffle_fries',
+        name: 'Cajun Waffle Fries',
+        description: 'Waffle fries seasoned with Cajun spices',
+        price: 6.00,
+        imageUrl: 'assets/sides.png',
+        category: 'sides',
+        available: true,
+        sizes: { 'Regular': 6.00, 'Large': 8.50 }
+      },
+      {
+        id: 'sour_cream_onion_waffle_fries',
+        name: 'Sour Cream + Onion Waffle Fries',
+        description: 'Waffle fries with sour cream and onion seasoning',
+        price: 6.00,
+        imageUrl: 'assets/sides.png',
+        category: 'sides',
+        available: true,
+        sizes: { 'Regular': 6.00, 'Large': 8.50 }
+      },
+      {
+        id: 'beer_fries_pickles',
+        name: 'Beer Fried Pickles',
+        description: 'Crispy beer-battered pickle spears',
+        price: 6.50,
+        imageUrl: 'assets/sides.png',
+        category: 'sides',
+        available: true
+      }
+    ],
+
+    'fixins': [
+      {
+        id: 'dill_pickles',
+        name: 'Dill Pickles',
+        description: 'Classic dill pickle spears',
+        price: 2.00,
+        imageUrl: 'assets/fixins.png',
+        category: 'fixins',
+        available: true
+      },
+      {
+        id: 'pickled_jalapenos',
+        name: 'Pickled Jalapeños',
+        description: 'Spicy pickled jalapeño slices',
+        price: 2.50,
+        imageUrl: 'assets/fixins.png',
+        category: 'fixins',
+        available: true
+      },
+      {
+        id: 'brioche_bun',
+        name: 'Brioche Bun',
+        description: 'Upgrade to a buttery brioche bun',
+        price: 1.00,
+        imageUrl: 'assets/fixins.png',
+        category: 'fixins',
+        available: true
       }
     ],
 
@@ -213,7 +335,7 @@ const menuData = {
       {
         id: 'chicas_sauce',
         name: "Chica's Sauce (Buttermilk Ranch)",
-        description: '',
+        description: 'Our signature buttermilk ranch sauce',
         price: 1.25,
         imageUrl: 'assets/sauces.png',
         category: 'sauces',
@@ -222,7 +344,34 @@ const menuData = {
       {
         id: 'sweet_heat_sauce',
         name: 'Sweet Heat Sauce',
-        description: '',
+        description: 'Perfect balance of sweet and spicy',
+        price: 1.25,
+        imageUrl: 'assets/sauces.png',
+        category: 'sauces',
+        available: true
+      },
+      {
+        id: 'buffalo_sauce',
+        name: 'Buffalo Sauce',
+        description: 'Classic tangy buffalo sauce',
+        price: 1.25,
+        imageUrl: 'assets/sauces.png',
+        category: 'sauces',
+        available: true
+      },
+      {
+        id: 'chipotle_aioli',
+        name: 'Chipotle Aioli',
+        description: 'Smoky chipotle mayo blend',
+        price: 1.25,
+        imageUrl: 'assets/sauces.png',
+        category: 'sauces',
+        available: true
+      },
+      {
+        id: 'hot_honey_sauce',
+        name: 'Hot Honey Sauce',
+        description: 'Sweet honey with a spicy kick',
         price: 1.25,
         imageUrl: 'assets/sauces.png',
         category: 'sauces',
@@ -234,17 +383,58 @@ const menuData = {
       {
         id: 'pepsi',
         name: 'Pepsi',
-        description: 'Classic Pepsi cola.',
+        description: 'Classic Pepsi cola',
         price: 2.50,
         imageUrl: 'assets/beverages.png',
         category: 'beverages',
-        available: true
+        available: true,
+        sizes: { 'Regular': 2.50, 'Large': 3.00 }
       },
       {
         id: 'diet_pepsi',
         name: 'Diet Pepsi',
-        description: 'Zero calorie Diet Pepsi.',
+        description: 'Zero calorie Diet Pepsi',
         price: 2.50,
+        imageUrl: 'assets/beverages.png',
+        category: 'beverages',
+        available: true,
+        sizes: { 'Regular': 2.50, 'Large': 3.00 }
+      },
+      {
+        id: 'mountain_dew',
+        name: 'Mountain Dew',
+        description: 'Citrus flavored soda',
+        price: 2.50,
+        imageUrl: 'assets/beverages.png',
+        category: 'beverages',
+        available: true,
+        sizes: { 'Regular': 2.50, 'Large': 3.00 }
+      },
+      {
+        id: 'lemonade',
+        name: 'Lemonade',
+        description: 'Fresh squeezed lemonade',
+        price: 3.00,
+        imageUrl: 'assets/beverages.png',
+        category: 'beverages',
+        available: true,
+        sizes: { 'Regular': 3.00, 'Large': 3.50 }
+      },
+      {
+        id: 'sweet_tea',
+        name: 'Sweet Tea',
+        description: 'Southern-style sweet tea',
+        price: 2.75,
+        imageUrl: 'assets/beverages.png',
+        category: 'beverages',
+        available: true,
+        sizes: { 'Regular': 2.75, 'Large': 3.25 }
+      },
+      {
+        id: 'water',
+        name: 'Bottled Water',
+        description: 'Pure bottled water',
+        price: 2.00,
         imageUrl: 'assets/beverages.png',
         category: 'beverages',
         available: true
@@ -277,19 +467,25 @@ router.get('/category/:categoryId', (req, res) => {
   try {
     const { categoryId } = req.params;
     logger.info(`Fetching menu items for category: ${categoryId}`);
-    
+
     const items = menuData.items[categoryId] || [];
-    
+
     if (items.length === 0) {
       return res.status(404).json({
         success: false,
         error: 'Category not found or no items available'
       });
     }
-    
+
+    // Add allowsHeatLevelSelection flag based on heatLevels array
+    const processedItems = items.map(item => ({
+      ...item,
+      allowsHeatLevelSelection: !!(item.heatLevels && item.heatLevels.length > 0)
+    }));
+
     res.json({
       success: true,
-      data: items,
+      data: processedItems,
       message: `Items for category ${categoryId} retrieved successfully`
     });
   } catch (error) {

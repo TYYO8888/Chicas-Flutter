@@ -3,7 +3,9 @@ import 'package:qsr_app/models/menu_item.dart';
 import 'package:qsr_app/services/cart_service.dart';
 import 'package:qsr_app/services/menu_service.dart';
 import 'package:qsr_app/widgets/sauce_selection_dialog.dart';
+import 'package:qsr_app/widgets/heat_level_selector.dart';
 import 'package:qsr_app/screens/crew_pack_customization_screen.dart';
+import 'package:qsr_app/models/crew_pack_selection.dart';
 
 class MenuItemScreen extends StatefulWidget {
   final String category;
@@ -38,24 +40,22 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
     );
 
     if (result != null) {
-      // Extract the selected items and bun types from the result
-      final selectedItems = result['selectedItems'] as Map<String, List<MenuItem>>;
-      final selectedBunTypes = result['selectedBunTypes'] as Map<String, String>;
+      // Extract the crew pack customization data
+      final crewPackCustomization = result['sandwiches'] as CrewPackCustomization?;
+      final customizations = result['customizations'] as Map<String, List<MenuItem>>?;
+      final selectedSauces = result['sauces'] as List<String>?;
 
-      // Update the price of the crew pack based on the selected bun types
-      double totalPrice = crewPack.price;
-      for (var sandwich in selectedItems['Sandwiches'] ?? []) {
-        sandwich.selectedBunType = selectedBunTypes[sandwich.name];
-        if (sandwich.selectedBunType == 'Brioche Bun') {
-          totalPrice += 1.0;
-        }
+      // Update the crew pack with selected sauces
+      if (selectedSauces != null) {
+        crewPack.selectedSauces = selectedSauces;
       }
 
-      // Add the crew pack with its selected items to the cart
-      widget.cartService.addToCart(crewPack, customizations: selectedItems);
-
-      // Update the crew pack price
-      crewPack.price = totalPrice;
+      // Add the crew pack with its customizations to the cart
+      widget.cartService.addToCart(
+        crewPack,
+        customizations: customizations,
+        crewPackCustomization: crewPackCustomization,
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -82,32 +82,70 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
     }
   }
 
+  Future<void> _handleHeatLevelSelection(MenuItem menuItem) async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Select Heat Level'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: HeatLevelSelector(
+            selectedHeatLevel: menuItem.selectedHeatLevel,
+            onHeatLevelChanged: (heatLevel) {
+              Navigator.pop(context, heatLevel);
+            },
+          ),
+        ),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        menuItem.selectedHeatLevel = result;
+      });
+    }
+  }
+
   void _addToCart(MenuItem menuItem) {
     String? selectedSize = _selectedSizes[menuItem.name];
+
+    // Check if sauce selection is required
     if (menuItem.allowsSauceSelection &&
         (menuItem.selectedSauces == null ||
             menuItem.selectedSauces!.length != menuItem.includedSauceCount)) {
       // Show sauce selection dialog if sauces haven't been selected
       _handleSauceSelection(menuItem).then((_) {
         if (menuItem.selectedSauces?.length == menuItem.includedSauceCount) {
-          widget.cartService.addToCart(menuItem, selectedSize: selectedSize);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${menuItem.name} added to cart'),
-              duration: const Duration(seconds: 2),
-            ),
-          );
+          _checkHeatLevelAndAddToCart(menuItem, selectedSize);
         }
       });
     } else {
-      widget.cartService.addToCart(menuItem, selectedSize: selectedSize);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${menuItem.name} added to cart'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      _checkHeatLevelAndAddToCart(menuItem, selectedSize);
     }
+  }
+
+  void _checkHeatLevelAndAddToCart(MenuItem menuItem, String? selectedSize) {
+    // Check if heat level selection is required
+    if (menuItem.allowsHeatLevelSelection && menuItem.selectedHeatLevel == null) {
+      // Show heat level selection dialog if heat level hasn't been selected
+      _handleHeatLevelSelection(menuItem).then((_) {
+        if (menuItem.selectedHeatLevel != null) {
+          _finalizeAddToCart(menuItem, selectedSize);
+        }
+      });
+    } else {
+      _finalizeAddToCart(menuItem, selectedSize);
+    }
+  }
+
+  void _finalizeAddToCart(MenuItem menuItem, String? selectedSize) {
+    widget.cartService.addToCart(menuItem, selectedSize: selectedSize);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${menuItem.name} added to cart'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -126,79 +164,338 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
           if (snapshot.hasData) {
             final menuItems = snapshot.data!;
             return ListView.builder(
+              padding: const EdgeInsets.all(16.0),
               itemCount: menuItems.length,
               itemBuilder: (context, index) {
                 final menuItem = menuItems[index];
-                return Card(
-                  margin: const EdgeInsets.all(8.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8.0,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          menuItem.name,
-                          style: const TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
+                        // Image Section
+                        Container(
+                          height: 200,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                const Color(0xFFFF5C22).withOpacity(0.8),
+                                const Color(0xFF9B1C24).withOpacity(0.8),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4.0),
-                        Text(menuItem.description),
-                        const SizedBox(height: 4.0),
-                        Text(
-                          '\$${menuItem.price.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        if (menuItem.sizes != null)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Stack(
                             children: [
-                              const Text('Choose your size:'),
-                              Wrap(
-                                children: menuItem.sizes!.keys.map((size) {
-                                  return Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Radio<String>(
-                                        value: size,
-                                        groupValue: _selectedSizes[menuItem.name],
-                                        onChanged: (String? value) {
-                                          setState(() {
-                                            _selectedSizes[menuItem.name] = value!;
-                                            menuItem.price = menuItem.sizes![size]!;
-                                          });
-                                        },
+                              // Placeholder for actual image
+                              Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.restaurant,
+                                      size: 60,
+                                      color: Colors.white.withOpacity(0.8),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Image Coming Soon',
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.8),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                      Text('$size (\$${menuItem.sizes![size]!.toStringAsFixed(2)})'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Price badge
+                              Positioned(
+                                top: 12,
+                                right: 12,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
                                     ],
-                                  );
-                                }).toList(),
+                                  ),
+                                  child: Text(
+                                    '\$${menuItem.price.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF9B1C24),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                        const SizedBox(height: 8.0),
-                        if (widget.category == 'CREW Combos')
-                          ElevatedButton(
-                            onPressed: () => _handleCrewPackSelection(menuItem),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepOrange,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text('Customize Pack'),
-                          )
-                        else
-                          ElevatedButton(
-                            onPressed: () => _addToCart(menuItem),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepOrange,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text('Add to Cart'),
+                        ),
+
+                        // Content Section
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Title
+                              Text(
+                                menuItem.name,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Description
+                              Text(
+                                menuItem.description,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  height: 1.4,
+                                ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 16),
+                              // Size Selection (if available)
+                              if (menuItem.sizes != null) ...[
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.grey[200]!),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Choose your size:',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Wrap(
+                                        spacing: 8,
+                                        children: menuItem.sizes!.keys.map((size) {
+                                          final isSelected = _selectedSizes[menuItem.name] == size;
+                                          return GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _selectedSizes[menuItem.name] = size;
+                                                menuItem.price = menuItem.sizes![size]!;
+                                              });
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 12,
+                                                vertical: 8,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: isSelected
+                                                    ? const Color(0xFFFF5C22)
+                                                    : Colors.white,
+                                                borderRadius: BorderRadius.circular(20),
+                                                border: Border.all(
+                                                  color: isSelected
+                                                      ? const Color(0xFFFF5C22)
+                                                      : Colors.grey[300]!,
+                                                ),
+                                              ),
+                                              child: Text(
+                                                '$size (\$${menuItem.sizes![size]!.toStringAsFixed(2)})',
+                                                style: TextStyle(
+                                                  color: isSelected ? Colors.white : Colors.black87,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+
+                              // Heat Level Selection (if available)
+                              if (menuItem.allowsHeatLevelSelection) ...[
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.red[200]!),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.whatshot,
+                                            color: Colors.red[600],
+                                            size: 18,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          const Text(
+                                            'Heat Level:',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      if (menuItem.selectedHeatLevel != null)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red[100],
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(color: Colors.red[300]!),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.local_fire_department,
+                                                color: Colors.red[700],
+                                                size: 14,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                menuItem.selectedHeatLevel!,
+                                                style: TextStyle(
+                                                  color: Colors.red[700],
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      else
+                                        GestureDetector(
+                                          onTap: () => _handleHeatLevelSelection(menuItem),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 8,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.circular(20),
+                                              border: Border.all(color: Colors.red[300]!),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  Icons.add,
+                                                  color: Colors.red[600],
+                                                  size: 16,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  'Select Heat Level',
+                                                  style: TextStyle(
+                                                    color: Colors.red[600],
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+
+                              // Action Button
+                              SizedBox(
+                                width: double.infinity,
+                                height: 48,
+                                child: ElevatedButton(
+                                  onPressed: widget.category == 'Crew Packs'
+                                      ? () => _handleCrewPackSelection(menuItem)
+                                      : () => _addToCart(menuItem),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFFF5C22),
+                                    foregroundColor: Colors.white,
+                                    elevation: 2,
+                                    shadowColor: const Color(0xFFFF5C22).withOpacity(0.3),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        widget.category == 'Crew Packs'
+                                            ? Icons.tune
+                                            : Icons.add_shopping_cart,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        widget.category == 'Crew Packs'
+                                            ? 'Customize Pack'
+                                            : 'Add to Cart',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                        ),
                       ],
                     ),
                   ),

@@ -17,10 +17,15 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
-    final total = widget.cartService.cart.items.fold<double>(
+    final subtotal = widget.cartService.cart.items.fold<double>(
       0,
-      (sum, item) => sum + (item.menuItem.price * item.quantity),
+      (sum, item) => sum + (item.itemPrice * item.quantity),
     );
+
+    // Canadian taxes: 5% GST + 7% PST = 12% total
+    final gst = subtotal * 0.05;
+    final pst = subtotal * 0.07;
+    final total = subtotal + gst + pst;
 
     return Scaffold(
       appBar: AppBar(        title: Text(
@@ -69,33 +74,226 @@ class _CartScreenState extends State<CartScreen> {
                     itemCount: widget.cartService.cart.items.length,
                     itemBuilder: (context, index) {
                       final cartItem = widget.cartService.cart.items[index];
-                      return CartItemCard(
-                        cartItem: cartItem,
-                        index: index,
-                        onDismissed: (direction) {
-                          setState(() {
-                            widget.cartService.removeItem(
-                              cartItem.menuItem,
-                              customizations: cartItem.customizations,
-                            );
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${cartItem.menuItem.name} removed from cart'),
-                              action: SnackBarAction(
-                                label: 'UNDO',
-                                onPressed: () {
-                                  setState(() {
-                                    widget.cartService.addToCart(
-                                      cartItem.menuItem,
-                                      customizations: cartItem.customizations,
-                                    );
-                                  });
-                                },
+                      return Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Main item info
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      cartItem.menuItem.name,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Qty: ${cartItem.quantity}',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          );
-                        },
+                              const SizedBox(height: 8),
+
+                              // Item description
+                              Text(
+                                cartItem.menuItem.description,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+
+                              // Customizations
+                              if (cartItem.menuItem.selectedSauces?.isNotEmpty == true ||
+                                  cartItem.menuItem.selectedBunType != null ||
+                                  cartItem.selectedSize != null ||
+                                  cartItem.crewPackCustomization != null ||
+                                  cartItem.customizations != null) ...[
+                                const SizedBox(height: 12),
+                                const Text(
+                                  'Customizations:',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.deepOrange,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+
+                                // Selected sauces
+                                if (cartItem.menuItem.selectedSauces?.isNotEmpty == true)
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange[50],
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.orange[200]!),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Row(
+                                          children: [
+                                            Icon(Icons.water_drop, size: 14, color: Colors.orange),
+                                            SizedBox(width: 6),
+                                            Text(
+                                              'Selected Sauces:',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                                color: Colors.orange,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Wrap(
+                                          spacing: 6,
+                                          runSpacing: 4,
+                                          children: cartItem.menuItem.selectedSauces!.map<Widget>((sauce) {
+                                            return Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.orange[100],
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              child: Text(
+                                                sauce,
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.orange,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                // Selected bun type
+                                if (cartItem.menuItem.selectedBunType != null)
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green[50],
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: Colors.green[200]!),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.bakery_dining, size: 12, color: Colors.green),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          'Bun: ${cartItem.menuItem.selectedBunType}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                // Selected heat level
+                                if (cartItem.menuItem.selectedHeatLevel != null)
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red[50],
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: Colors.red[200]!),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.whatshot, size: 12, color: Colors.red),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          'Heat: ${cartItem.menuItem.selectedHeatLevel}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                // Selected size
+                                if (cartItem.selectedSize != null)
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue[50],
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: Colors.blue[200]!),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.straighten, size: 12, color: Colors.blue),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          'Size: ${cartItem.selectedSize}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.blue,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+
+                              const SizedBox(height: 12),
+                              // Price
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'Total:',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    '\$${(cartItem.itemPrice * cartItem.quantity).toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.deepOrange,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       );
                     },
                   ),
@@ -115,6 +313,72 @@ class _CartScreenState extends State<CartScreen> {
               ),
               child: Column(
                 children: [
+                  // Subtotal
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Subtotal:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        '\$${subtotal.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // GST
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'GST (5%):',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        '\$${gst.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  // PST
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'PST (7%):',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        '\$${pst.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  // Total
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -293,13 +557,237 @@ class _CartItemCardState extends State<CartItemCard>
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                                // Display selected sauces
                                 if (widget.cartItem.menuItem.selectedSauces?.isNotEmpty ?? false)
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 4.0),
-                                    child: Text(
-                                      'Sauces: ${widget.cartItem.menuItem.selectedSauces!.join(", ")}',
-                                      style: const TextStyle(
-                                        fontStyle: FontStyle.italic,
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange[50],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.orange[200]!),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Row(
+                                            children: [
+                                              Icon(Icons.water_drop, size: 14, color: Colors.orange),
+                                              SizedBox(width: 6),
+                                              Text(
+                                                'Selected Sauces:',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 12,
+                                                  color: Colors.orange,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Wrap(
+                                            spacing: 6,
+                                            runSpacing: 4,
+                                            children: widget.cartItem.menuItem.selectedSauces!.map<Widget>((sauce) {
+                                              return Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.orange[100],
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                                child: Text(
+                                                  sauce,
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.orange,
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
+                                // Display bun type selection
+                                if (widget.cartItem.menuItem.selectedBunType != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green[50],
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(color: Colors.green[200]!),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.bakery_dining, size: 12, color: Colors.green),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            'Bun: ${widget.cartItem.menuItem.selectedBunType}',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
+                                // Display heat level selection
+                                if (widget.cartItem.menuItem.selectedHeatLevel != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red[50],
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(color: Colors.red[200]!),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.whatshot, size: 12, color: Colors.red),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            'Heat Level: ${widget.cartItem.menuItem.selectedHeatLevel}',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                // Display crew pack customizations
+                                if (widget.cartItem.crewPackCustomization != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(12.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.grey[200]!),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Crew Pack Selections:',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13,
+                                              color: Colors.deepOrange,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          ...widget.cartItem.crewPackCustomization!.selections.map<Widget>((selection) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(bottom: 4.0),
+                                              child: Row(
+                                                children: [
+                                                  const Icon(Icons.restaurant, size: 14, color: Colors.grey),
+                                                  const SizedBox(width: 6),
+                                                  Expanded(
+                                                    child: Text(
+                                                      'Sandwich (${selection.bunType})',
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  if (selection.bunType == 'Brioche Bun')
+                                                    const Text(
+                                                      '+\$1.00',
+                                                      style: TextStyle(
+                                                        fontSize: 11,
+                                                        color: Colors.green,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                // Display regular customizations
+                                if (widget.cartItem.customizations != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(12.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue[50],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.blue[200]!),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Pack Includes:',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13,
+                                              color: Colors.blue,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          ...widget.cartItem.customizations!.entries.map<Widget>((entry) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(bottom: 6.0),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    '${entry.value.length}x ${entry.key}:',
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Colors.blue,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  ...entry.value.map<Widget>((item) {
+                                                    return Padding(
+                                                      padding: const EdgeInsets.only(left: 12.0, bottom: 2.0),
+                                                      child: Row(
+                                                        children: [
+                                                          const Icon(Icons.arrow_right, size: 12, color: Colors.grey),
+                                                          const SizedBox(width: 4),
+                                                          Expanded(
+                                                            child: Text(
+                                                              item.name,
+                                                              style: const TextStyle(
+                                                                fontSize: 11,
+                                                                color: Colors.grey,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  }).toList(),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -307,7 +795,7 @@ class _CartItemCardState extends State<CartItemCard>
                             ),
                           ),
                           Text(
-                            '\$${widget.cartItem.menuItem.price.toStringAsFixed(2)}',
+                            '\$${widget.cartItem.itemPrice.toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,

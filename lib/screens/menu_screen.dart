@@ -11,11 +11,11 @@ class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key, required this.cartService});
 
   final List<String> menuCategories = const [
-    'CREW Combos',
-    'Whole Wings',
-    'Chicken Bites',
-    'Chicken Pieces',
     'Sandwiches',
+    'Whole Wings',
+    'Chicken Pieces',
+    'Chicken Bites',
+    'Crew Packs',
     'Sides',
     'Fixin\'s',
     'Sauces',
@@ -121,6 +121,56 @@ class _MenuCategoryCardState extends State<MenuCategoryCard>
     });
   }
 
+  IconData _getCategoryIcon(String category) {
+    switch (category.toLowerCase()) {
+      case 'sandwiches':
+        return Icons.lunch_dining;
+      case 'whole wings':
+        return Icons.local_fire_department;
+      case 'chicken pieces':
+        return Icons.restaurant;
+      case 'chicken bites':
+        return Icons.fastfood;
+      case 'crew packs':
+        return Icons.group;
+      case 'sides':
+        return Icons.rice_bowl;
+      case 'fixin\'s':
+        return Icons.add_circle;
+      case 'sauces':
+        return Icons.water_drop;
+      case 'beverages':
+        return Icons.local_drink;
+      default:
+        return Icons.restaurant_menu;
+    }
+  }
+
+  String _getCategorySubtitle(String category) {
+    switch (category.toLowerCase()) {
+      case 'sandwiches':
+        return 'Hearty & delicious';
+      case 'whole wings':
+        return 'Crispy & flavorful';
+      case 'chicken pieces':
+        return 'Classic favorites';
+      case 'chicken bites':
+        return 'Bite-sized goodness';
+      case 'crew packs':
+        return 'Perfect for sharing';
+      case 'sides':
+        return 'Perfect pairings';
+      case 'fixin\'s':
+        return 'Extra touches';
+      case 'sauces':
+        return 'Flavor enhancers';
+      case 'beverages':
+        return 'Thirst quenchers';
+      default:
+        return 'Delicious options';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Listener(
@@ -149,35 +199,90 @@ class _MenuCategoryCardState extends State<MenuCategoryCard>
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.0),
+                  borderRadius: BorderRadius.circular(16.0),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
-                      spreadRadius: _elevationAnimation.value,
-                      blurRadius: _elevationAnimation.value + 2,
+                      color: Colors.black.withOpacity(0.1),
+                      spreadRadius: 0,
+                      blurRadius: _elevationAnimation.value + 4,
                       offset: Offset(0, _elevationAnimation.value / 2),
                     ),
                   ],
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
                 child: Stack(
                   children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset(
-                          'assets/CC-Penta-3.png',
-                          height: 100,
-                          width: 100,
-                          fit: BoxFit.cover,
+                    // Background gradient
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16.0),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white,
+                            AppColors.surfaceLight,
+                          ],
                         ),
-                        const SizedBox(height: 8.0),
-                        Text(
-                          widget.category,                          style: AppTypography.headlineMedium.copyWith(
-                            color: AppColors.textPrimary,
+                      ),
+                    ),
+
+                    // Content
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          // Icon/Image container
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: AppColors.primary.withOpacity(0.2),
+                                width: 2,
+                              ),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                _getCategoryIcon(widget.category),
+                                size: 40,
+                                color: AppColors.primary,
+                              ),
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                          const SizedBox(height: 12.0),
+
+                          // Category name
+                          Text(
+                            widget.category,
+                            style: AppTypography.headlineSmall.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4.0),
+
+                          // Subtitle
+                          Text(
+                            _getCategorySubtitle(widget.category),
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
                     AnimatedBuilder(
                       animation: _controller,

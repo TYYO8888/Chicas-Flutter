@@ -71,8 +71,8 @@ class MenuService {
         return 'fixins';
       case 'Sauces':
         return 'sauces';
-      case 'CREW Combos':
-        return 'crew-combos';
+      case 'Crew Packs':
+        return 'crew-packs';
       case 'Beverages':
         return 'beverages';
       default:
@@ -90,7 +90,7 @@ class MenuService {
       MenuCategory(id: 'sides', name: 'Sides', displayOrder: 5),
       MenuCategory(id: 'fixins', name: "Fixin's", displayOrder: 6),
       MenuCategory(id: 'sauces', name: 'Sauces', displayOrder: 7),
-      MenuCategory(id: 'crew-combos', name: 'CREW Combos', displayOrder: 8),
+      MenuCategory(id: 'crew-packs', name: 'Crew Packs', displayOrder: 5),
       MenuCategory(id: 'beverages', name: 'Beverages', displayOrder: 9),
     ];
   }
@@ -113,6 +113,7 @@ class MenuService {
             imageUrl: 'assets/sandwiches.png',
             category: 'Sandwiches',
             sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
+            allowsHeatLevelSelection: true,
           ),
           MenuItem(
             id: 'sweet_heat_sando',
@@ -122,6 +123,7 @@ class MenuService {
             imageUrl: 'assets/sandwiches.png',
             category: 'Sandwiches',
             sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
+            allowsHeatLevelSelection: true,
           ),
           MenuItem(
             id: 'buffalo_sando',
@@ -131,6 +133,7 @@ class MenuService {
             imageUrl: 'assets/sandwiches.png',
             category: 'Sandwiches',
             sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
+            allowsHeatLevelSelection: true,
           ),
           MenuItem(
             id: 'jalapeno_sando',
@@ -140,6 +143,7 @@ class MenuService {
             imageUrl: 'assets/sandwiches.png',
             category: 'Sandwiches',
             sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
+            allowsHeatLevelSelection: true,
           ),
           MenuItem(
             id: 'hot_honey_sando',
@@ -149,6 +153,7 @@ class MenuService {
             imageUrl: 'assets/sandwiches.png',
             category: 'Sandwiches',
             sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
+            allowsHeatLevelSelection: true,
           ),
         ];
       case 'Whole Wings':
@@ -172,6 +177,7 @@ class MenuService {
             category: 'Whole Wings',
             allowsSauceSelection: true,
             includedSauceCount: 1,
+            allowsHeatLevelSelection: true,
           ),
           MenuItem(
             id: 'lemon_pepper_wings',
@@ -195,6 +201,7 @@ class MenuService {
             category: 'Chicken Pieces',
             allowsSauceSelection: true,
             includedSauceCount: 1,
+            allowsHeatLevelSelection: true,
           ),
           MenuItem(
             id: '3pc_chicken',
@@ -205,6 +212,7 @@ class MenuService {
             category: 'Chicken Pieces',
             allowsSauceSelection: true,
             includedSauceCount: 1,
+            allowsHeatLevelSelection: true,
           ),
           MenuItem(
             id: '4pc_chicken',
@@ -215,6 +223,7 @@ class MenuService {
             category: 'Chicken Pieces',
             allowsSauceSelection: true,
             includedSauceCount: 2,
+            allowsHeatLevelSelection: true,
           ),
         ];
       case 'Chicken Bites':
@@ -228,6 +237,7 @@ class MenuService {
             category: 'Chicken Bites',
             allowsSauceSelection: true,
             includedSauceCount: 1,
+            allowsHeatLevelSelection: true,
           ),
           MenuItem(
             id: 'sweet_heat_bites',
@@ -370,15 +380,15 @@ class MenuService {
             category: 'Sauces',
           ),
         ];
-      case 'CREW Combos':
+      case 'Crew Packs':
         return [
           MenuItem(
             id: 'crew_pack_1',
             name: 'Crew Pack 1',
             description: '(\$45 serves 2-3): 2x Sandwiches, 1x Chicken Bites, 2x Sides [R], 2x Sauces, 2x Drinks',
             price: 45.00,
-            imageUrl: 'assets/crew_combos.png',
-            category: 'CREW Combos',
+            imageUrl: 'assets/crew_packs.png',
+            category: 'Crew Packs',
             customizationCounts: {
               'Sandwiches': 2,
               'Chicken Bites': 1,
@@ -393,8 +403,8 @@ class MenuService {
             name: 'Crew Pack 2',
             description: '(\$65 serves 4-5): 3x Sandwiches, 2x Chicken Bites, 3x Sides [R], 3x Sauces, 3x Drinks',
             price: 65.00,
-            imageUrl: 'assets/crew_combos.png',
-            category: 'CREW Combos',
+            imageUrl: 'assets/crew_packs.png',
+            category: 'Crew Packs',
             customizationCounts: {
               'Sandwiches': 3,
               'Chicken Bites': 2,
@@ -409,8 +419,8 @@ class MenuService {
             name: 'Crew Pack 3',
             description: '(\$85 serves 6-7): 4x Sandwiches, 3x Chicken Bites, 4x Sides [R], 4x Sauces, 4x Drinks',
             price: 85.00,
-            imageUrl: 'assets/crew_combos.png',
-            category: 'CREW Combos',
+            imageUrl: 'assets/crew_packs.png',
+            category: 'Crew Packs',
             customizationCounts: {
               'Sandwiches': 4,
               'Chicken Bites': 3,

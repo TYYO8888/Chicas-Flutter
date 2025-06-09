@@ -16,6 +16,10 @@ class MenuItem {
   // Bun selection properties
   String? selectedBunType;
 
+  // Heat level properties
+  bool allowsHeatLevelSelection;
+  String? selectedHeatLevel;
+
   // Size options
   Map<String, double>? sizes;
 
@@ -40,6 +44,8 @@ class MenuItem {
     this.selectedSauces,
     this.includedSauceCount,
     this.selectedBunType,
+    this.allowsHeatLevelSelection = false,
+    this.selectedHeatLevel,
     this.sizes,
     this.customizationCounts,
     this.customizationCategories,
@@ -62,6 +68,8 @@ class MenuItem {
       selectedSauces: selectedSauces != null ? List.from(selectedSauces!) : null,
       includedSauceCount: includedSauceCount,
       selectedBunType: selectedBunType,
+      allowsHeatLevelSelection: allowsHeatLevelSelection,
+      selectedHeatLevel: selectedHeatLevel,
       sizes: sizes != null ? Map.from(sizes!) : null,
       customizationCounts: customizationCounts != null ? Map.from(customizationCounts!) : null,
       customizationCategories: customizationCategories != null ? List.from(customizationCategories!) : null,
@@ -87,6 +95,8 @@ class MenuItem {
           : null,
       includedSauceCount: json['includedSauceCount'],
       selectedBunType: json['selectedBunType'],
+      allowsHeatLevelSelection: json['allowsHeatLevelSelection'] ?? false,
+      selectedHeatLevel: json['selectedHeatLevel'],
       sizes: json['sizes'] != null
           ? Map<String, double>.from(json['sizes'].map((k, v) => MapEntry(k, v.toDouble())))
           : null,
@@ -116,6 +126,8 @@ class MenuItem {
       'selectedSauces': selectedSauces,
       'includedSauceCount': includedSauceCount,
       'selectedBunType': selectedBunType,
+      'allowsHeatLevelSelection': allowsHeatLevelSelection,
+      'selectedHeatLevel': selectedHeatLevel,
       'sizes': sizes,
       'customizationCounts': customizationCounts,
       'customizationCategories': customizationCategories,

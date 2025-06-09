@@ -142,40 +142,226 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         separatorBuilder: (context, index) => const Divider(),
                         itemBuilder: (context, index) {
                           final item = widget.cart.items[index];
-                          return ListTile(
-                            title: Text(item.menuItem.name),
-                            subtitle: Column(
+                          return Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (item.menuItem.selectedSauces?.isNotEmpty ?? false)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        item.menuItem.name,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      '\$${(item.itemPrice * item.quantity).toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.deepOrange,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+
+                                // Quantity
+                                Text(
+                                  'Quantity: ${item.quantity}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+
+                                // Bun type selection
+                                if (item.menuItem.selectedBunType != null)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 4),
                                     child: Text(
-                                      'Sauces: ${item.menuItem.selectedSauces!.join(", ")}',
+                                      'Bun: ${item.menuItem.selectedBunType}',
                                       style: const TextStyle(
-                                        fontStyle: FontStyle.italic,
+                                        fontSize: 14,
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),
-                                if (item.customizations?.isNotEmpty ?? false)
-                                  ...item.customizations!.entries.map(
-                                    (entry) => Padding(
-                                      padding: const EdgeInsets.only(top: 4),
-                                      child: Text(
-                                        '${entry.key}: ${entry.value.map((item) => item.name).join(", ")}',
-                                        style: const TextStyle(
-                                          fontStyle: FontStyle.italic,
+
+                                // Selected size
+                                if (item.selectedSize != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: Text(
+                                      'Size: ${item.selectedSize}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+
+                                // Selected sauces
+                                if (item.menuItem.selectedSauces?.isNotEmpty ?? false)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Sauces:',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.orange,
+                                          ),
                                         ),
+                                        const SizedBox(height: 4),
+                                        Wrap(
+                                          spacing: 6,
+                                          runSpacing: 4,
+                                          children: item.menuItem.selectedSauces!.map((sauce) {
+                                            return Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.orange[100],
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              child: Text(
+                                                sauce,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.orange,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                // Crew pack customizations
+                                if (item.crewPackCustomization != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.grey[300]!),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Crew Pack Selections:',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.deepOrange,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          ...item.crewPackCustomization!.selections.map((selection) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(bottom: 4),
+                                              child: Row(
+                                                children: [
+                                                  const Icon(Icons.restaurant, size: 14, color: Colors.grey),
+                                                  const SizedBox(width: 6),
+                                                  Expanded(
+                                                    child: Text(
+                                                      'Sandwich (${selection.bunType})',
+                                                      style: const TextStyle(fontSize: 13),
+                                                    ),
+                                                  ),
+                                                  if (selection.bunType == 'Brioche Bun')
+                                                    const Text(
+                                                      '+\$1.00',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.green,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
+                                // Regular customizations
+                                if (item.customizations?.isNotEmpty ?? false)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue[50],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.blue[200]!),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Pack Includes:',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.blue,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          ...item.customizations!.entries.map((entry) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(bottom: 6),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    '${entry.value.length}x ${entry.key}:',
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Colors.blue,
+                                                    ),
+                                                  ),
+                                                  ...entry.value.map((menuItem) {
+                                                    return Padding(
+                                                      padding: const EdgeInsets.only(left: 12, top: 2),
+                                                      child: Text(
+                                                        '• ${menuItem.name}',
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }).toList(),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ],
                                       ),
                                     ),
                                   ),
                               ],
-                            ),
-                            trailing: Text(
-                              '\$${(item.menuItem.price * item.quantity).toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
                             ),
                           );
                         },
@@ -185,23 +371,93 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     Card(
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Column(
                           children: [
-                            const Text(
-                              'Total:',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            // Subtotal
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Subtotal:',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  '\$${widget.cart.totalPrice.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '\$${widget.cart.totalPrice.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.deepOrange,
-                              ),
+                            const SizedBox(height: 8),
+                            // GST
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'GST (5%):',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                Text(
+                                  '\$${(widget.cart.totalPrice * 0.05).toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            // PST
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'PST (7%):',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                Text(
+                                  '\$${(widget.cart.totalPrice * 0.07).toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            const Divider(),
+                            const SizedBox(height: 8),
+                            // Total with taxes
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Total (incl. taxes):',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  '\$${(widget.cart.totalPrice * 1.12).toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.deepOrange,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

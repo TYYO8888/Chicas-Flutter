@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
 import '../services/recommendation_service.dart';
+import '../services/cart_service.dart';
 import '../widgets/deal_card.dart';
 import '../screens/menu_item_screen.dart';
 
 class HotDealsSection extends StatefulWidget {
-  const HotDealsSection({Key? key}) : super(key: key);
+  final CartService cartService;
+
+  const HotDealsSection({Key? key, required this.cartService}) : super(key: key);
 
   @override
   State<HotDealsSection> createState() => _HotDealsSectionState();
@@ -93,7 +96,10 @@ class _HotDealsSectionState extends State<HotDealsSection> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MenuItemScreen(category: _deals[index].category),
+                              builder: (context) => MenuItemScreen(
+                                category: _deals[index].category,
+                                cartService: widget.cartService,
+                              ),
                             ),
                           );
                         }

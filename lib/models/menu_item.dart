@@ -6,7 +6,8 @@ class MenuItem {
   final String imageUrl;
   final String category;
   final bool isSpecial;
-  
+  final bool available;
+
   // Sauce selection properties
   bool allowsSauceSelection;
   List<String>? selectedSauces;
@@ -23,6 +24,9 @@ class MenuItem {
   List<String>? customizationCategories;
   Map<String, dynamic>? customizations;
 
+  // Nutrition information
+  Map<String, dynamic>? nutritionInfo;
+
   MenuItem({
     required this.id,
     required this.name,
@@ -31,6 +35,7 @@ class MenuItem {
     required this.imageUrl,
     required this.category,
     this.isSpecial = false,
+    this.available = true,
     this.allowsSauceSelection = false,
     this.selectedSauces,
     this.includedSauceCount,
@@ -39,6 +44,7 @@ class MenuItem {
     this.customizationCounts,
     this.customizationCategories,
     this.customizations,
+    this.nutritionInfo,
   });
 
   // Clone method for creating copies of menu items
@@ -51,6 +57,7 @@ class MenuItem {
       imageUrl: imageUrl,
       category: category,
       isSpecial: isSpecial,
+      available: available,
       allowsSauceSelection: allowsSauceSelection,
       selectedSauces: selectedSauces != null ? List.from(selectedSauces!) : null,
       includedSauceCount: includedSauceCount,
@@ -59,6 +66,61 @@ class MenuItem {
       customizationCounts: customizationCounts != null ? Map.from(customizationCounts!) : null,
       customizationCategories: customizationCategories != null ? List.from(customizationCategories!) : null,
       customizations: customizations != null ? Map.from(customizations!) : null,
+      nutritionInfo: nutritionInfo != null ? Map.from(nutritionInfo!) : null,
     );
+  }
+
+  // Factory constructor for creating MenuItem from JSON
+  factory MenuItem.fromJson(Map<String, dynamic> json) {
+    return MenuItem(
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      price: json['price'].toDouble(),
+      imageUrl: json['imageUrl'],
+      category: json['category'],
+      isSpecial: json['isSpecial'] ?? false,
+      available: json['available'] ?? true,
+      allowsSauceSelection: json['allowsSauceSelection'] ?? false,
+      selectedSauces: json['selectedSauces'] != null
+          ? List<String>.from(json['selectedSauces'])
+          : null,
+      includedSauceCount: json['includedSauceCount'],
+      selectedBunType: json['selectedBunType'],
+      sizes: json['sizes'] != null
+          ? Map<String, double>.from(json['sizes'].map((k, v) => MapEntry(k, v.toDouble())))
+          : null,
+      customizationCounts: json['customizationCounts'] != null
+          ? Map<String, int>.from(json['customizationCounts'])
+          : null,
+      customizationCategories: json['customizationCategories'] != null
+          ? List<String>.from(json['customizationCategories'])
+          : null,
+      customizations: json['customizations'],
+      nutritionInfo: json['nutritionInfo'],
+    );
+  }
+
+  // Convert MenuItem to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'price': price,
+      'imageUrl': imageUrl,
+      'category': category,
+      'isSpecial': isSpecial,
+      'available': available,
+      'allowsSauceSelection': allowsSauceSelection,
+      'selectedSauces': selectedSauces,
+      'includedSauceCount': includedSauceCount,
+      'selectedBunType': selectedBunType,
+      'sizes': sizes,
+      'customizationCounts': customizationCounts,
+      'customizationCategories': customizationCategories,
+      'customizations': customizations,
+      'nutritionInfo': nutritionInfo,
+    };
   }
 }

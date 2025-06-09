@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'screens/loading_screen.dart';
 import 'layouts/main_layout.dart';
+import 'screens/api_test_screen.dart';
 
 // This is the main function that runs when the app starts.
 void main() {
@@ -51,10 +52,8 @@ class MyApp extends StatelessWidget {
         ),
         colorScheme: const ColorScheme(
           primary: Color(0xFFFF5C22), // Chica Orange
-          secondary: Color(0xFF9B1C24), // Spice Red (Pantone 7625 C)
-          background: Colors.white,
+          secondary: Color(0xFF9B1C24),
           surface: Colors.white,
-          onBackground: Colors.black,
           onSurface: Colors.black,
           onPrimary: Colors.white,
           onSecondary: Colors.white,
@@ -77,6 +76,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const LoadingScreen(),
         '/home': (context) => const MainLayout(),
+        '/api-test': (context) => const ApiTestScreen(),
       },
     );
   }

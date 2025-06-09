@@ -13,12 +13,27 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  http: ^1.4.0 # For making API calls to Revel Systems
+  http: ^1.4.0 # For making API calls to backend
   provider: ^6.0.0 # For managing the app's state
   flutter_animate: ^4.5.0 # For GSAP-like animations
   flutter_staggered_animations: ^1.1.1 # For staggered list animations
   visibility_detector: ^0.4.0+2 # For scroll-triggered animations
   animations: ^2.0.11 # For page transitions
+
+  # Backend Integration (Firebase temporarily disabled for testing)
+  # firebase_core: ^2.24.2 # Firebase core functionality
+  # firebase_auth: ^4.15.3 # Firebase authentication
+  # cloud_firestore: ^4.13.6 # Firestore database
+  # firebase_analytics: ^10.7.4 # Analytics tracking
+  # firebase_messaging: ^14.7.10 # Push notifications
+
+  # Payment Processing (Stripe temporarily disabled for testing)
+  # flutter_stripe: ^9.5.0 # Stripe payments
+
+  # Additional utilities
+  shared_preferences: ^2.2.2 # Local storage
+  connectivity_plus: ^5.0.2 # Network connectivity
+  dio: ^5.4.0 # Advanced HTTP client
 
 dev_dependencies:
   flutter_test:

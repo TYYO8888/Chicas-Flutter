@@ -3,8 +3,13 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:qsr_app/screens/menu_item_screen.dart';
 import '../constants/typography.dart';
 import '../constants/colors.dart';
+import '../services/cart_service.dart';
 
 class MenuScreen extends StatelessWidget {
+  final CartService cartService;
+
+  const MenuScreen({super.key, required this.cartService});
+
   final List<String> menuCategories = const [
     'CREW Combos',
     'Whole Wings',
@@ -16,8 +21,6 @@ class MenuScreen extends StatelessWidget {
     'Sauces',
     'Beverages',
   ];
-
-  const MenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +48,7 @@ class MenuScreen extends StatelessWidget {
           return MenuCategoryCard(
             category: category,
             index: index,
+            cartService: cartService,
           );
         },
       ),
@@ -55,11 +59,13 @@ class MenuScreen extends StatelessWidget {
 class MenuCategoryCard extends StatefulWidget {
   final String category;
   final int index;
+  final CartService cartService;
 
   const MenuCategoryCard({
     Key? key,
     required this.category,
     required this.index,
+    required this.cartService,
   }) : super(key: key);
 
   @override
@@ -133,7 +139,10 @@ class _MenuCategoryCardState extends State<MenuCategoryCard>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MenuItemScreen(category: widget.category),
+                    builder: (context) => MenuItemScreen(
+                      category: widget.category,
+                      cartService: widget.cartService,
+                    ),
                   ),
                 );
               },

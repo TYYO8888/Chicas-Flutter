@@ -3,7 +3,14 @@ import 'package:qsr_app/models/menu_item.dart';
 import 'package:qsr_app/models/crew_pack_selection.dart';
 
 class CartService {
+  static final CartService _instance = CartService._internal();
   static final Cart _cart = Cart();
+
+  factory CartService() {
+    return _instance;
+  }
+
+  CartService._internal();
 
   Cart get cart => _cart;
 

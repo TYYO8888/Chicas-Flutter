@@ -1,0 +1,8 @@
+{"level":"info","message":"🍗 Chica's Chicken Backend running on port 3000","service":"chicas-chicken-api","timestamp":"2025-06-08T17:42:29.481Z"}
+{"level":"info","message":"🌍 Environment: undefined","service":"chicas-chicken-api","timestamp":"2025-06-08T17:42:29.484Z"}
+{"level":"info","message":"🔗 Health check: http://localhost:3000/health","service":"chicas-chicken-api","timestamp":"2025-06-08T17:42:29.485Z"}
+{"level":"info","message":"GET /health - ::ffff:127.0.0.1","service":"chicas-chicken-api","timestamp":"2025-06-08T17:42:44.420Z"}
+{"level":"info","message":"GET /api/menu/categories - ::ffff:127.0.0.1","service":"chicas-chicken-api","timestamp":"2025-06-08T17:42:53.563Z"}
+{"level":"info","message":"Fetching menu categories","service":"chicas-chicken-api","timestamp":"2025-06-08T17:42:53.564Z"}
+{"level":"info","message":"GET /api/menu/category/sandwiches - ::ffff:127.0.0.1","service":"chicas-chicken-api","timestamp":"2025-06-08T17:42:59.698Z"}
+{"level":"info","message":"Fetching menu items for category: sandwiches","service":"chicas-chicken-api","timestamp":"2025-06-08T17:42:59.699Z"}

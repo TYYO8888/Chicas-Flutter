@@ -1,0 +1,47 @@
+{
+   "checksum": "9bb0da7f8f70ee75a9354f0d50d8d872",
+   "roots": {
+      "bookmark_bar": {
+         "children": [ {
+            "date_added": "13393879047023268",
+            "date_last_used": "0",
+            "guid": "19a2330c-6c46-4e9a-9c8a-3899f2ec1bb3",
+            "id": "5",
+            "meta_info": {
+               "power_bookmark_meta": ""
+            },
+            "name": "Chica's Chicken - API Test",
+            "type": "url",
+            "url": "http://localhost:8080/"
+         } ],
+         "date_added": "13393878927906603",
+         "date_last_used": "0",
+         "date_modified": "13393879047023268",
+         "guid": "0bc5d13f-2cba-5d74-951f-3f233fe6c908",
+         "id": "1",
+         "name": "Bookmarks bar",
+         "type": "folder"
+      },
+      "other": {
+         "children": [  ],
+         "date_added": "13393878927906609",
+         "date_last_used": "0",
+         "date_modified": "0",
+         "guid": "82b081ec-3dd3-529c-8475-ab6c344590dd",
+         "id": "2",
+         "name": "Other bookmarks",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_added": "13393878927906615",
+         "date_last_used": "0",
+         "date_modified": "0",
+         "guid": "4cf2e351-0e85-532b-bb37-df045d8f8d0f",
+         "id": "3",
+         "name": "Mobile bookmarks",
+         "type": "folder"
+      }
+   },
+   "version": 1
+}

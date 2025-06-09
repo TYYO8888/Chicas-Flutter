@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
 import '../services/recommendation_service.dart';
+import '../services/cart_service.dart';
 import '../widgets/deal_card.dart';
 import '../screens/menu_item_screen.dart';
 
 class PersonalizedRecommendationsSection extends StatefulWidget {
-  const PersonalizedRecommendationsSection({Key? key}) : super(key: key);
+  final CartService cartService;
+
+  const PersonalizedRecommendationsSection({Key? key, required this.cartService}) : super(key: key);
 
   @override
   State<PersonalizedRecommendationsSection> createState() =>
@@ -108,7 +111,10 @@ class _PersonalizedRecommendationsSectionState
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MenuItemScreen(category: recommendation.category),
+                              builder: (context) => MenuItemScreen(
+                                category: recommendation.category,
+                                cartService: widget.cartService,
+                              ),
                             ),
                           );
                         }

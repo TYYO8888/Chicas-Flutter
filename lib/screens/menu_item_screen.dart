@@ -7,12 +7,15 @@ import 'package:qsr_app/screens/crew_pack_customization_screen.dart';
 import '../constants/typography.dart';
 import '../constants/colors.dart';
 
-final CartService cartService = CartService();
-
 class MenuItemScreen extends StatefulWidget {
   final String category;
+  final CartService cartService;
 
-  const MenuItemScreen({super.key, required this.category});
+  const MenuItemScreen({
+    super.key, 
+    required this.category,
+    required this.cartService,
+  });
 
   @override
   _MenuItemScreenState createState() => _MenuItemScreenState();
@@ -51,7 +54,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
       }
 
       // Add the crew pack with its selected items to the cart
-      cartService.addToCart(crewPack, customizations: selectedItems);
+      widget.cartService.addToCart(crewPack, customizations: selectedItems);
 
       // Update the crew pack price
       crewPack.price = totalPrice;
@@ -89,7 +92,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
       // Show sauce selection dialog if sauces haven't been selected
       _handleSauceSelection(menuItem).then((_) {
         if (menuItem.selectedSauces?.length == menuItem.includedSauceCount) {
-          cartService.addToCart(menuItem, selectedSize: selectedSize);
+          widget.cartService.addToCart(menuItem, selectedSize: selectedSize);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('${menuItem.name} added to cart'),
@@ -99,7 +102,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
         }
       });
     } else {
-      cartService.addToCart(menuItem, selectedSize: selectedSize);
+      widget.cartService.addToCart(menuItem, selectedSize: selectedSize);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${menuItem.name} added to cart'),

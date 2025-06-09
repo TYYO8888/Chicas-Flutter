@@ -1,8 +1,106 @@
 import 'package:qsr_app/models/menu_item.dart';
+import 'package:qsr_app/services/api_service.dart';
+import 'package:qsr_app/utils/logger.dart';
 
 class MenuService {
-  // This method will eventually fetch menu items from the Revel API
+  final ApiService _apiService = ApiService();
+
+  // 📋 Get menu categories
+  Future<List<MenuCategory>> getMenuCategories() async {
+    try {
+      AppLogger.info('Fetching menu categories');
+      return await _apiService.getMenuCategories();
+    } catch (e) {
+      AppLogger.error('Failed to fetch menu categories', e);
+      // Return fallback categories if API fails
+      return _getFallbackCategories();
+    }
+  }
+
+  // 🍗 Get menu items by category
   Future<List<MenuItem>> getMenuItems(String category) async {
+    try {
+      AppLogger.info('Fetching menu items for category: $category');
+
+      // Convert display name to API category ID
+      final categoryId = _getCategoryId(category);
+      return await _apiService.getMenuItems(categoryId);
+    } catch (e) {
+      AppLogger.error('Failed to fetch menu items for $category', e);
+      // Return fallback data if API fails
+      return _getFallbackMenuItems(category);
+    }
+  }
+
+  // 🔍 Search menu items
+  Future<List<MenuItem>> searchMenuItems(String query, {String? category}) async {
+    try {
+      AppLogger.info('Searching menu items: $query');
+      return await _apiService.searchMenuItems(query, category: category);
+    } catch (e) {
+      AppLogger.error('Failed to search menu items', e);
+      return [];
+    }
+  }
+
+  // 🎯 Get specific menu item
+  Future<MenuItem?> getMenuItem(String itemId) async {
+    try {
+      AppLogger.info('Fetching menu item: $itemId');
+      return await _apiService.getMenuItem(itemId);
+    } catch (e) {
+      AppLogger.error('Failed to fetch menu item $itemId', e);
+      return null;
+    }
+  }
+
+  // 🔄 Convert display category name to API category ID
+  String _getCategoryId(String displayName) {
+    switch (displayName) {
+      case 'Sandwiches':
+        return 'sandwiches';
+      case 'Whole Wings':
+        return 'whole-wings';
+      case 'Chicken Pieces':
+        return 'chicken-pieces';
+      case 'Chicken Bites':
+        return 'chicken-bites';
+      case 'Sides':
+        return 'sides';
+      case "Fixin's":
+        return 'fixins';
+      case 'Sauces':
+        return 'sauces';
+      case 'CREW Combos':
+        return 'crew-combos';
+      case 'Beverages':
+        return 'beverages';
+      default:
+        return displayName.toLowerCase().replaceAll(' ', '-');
+    }
+  }
+
+  // 📋 Fallback categories if API fails
+  List<MenuCategory> _getFallbackCategories() {
+    return [
+      MenuCategory(id: 'sandwiches', name: 'Sandwiches', displayOrder: 1),
+      MenuCategory(id: 'whole-wings', name: 'Whole Wings', displayOrder: 2),
+      MenuCategory(id: 'chicken-pieces', name: 'Chicken Pieces', displayOrder: 3),
+      MenuCategory(id: 'chicken-bites', name: 'Chicken Bites', displayOrder: 4),
+      MenuCategory(id: 'sides', name: 'Sides', displayOrder: 5),
+      MenuCategory(id: 'fixins', name: "Fixin's", displayOrder: 6),
+      MenuCategory(id: 'sauces', name: 'Sauces', displayOrder: 7),
+      MenuCategory(id: 'crew-combos', name: 'CREW Combos', displayOrder: 8),
+      MenuCategory(id: 'beverages', name: 'Beverages', displayOrder: 9),
+    ];
+  }
+
+  // 🍗 Fallback menu items if API fails (keeping your original mock data)
+  Future<List<MenuItem>> _getFallbackMenuItems(String category) async {
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    AppLogger.warning('Using fallback data for category: $category');
     // For now, we'll return a hardcoded list of menu items
     switch (category) {
       case 'Sandwiches':

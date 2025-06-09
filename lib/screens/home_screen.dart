@@ -5,11 +5,13 @@ import '../widgets/custom_carousel.dart';
 import '../widgets/navigation_menu_drawer.dart';
 import '../widgets/hot_deals_section.dart';
 import '../widgets/personalized_recommendations_section.dart';
-import '../widgets/animated_cart_button.dart';
 import '../screens/menu_item_screen.dart';
+import '../services/cart_service.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final CartService cartService;
+
+  const HomeScreen({Key? key, required this.cartService}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -107,7 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => MenuItemScreen(category: item['category']!),
+                        builder: (context) => MenuItemScreen(
+                          category: item['category']!,
+                          cartService: widget.cartService,
+                        ),
                       ),
                     );
                   },
@@ -205,10 +210,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               // Hot Deals Section
-              const HotDealsSection(),
+              HotDealsSection(cartService: widget.cartService),
 
               // Personalized Recommendations Section
-              const PersonalizedRecommendationsSection(),
+              PersonalizedRecommendationsSection(cartService: widget.cartService),
 
               // Bottom padding
               const SizedBox(height: 24),

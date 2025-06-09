@@ -195,6 +195,25 @@ class NavigationMenuDrawer extends StatelessWidget {
                       leading: const Icon(Icons.help_outline),
                       title: const Text('Support & FAQ'),
                       onTap: () => _navigateToComingSoon(context, 'Support'),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.api),
+                      title: const Text('API Test'),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'DEV',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, '/api-test');
+                      },
                     ),],
                 ),
 

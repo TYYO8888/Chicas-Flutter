@@ -55,7 +55,7 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                         const SizedBox(height: 16),
                         const Text(                          'Your cart is empty',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'MontserratBlack',
                             fontSize: 28,
                             height: 1.28,
@@ -156,10 +156,10 @@ class _CartScreenState extends State<CartScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(                          'CHECKOUT',                          style: const TextStyle(
+                      children: [
+                        Text(                          'CHECKOUT',                          style: TextStyle(
                             fontFamily: 'MontserratBlack',
                             fontSize: 18,
                             height: 1.42,

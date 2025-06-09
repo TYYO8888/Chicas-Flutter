@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/cart.dart';
+import '../services/navigation_service.dart';
+import 'feedback_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final Cart cart;
@@ -13,6 +15,7 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _isLoading = false;
   bool _orderPlaced = false;
+  String _orderId = '';
 
   // This is like telling your friend to call the restaurant!
   Future<void> _submitOrder() async {
@@ -52,9 +55,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       */
 
       // For now, we'll just simulate a successful order
+      final orderId = 'CHK${DateTime.now().millisecondsSinceEpoch}';
       setState(() {
         _isLoading = false;
         _orderPlaced = true;
+        _orderId = orderId;
       });
     } catch (e) {
       setState(() {
@@ -97,27 +102,80 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Your delicious food is being prepared!',
-                    style: TextStyle(fontSize: 16),
+                  Text(
+                    'ORDER #$_orderId',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
                   ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Pop back to the menu screen and clear the cart
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepOrange,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
+                  const SizedBox(height: 8),
+                  const Text(
+                    'YOUR DELICIOUS FOOD IS BEING PREPARED!',
+                    style: TextStyle(fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Feedback Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FeedbackScreen(
+                              orderId: _orderId,
+                              customerEmail: 'customer@example.com', // TODO: Get from user profile
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF5C22),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.star, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'RATE YOUR EXPERIENCE',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
                     ),
-                    child: const Text(
-                      'Return to Menu',
-                      style: TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Return to Menu Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        // Navigate back to the main menu
+                        NavigationService.navigateToMenu();
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFFFF5C22),
+                        side: const BorderSide(color: Color(0xFFFF5C22)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                      ),
+                      child: const Text(
+                        'RETURN TO MENU',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ],
@@ -195,8 +253,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     ),
                                   ),
 
-                                // Selected size
-                                if (item.selectedSize != null)
+                                // Selected bun (for sandwich items)
+                                if (item.selectedSize != null && item.menuItem.category.toLowerCase() == 'sandwiches')
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: Text(
+                                      'Bun: ${item.selectedSize}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+
+                                // Selected size (for non-sandwich items)
+                                if (item.selectedSize != null && item.menuItem.category.toLowerCase() != 'sandwiches')
                                   Padding(
                                     padding: const EdgeInsets.only(top: 4),
                                     child: Text(

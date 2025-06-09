@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:qsr_app/models/menu_item.dart';
 import 'package:qsr_app/services/cart_service.dart';
 import 'package:qsr_app/services/menu_service.dart';
+import 'package:qsr_app/services/navigation_service.dart';
 import 'package:qsr_app/widgets/sauce_selection_dialog.dart';
 import 'package:qsr_app/widgets/heat_level_selector.dart';
+import 'package:qsr_app/widgets/custom_bottom_nav_bar.dart';
 import 'package:qsr_app/screens/crew_pack_customization_screen.dart';
 import 'package:qsr_app/models/crew_pack_selection.dart';
 
@@ -150,12 +152,16 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(      appBar: AppBar(
-        title: Text(widget.category),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.category.toUpperCase()),
         backgroundColor: Theme.of(context).primaryColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).maybePop(),
+          onPressed: () {
+            // Navigate back to main menu page
+            NavigationService.navigateToMenu();
+          },
         ),
       ),
       body: FutureBuilder<List<MenuItem>>(
@@ -266,7 +272,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
                             children: [
                               // Title
                               Text(
-                                menuItem.name,
+                                menuItem.name.toUpperCase(),
                                 style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -277,7 +283,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
 
                               // Description
                               Text(
-                                menuItem.description,
+                                menuItem.description.toUpperCase(),
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[600],
@@ -300,7 +306,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       const Text(
-                                        'Choose your size:',
+                                        'CHOOSE BUN:',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w600,
                                           fontSize: 14,
@@ -335,7 +341,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
                                                 ),
                                               ),
                                               child: Text(
-                                                '$size (\$${menuItem.sizes![size]!.toStringAsFixed(2)})',
+                                                size == 'Brioche Bun' ? '${size.toUpperCase()} (+\$1)' : size.toUpperCase(),
                                                 style: TextStyle(
                                                   color: isSelected ? Colors.white : Colors.black87,
                                                   fontWeight: FontWeight.w500,
@@ -373,7 +379,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
                                           ),
                                           const SizedBox(width: 8),
                                           const Text(
-                                            'Heat Level:',
+                                            'HEAT LEVEL:',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 14,
@@ -382,14 +388,15 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
                                         ],
                                       ),
                                       const SizedBox(height: 8),
-                                      if (menuItem.selectedHeatLevel != null)
-                                        Container(
+                                      GestureDetector(
+                                        onTap: () => _handleHeatLevelSelection(menuItem),
+                                        child: Container(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 12,
-                                            vertical: 6,
+                                            vertical: 8,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.red[100],
+                                            color: menuItem.selectedHeatLevel != null ? Colors.red[100] : Colors.white,
                                             borderRadius: BorderRadius.circular(20),
                                             border: Border.all(color: Colors.red[300]!),
                                           ),
@@ -397,56 +404,27 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               Icon(
-                                                Icons.local_fire_department,
-                                                color: Colors.red[700],
-                                                size: 14,
+                                                menuItem.selectedHeatLevel != null
+                                                    ? Icons.local_fire_department
+                                                    : Icons.add,
+                                                color: Colors.red[600],
+                                                size: 16,
                                               ),
                                               const SizedBox(width: 4),
                                               Text(
-                                                menuItem.selectedHeatLevel!,
+                                                menuItem.selectedHeatLevel != null
+                                                    ? '${menuItem.selectedHeatLevel!} (TAP TO CHANGE)'
+                                                    : 'SELECT HEAT LEVEL',
                                                 style: TextStyle(
-                                                  color: Colors.red[700],
+                                                  color: Colors.red[600],
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 12,
                                                 ),
                                               ),
                                             ],
                                           ),
-                                        )
-                                      else
-                                        GestureDetector(
-                                          onTap: () => _handleHeatLevelSelection(menuItem),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 8,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(20),
-                                              border: Border.all(color: Colors.red[300]!),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  Icons.add,
-                                                  color: Colors.red[600],
-                                                  size: 16,
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  'Select Heat Level',
-                                                  style: TextStyle(
-                                                    color: Colors.red[600],
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
                                         ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -482,8 +460,8 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
                                       const SizedBox(width: 8),
                                       Text(
                                         widget.category == 'Crew Packs'
-                                            ? 'Customize Pack'
-                                            : 'Add to Cart',
+                                            ? 'CUSTOMIZE PACK'
+                                            : 'ADD TO CART',
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
@@ -510,6 +488,29 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
             return const Center(
               child: CircularProgressIndicator(),
             );
+          }
+        },
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        selectedIndex: 2, // Menu is selected (now at index 2)
+        onItemSelected: (index) {
+          // Navigate to the correct page using navigation service
+          switch (index) {
+            case 0:
+              NavigationService.navigateToHome();
+              break;
+            case 1:
+              NavigationService.navigateToScan();
+              break;
+            case 2:
+              NavigationService.navigateToMenu();
+              break;
+            case 3:
+              NavigationService.navigateToCart();
+              break;
+            case 4:
+              NavigationService.navigateToMore();
+              break;
           }
         },
       ),

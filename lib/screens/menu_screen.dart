@@ -34,21 +34,44 @@ class MenuScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16.0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 16.0,
-          childAspectRatio: 1.0,
-        ),
-        itemCount: menuCategories.length,
-        itemBuilder: (context, index) {
-          final category = menuCategories[index];
-          return MenuCategoryCard(
-            category: category,
-            index: index,
-            cartService: cartService,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // Responsive grid based on screen width
+          int crossAxisCount;
+          double childAspectRatio;
+
+          if (constraints.maxWidth < 600) {
+            // Mobile: 2 columns, taller cards for bigger images
+            crossAxisCount = 2;
+            childAspectRatio = 0.7; // Even taller for bigger images
+          } else if (constraints.maxWidth < 900) {
+            // Tablet: 3 columns
+            crossAxisCount = 3;
+            childAspectRatio = 0.75;
+          } else {
+            // Desktop: 4 columns
+            crossAxisCount = 4;
+            childAspectRatio = 0.8;
+          }
+
+          return GridView.builder(
+            padding: EdgeInsets.all(constraints.maxWidth < 600 ? 12.0 : 16.0),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: constraints.maxWidth < 600 ? 12.0 : 16.0,
+              mainAxisSpacing: constraints.maxWidth < 600 ? 12.0 : 16.0,
+              childAspectRatio: childAspectRatio,
+            ),
+            itemCount: menuCategories.length,
+            itemBuilder: (context, index) {
+              final category = menuCategories[index];
+              return MenuCategoryCard(
+                category: category,
+                index: index,
+                cartService: cartService,
+                isMobile: constraints.maxWidth < 600,
+              );
+            },
           );
         },
       ),
@@ -60,12 +83,14 @@ class MenuCategoryCard extends StatefulWidget {
   final String category;
   final int index;
   final CartService cartService;
+  final bool isMobile;
 
   const MenuCategoryCard({
     Key? key,
     required this.category,
     required this.index,
     required this.cartService,
+    this.isMobile = false,
   }) : super(key: key);
 
   @override
@@ -202,14 +227,14 @@ class _MenuCategoryCardState extends State<MenuCategoryCard>
                   borderRadius: BorderRadius.circular(16.0),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       spreadRadius: 0,
                       blurRadius: _elevationAnimation.value + 4,
                       offset: Offset(0, _elevationAnimation.value / 2),
                     ),
                   ],
                   border: Border.all(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -231,58 +256,91 @@ class _MenuCategoryCardState extends State<MenuCategoryCard>
                     ),
 
                     // Content
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          // Icon/Image container
-                          Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: AppColors.primary.withOpacity(0.2),
-                                width: 2,
-                              ),
+                    Column(
+                      children: <Widget>[
+                        // Full-width Image container at top (bigger)
+                        Container(
+                          width: double.infinity,
+                          height: widget.isMobile ? 140 : 160,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppColors.primary.withValues(alpha: 0.8),
+                                AppColors.primary.withValues(alpha: 0.6),
+                              ],
                             ),
-                            child: Center(
-                              child: Icon(
-                                _getCategoryIcon(widget.category),
-                                size: 40,
-                                color: AppColors.primary,
-                              ),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(16),
+                              topRight: Radius.circular(16),
                             ),
                           ),
-                          const SizedBox(height: 12.0),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.image,
+                                  size: widget.isMobile ? 32 : 40,
+                                  color: Colors.white.withValues(alpha: 0.8),
+                                ),
+                                SizedBox(height: widget.isMobile ? 4 : 8),
+                                Text(
+                                  widget.isMobile ? 'IMAGE' : 'IMAGE COMING SOON',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.8),
+                                    fontSize: widget.isMobile ? 10 : 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
 
-                          // Category name
-                          Text(
-                            widget.category,
-                            style: AppTypography.headlineSmall.copyWith(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4.0),
+                        // Text content below image (compact)
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(widget.isMobile ? 6.0 : 8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Category name
+                                Flexible(
+                                  child: Text(
+                                    widget.category.toUpperCase(),
+                                    style: AppTypography.headlineSmall.copyWith(
+                                      color: AppColors.textPrimary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: widget.isMobile ? 12 : 14,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                SizedBox(height: widget.isMobile ? 1.0 : 2.0),
 
-                          // Subtitle
-                          Text(
-                            _getCategorySubtitle(widget.category),
-                            style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
+                                // Subtitle
+                                Flexible(
+                                  child: Text(
+                                    _getCategorySubtitle(widget.category).toUpperCase(),
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: AppColors.textSecondary,
+                                      fontSize: widget.isMobile ? 9 : 11,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     AnimatedBuilder(
                       animation: _controller,

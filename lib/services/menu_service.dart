@@ -123,7 +123,6 @@ class MenuService {
             imageUrl: 'assets/sandwiches.png',
             category: 'Sandwiches',
             sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
-            allowsHeatLevelSelection: true,
           ),
           MenuItem(
             id: 'buffalo_sando',
@@ -133,7 +132,6 @@ class MenuService {
             imageUrl: 'assets/sandwiches.png',
             category: 'Sandwiches',
             sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
-            allowsHeatLevelSelection: true,
           ),
           MenuItem(
             id: 'jalapeno_sando',
@@ -143,7 +141,6 @@ class MenuService {
             imageUrl: 'assets/sandwiches.png',
             category: 'Sandwiches',
             sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
-            allowsHeatLevelSelection: true,
           ),
           MenuItem(
             id: 'hot_honey_sando',
@@ -153,21 +150,10 @@ class MenuService {
             imageUrl: 'assets/sandwiches.png',
             category: 'Sandwiches',
             sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
-            allowsHeatLevelSelection: true,
           ),
         ];
       case 'Whole Wings':
         return [
-          MenuItem(
-            id: 'ilb_plus_wings',
-            name: 'ILB+',
-            description: 'Includes one side of Chica\'s sauce',
-            price: 18.00,
-            imageUrl: 'assets/whole_wings.png',
-            category: 'Whole Wings',
-            allowsSauceSelection: true,
-            includedSauceCount: 1,
-          ),
           MenuItem(
             id: 'og_wings',
             name: 'OG Whole Wings',
@@ -283,31 +269,39 @@ class MenuService {
       case 'Sides':
         return [
           MenuItem(
-            id: 'crinkle_fries',
-            name: 'Crinkle Cut Fries',
-            description: 'Crispy crinkle cut fries',
-            price: 5.00,
+            id: 'waffle_fries',
+            name: 'Waffle Fries',
+            description: 'Golden waffle-cut fries with perfect seasoning',
+            price: 5.50,
             imageUrl: 'assets/sides.png',
             category: 'Sides',
-            sizes: {'Regular': 5.00, 'Large': 7.50},
+            sizes: {'Regular': 5.50, 'Large': 8.00},
           ),
           MenuItem(
-            id: 'mac_cheese',
-            name: 'Mac & Cheese',
-            description: 'Creamy three-cheese blend',
-            price: 5.00,
+            id: 'cajun_waffle_fries',
+            name: 'Cajun Waffle Fries',
+            description: 'Waffle fries seasoned with Cajun spices',
+            price: 6.00,
             imageUrl: 'assets/sides.png',
             category: 'Sides',
-            sizes: {'Regular': 5.00, 'Large': 7.50},
+            sizes: {'Regular': 6.00, 'Large': 8.50},
           ),
           MenuItem(
-            id: 'coleslaw',
-            name: 'Coleslaw',
-            description: 'Fresh, creamy house-made slaw',
-            price: 5.75,
+            id: 'sour_cream_onion_waffle_fries',
+            name: 'Sour Cream + Onion Waffle Fries',
+            description: 'Waffle fries with sour cream and onion seasoning',
+            price: 6.00,
             imageUrl: 'assets/sides.png',
             category: 'Sides',
-            sizes: {'Regular': 5.75, 'Large': 8.25},
+            sizes: {'Regular': 6.00, 'Large': 8.50},
+          ),
+          MenuItem(
+            id: 'deep_fried_pickles',
+            name: 'DEEP Fried Pickles',
+            description: 'Crispy deep-fried pickle spears',
+            price: 6.50,
+            imageUrl: 'assets/sides.png',
+            category: 'Sides',
           ),
         ];
       case 'Fixin\'s':

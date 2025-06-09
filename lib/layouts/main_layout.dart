@@ -21,6 +21,7 @@ class _MainLayoutState extends State<MainLayout> {
   final NotificationService _notificationService = NotificationService();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final PageController _pageController;
+  bool _hasProcessedArguments = false;
 
   late final List<Widget> _pages;
 
@@ -34,10 +35,10 @@ class _MainLayoutState extends State<MainLayout> {
 
     _pages = [
       HomeScreen(cartService: _cartService), // Home/Offers page
+      const Scaffold(body: Center(child: Text('SCAN COMING SOON'))), // Scan page placeholder
       MenuScreen(cartService: _cartService), // Menu page
-      const Scaffold(body: Center(child: Text('Scan Coming Soon'))), // Scan page placeholder
       CartScreen(cartService: _cartService), // Cart page
-      const Scaffold(body: Center(child: Text('More Options'))), // More page placeholder
+      const Scaffold(body: Center(child: Text('MORE OPTIONS'))), // More page placeholder
     ];
   }
 
@@ -55,6 +56,21 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
+    // Check for route arguments to set initial page (only once)
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (!_hasProcessedArguments && args is Map<String, dynamic> && args['initialPage'] != null) {
+      final targetPage = args['initialPage'] as int;
+      if (targetPage >= 0 && targetPage < _pages.length) {
+        _hasProcessedArguments = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _selectedIndex = targetPage;
+          });
+          _pageController.jumpToPage(targetPage);
+        });
+      }
+    }
+
     return Scaffold(
       key: _scaffoldKey,
       body: Stack(

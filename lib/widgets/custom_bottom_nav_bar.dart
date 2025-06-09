@@ -46,13 +46,14 @@ class CustomBottomNavBar extends StatelessWidget {
                 label: 'HOME',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.restaurant_menu),
-                activeIcon: Icon(Icons.restaurant_menu, size: 28),
-                label: 'MENU',
-              ),              BottomNavigationBarItem(
                 icon: Icon(Icons.qr_code_scanner),
                 activeIcon: Icon(Icons.qr_code_scanner, size: 28),
                 label: 'SCAN',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.restaurant_menu),
+                activeIcon: Icon(Icons.restaurant_menu, size: 28),
+                label: 'MENU',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.shopping_cart),

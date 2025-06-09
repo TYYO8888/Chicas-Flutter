@@ -118,9 +118,9 @@ class _HeatLevelSelectorState extends State<HeatLevelSelector> {
                 ),
               ),
               
-              // Star rating
+              // Flame rating
               Row(
-                children: HeatLevels.buildStarRating(heatLevel.stars, size: 18),
+                children: HeatLevels.buildFlameRating(heatLevel.stars, size: 18),
               ),
               
               // Selection indicator

@@ -143,4 +143,53 @@ class CartService {
   double getTotalPrice() {
     return _cart.totalPrice;
   }
+
+  // Remove a specific cart item by index
+  void removeCartItemByIndex(int index) {
+    if (index >= 0 && index < _cart.items.length) {
+      _cart.items.removeAt(index);
+    }
+  }
+
+  // Update quantity of a specific cart item by index
+  void updateCartItemQuantity(int index, int newQuantity) {
+    if (index >= 0 && index < _cart.items.length) {
+      if (newQuantity <= 0) {
+        removeCartItemByIndex(index);
+      } else {
+        _cart.items[index].quantity = newQuantity;
+      }
+    }
+  }
+
+  // Update a cart item's customizations
+  void updateCartItem(int index, {
+    String? selectedSize,
+    Map<String, List<MenuItem>>? customizations,
+    CrewPackCustomization? crewPackCustomization,
+  }) {
+    if (index >= 0 && index < _cart.items.length) {
+      final item = _cart.items[index];
+      if (selectedSize != null) {
+        item.selectedSize = selectedSize;
+      }
+      if (customizations != null) {
+        item.customizations = customizations;
+      }
+      if (crewPackCustomization != null) {
+        item.crewPackCustomization = crewPackCustomization;
+      }
+    }
+  }
+
+  // Clear all items from cart
+  void clearCart() {
+    _cart.items.clear();
+  }
+
+  // Get cart item count
+  int get itemCount => _cart.items.length;
+
+  // Check if cart is empty
+  bool get isEmpty => _cart.items.isEmpty;
 }

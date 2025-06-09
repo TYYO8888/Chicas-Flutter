@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'screens/loading_screen.dart';
 import 'layouts/main_layout.dart';
 import 'screens/api_test_screen.dart';
+import 'services/navigation_service.dart';
 
 // This is the main function that runs when the app starts.
 void main() {
@@ -20,7 +21,9 @@ class MyApp extends StatelessWidget {
     // It sets up things like the app's title, theme, and the first screen to show.
     return MaterialApp(
       title: "Chica's Chicken", // The name of our app
-      debugShowCheckedModeBanner: false,      theme: ThemeData(
+      debugShowCheckedModeBanner: false,
+      navigatorKey: NavigationService.navigatorKey,
+      theme: ThemeData(
         // Brand Colors from style guide
         primaryColor: const Color(0xFFFF5C22), // Chica Orange
         scaffoldBackgroundColor: Colors.white,

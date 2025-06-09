@@ -33,7 +33,8 @@ const menuData = {
         imageUrl: 'assets/sandwiches.png',
         category: 'sandwiches',
         available: true,
-        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT AF'],
+        sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 },
         nutritionInfo: { calories: 650, protein: 35, carbs: 45, fat: 28 }
       },
       {
@@ -43,7 +44,8 @@ const menuData = {
         price: 13.00,
         imageUrl: 'assets/sandwiches.png',
         category: 'sandwiches',
-        available: true
+        available: true,
+        sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 }
       },
       {
         id: 'buffalo_sando',
@@ -52,7 +54,8 @@ const menuData = {
         price: 13.00,
         imageUrl: 'assets/sandwiches.png',
         category: 'sandwiches',
-        available: true
+        available: true,
+        sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 }
       },
       {
         id: 'jalapeno_sando',
@@ -61,7 +64,8 @@ const menuData = {
         price: 13.00,
         imageUrl: 'assets/sandwiches.png',
         category: 'sandwiches',
-        available: true
+        available: true,
+        sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 }
       },
       {
         id: 'hot_honey_sando',
@@ -70,7 +74,8 @@ const menuData = {
         price: 13.00,
         imageUrl: 'assets/sandwiches.png',
         category: 'sandwiches',
-        available: true
+        available: true,
+        sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 }
       }
     ],
     
@@ -83,7 +88,7 @@ const menuData = {
         imageUrl: 'assets/whole_wings.png',
         category: 'whole-wings',
         available: true,
-        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT AF'],
         allowsSauceSelection: true,
         includedSauceCount: 1,
         sizes: { '6 Wings': 16.00, '12 Wings': 28.00, '18 Wings': 40.00 }
@@ -111,7 +116,7 @@ const menuData = {
         imageUrl: 'assets/chicken_pieces.png',
         category: 'chicken-pieces',
         available: true,
-        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT AF'],
         allowsSauceSelection: true,
         includedSauceCount: 1
       },
@@ -123,7 +128,7 @@ const menuData = {
         imageUrl: 'assets/chicken_pieces.png',
         category: 'chicken-pieces',
         available: true,
-        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT AF'],
         allowsSauceSelection: true,
         includedSauceCount: 1
       },
@@ -135,7 +140,7 @@ const menuData = {
         imageUrl: 'assets/chicken_pieces.png',
         category: 'chicken-pieces',
         available: true,
-        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT AF'],
         allowsSauceSelection: true,
         includedSauceCount: 2
       }
@@ -150,7 +155,7 @@ const menuData = {
         imageUrl: 'assets/chicken_bites.png',
         category: 'chicken-bites',
         available: true,
-        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT'],
+        heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT AF'],
         allowsSauceSelection: true,
         includedSauceCount: 1
       },

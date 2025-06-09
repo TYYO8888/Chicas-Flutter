@@ -42,7 +42,7 @@ class HeatLevels {
   );
 
   static const hot = HeatLevel(
-    name: 'HOT',
+    name: 'HOT AF',
     description: 'EXTREMELY HOT',
     stars: 4,
     color: Colors.red,
@@ -64,11 +64,11 @@ class HeatLevels {
     }
   }
 
-  static List<Widget> buildStarRating(int stars, {double size = 16}) {
+  static List<Widget> buildFlameRating(int flames, {double size = 16}) {
     return List.generate(4, (index) {
       return Icon(
-        index < stars ? Icons.star : Icons.star_border,
-        color: index < stars ? Colors.amber : Colors.grey,
+        index < flames ? Icons.local_fire_department : Icons.local_fire_department_outlined,
+        color: index < flames ? Colors.red : Colors.grey,
         size: size,
       );
     });

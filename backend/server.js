@@ -16,6 +16,7 @@ const orderRoutes = require('./routes/orders');
 const paymentRoutes = require('./routes/payments');
 const analyticsRoutes = require('./routes/analytics');
 const notificationRoutes = require('./routes/notifications');
+const feedbackRoutes = require('./routes/feedback');
 
 // Import middleware and services
 const { errorHandler } = require('./middleware/errorHandler');
@@ -74,6 +75,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // 🎯 Default Route
 app.get('/', (req, res) => {

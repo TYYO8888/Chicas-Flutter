@@ -4,8 +4,6 @@ import 'package:qsr_app/services/cart_service.dart';
 import 'package:qsr_app/services/menu_service.dart';
 import 'package:qsr_app/widgets/sauce_selection_dialog.dart';
 import 'package:qsr_app/screens/crew_pack_customization_screen.dart';
-import '../constants/typography.dart';
-import '../constants/colors.dart';
 
 class MenuItemScreen extends StatefulWidget {
   final String category;

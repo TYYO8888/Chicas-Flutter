@@ -20,12 +20,12 @@ dependencies:
   visibility_detector: ^0.4.0+2 # For scroll-triggered animations
   animations: ^2.0.11 # For page transitions
 
-  # Backend Integration (Firebase temporarily disabled for testing)
+  # Backend Integration (Firebase temporarily disabled for web compatibility)
   # firebase_core: ^2.24.2 # Firebase core functionality
-  # firebase_auth: ^4.15.3 # Firebase authentication
-  # cloud_firestore: ^4.13.6 # Firestore database
-  # firebase_analytics: ^10.7.4 # Analytics tracking
-  # firebase_messaging: ^14.7.10 # Push notifications
+  # firebase_auth: ^4.15.3 # Firebase authentication (temporarily disabled)
+  # cloud_firestore: ^4.13.6 # Firestore database (temporarily disabled)
+  # firebase_analytics: ^10.7.4 # Analytics tracking (temporarily disabled)
+  # firebase_messaging: ^14.7.10 # Push notifications (temporarily disabled)
 
   # Payment Processing (Stripe temporarily disabled for testing)
   # flutter_stripe: ^9.5.0 # Stripe payments
@@ -34,6 +34,7 @@ dependencies:
   shared_preferences: ^2.2.2 # Local storage
   connectivity_plus: ^5.0.2 # Network connectivity
   dio: ^5.4.0 # Advanced HTTP client
+  web_socket_channel: ^2.4.0 # WebSocket support for real-time notifications
 
 dev_dependencies:
   flutter_test:

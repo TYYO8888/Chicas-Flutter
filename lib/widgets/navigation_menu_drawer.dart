@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/coming_soon_screen.dart';
+import '../screens/notification_test_screen.dart';
 
 class NavigationMenuDrawer extends StatelessWidget {
   const NavigationMenuDrawer({Key? key}) : super(key: key);
@@ -213,6 +214,30 @@ class NavigationMenuDrawer extends StatelessWidget {
                       onTap: () {
                         Navigator.pop(context);
                         Navigator.pushNamed(context, '/api-test');
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.notifications),
+                      title: const Text('Notification Test'),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'NEW',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NotificationTestScreen(),
+                          ),
+                        );
                       },
                     ),],
                 ),

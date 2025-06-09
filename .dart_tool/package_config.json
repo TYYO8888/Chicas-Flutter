@@ -56,6 +56,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "crypto",
+      "rootUri": "file:///C:/Users/tlim8/AppData/Local/Pub/Cache/hosted/pub.dev/crypto-3.0.6",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "cupertino_icons",
       "rootUri": "file:///C:/Users/tlim8/AppData/Local/Pub/Cache/hosted/pub.dev/cupertino_icons-1.0.8",
       "packageUri": "lib/",
@@ -374,6 +380,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "web_socket_channel",
+      "rootUri": "file:///C:/Users/tlim8/AppData/Local/Pub/Cache/hosted/pub.dev/web_socket_channel-2.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
       "name": "xdg_directories",
       "rootUri": "file:///C:/Users/tlim8/AppData/Local/Pub/Cache/hosted/pub.dev/xdg_directories-1.1.0",
       "packageUri": "lib/",
@@ -392,7 +404,7 @@
       "languageVersion": "3.0"
     }
   ],
-  "generated": "2025-06-08T17:53:56.480133Z",
+  "generated": "2025-06-09T04:24:27.508407Z",
   "generator": "pub",
   "generatorVersion": "3.7.0",
   "flutterRoot": "file:///C:/src/flutter",

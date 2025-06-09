@@ -4,7 +4,9 @@ import '../screens/cart_screen.dart';
 import '../screens/home_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../widgets/navigation_menu_drawer.dart';
+import '../widgets/notification_banner.dart';
 import '../services/cart_service.dart';
+import '../services/notification_service.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({Key? key}) : super(key: key);
@@ -16,6 +18,7 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0; // Start with Home/Offers selected
   final CartService _cartService = CartService();
+  final NotificationService _notificationService = NotificationService();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final PageController _pageController;
 
@@ -24,7 +27,12 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: _selectedIndex);    _pages = [
+    _pageController = PageController(initialPage: _selectedIndex);
+
+    // Initialize notification service
+    _notificationService.initialize();
+
+    _pages = [
       HomeScreen(cartService: _cartService), // Home/Offers page
       MenuScreen(cartService: _cartService), // Menu page
       const Scaffold(body: Center(child: Text('Scan Coming Soon'))), // Scan page placeholder
@@ -48,15 +56,22 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,      body: PageView(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        children: _pages,
+      key: _scaffoldKey,
+      body: Stack(
+        children: [
+          PageView(
+            physics: const NeverScrollableScrollPhysics(),
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            children: _pages,
+          ),
+          // Notification banner overlay
+          const NotificationBanner(),
+        ],
       ),
       endDrawer: const NavigationMenuDrawer(),
       bottomNavigationBar: CustomBottomNavBar(

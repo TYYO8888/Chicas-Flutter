@@ -7,6 +7,10 @@ class AppColors {
   static const sunburstYellow = Color(0xFFFFCC72); // Pantone 123C
   static const pickleGreen = Color(0xFF9B9963); // Pantone 7495 C
 
+  // Convenience aliases for common usage
+  static const primary = chicaOrange;
+  static const secondary = spiceRed;
+
   // Usage Guidelines
   // Chica Orange: Primary brand color, used for buttons and primary actions
   // Spice Red: Used sparingly for highlights, alerts and promotional badges

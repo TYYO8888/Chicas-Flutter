@@ -251,16 +251,6 @@ const menuData = {
 
     'sides': [
       {
-        id: 'crinkle_fries',
-        name: 'Crinkle Cut Fries',
-        description: 'Crispy seasoned crinkle cut fries',
-        price: 5.00,
-        imageUrl: 'assets/sides.png',
-        category: 'sides',
-        available: true,
-        sizes: { 'Regular': 5.00, 'Large': 7.50 }
-      },
-      {
         id: 'waffle_fries',
         name: 'Waffle Fries',
         description: 'Golden waffle-cut fries with perfect seasoning',
@@ -291,9 +281,9 @@ const menuData = {
         sizes: { 'Regular': 6.00, 'Large': 8.50 }
       },
       {
-        id: 'beer_fries_pickles',
-        name: 'Beer Fried Pickles',
-        description: 'Crispy beer-battered pickle spears',
+        id: 'deep_fried_pickles',
+        name: 'DEEP Fried Pickles',
+        description: 'Crispy deep-fried pickle spears',
         price: 6.50,
         imageUrl: 'assets/sides.png',
         category: 'sides',

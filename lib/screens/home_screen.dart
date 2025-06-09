@@ -8,6 +8,7 @@ import '../widgets/personalized_recommendations_section.dart';
 import '../screens/menu_item_screen.dart';
 import '../services/cart_service.dart';
 
+
 class HomeScreen extends StatefulWidget {
   final CartService cartService;
 
@@ -138,15 +139,44 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF9F5F2),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: RefreshIndicator(
         onRefresh: () async {
           // TODO: Implement refresh logic
         },
-        child: SingleChildScrollView(          child: Column(
+        child: SingleChildScrollView(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              
+              // Menu button overlay
+              Padding(
+                padding: const EdgeInsets.only(top: 40, right: 16),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).shadowColor.withValues(alpha: 0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.menu,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                      onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
+                      tooltip: 'Open menu',
+                    ),
+                  ),
+                ),
+              ),
+
               // Carousel Header
               CustomCarousel(
                 height: 300,
@@ -159,18 +189,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   duration: AnimationDurations.normal,
                   curve: GSAPCurves.power2InOut,
                 ),
+
                 // Smart Ordering Tips
               Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Smart Ordering Tips',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.brown,
+                        color: Theme.of(context).textTheme.headlineSmall?.color,
                       ),
                     ).animate()
                       .fadeIn()
@@ -184,11 +215,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
+                            color: Theme.of(context).shadowColor.withValues(alpha: 0.1),
                             spreadRadius: 1,
                             blurRadius: 5,
                           ),
@@ -253,7 +284,10 @@ class BulletPoint extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+              ),
             ),
           ),
         ],      ),

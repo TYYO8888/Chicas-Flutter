@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -9,16 +9,13 @@ import '../models/menu_category.dart';
 import '../utils/logger.dart';
 
 class OfflineStorageService {
-  static const String _menuItemsBox = 'menu_items';
-  static const String _ordersBox = 'orders';
-  static const String _categoriesBox = 'categories';
-  static const String _syncMetadataBox = 'sync_metadata';
+  static const String _menuItemsKey = 'cached_menu_items';
+  static const String _categoriesKey = 'cached_categories';
+  static const String _pendingOrdersKey = 'pending_orders';
+  static const String _syncMetadataKey = 'sync_metadata';
   static const String _orderHistoryTable = 'order_history';
 
-  late Box<OfflineMenuItem> _menuItemsBox_;
-  late Box<OfflineOrder> _ordersBox_;
-  late Box<OfflineMenuCategory> _categoriesBox_;
-  late Box<SyncMetadata> _syncMetadataBox_;
+  late SharedPreferences _prefs;
   late Database _database;
 
   bool _isInitialized = false;
@@ -34,31 +31,8 @@ class OfflineStorageService {
     if (_isInitialized) return;
 
     try {
-      // Initialize Hive
-      await Hive.initFlutter();
-      
-      // Register adapters
-      if (!Hive.isAdapterRegistered(0)) {
-        Hive.registerAdapter(OfflineMenuItemAdapter());
-      }
-      if (!Hive.isAdapterRegistered(1)) {
-        Hive.registerAdapter(OfflineOrderAdapter());
-      }
-      if (!Hive.isAdapterRegistered(2)) {
-        Hive.registerAdapter(OfflineOrderItemAdapter());
-      }
-      if (!Hive.isAdapterRegistered(3)) {
-        Hive.registerAdapter(OfflineMenuCategoryAdapter());
-      }
-      if (!Hive.isAdapterRegistered(4)) {
-        Hive.registerAdapter(SyncMetadataAdapter());
-      }
-
-      // Open boxes
-      _menuItemsBox_ = await Hive.openBox<OfflineMenuItem>(_menuItemsBox);
-      _ordersBox_ = await Hive.openBox<OfflineOrder>(_ordersBox);
-      _categoriesBox_ = await Hive.openBox<OfflineMenuCategory>(_categoriesBox);
-      _syncMetadataBox_ = await Hive.openBox<SyncMetadata>(_syncMetadataBox);
+      // Initialize SharedPreferences
+      _prefs = await SharedPreferences.getInstance();
 
       // Initialize SQLite for order history
       await _initializeDatabase();
@@ -117,22 +91,33 @@ class OfflineStorageService {
   // Cache menu items locally
   Future<void> cacheMenuItems(List<MenuItem> menuItems) async {
     await _ensureInitialized();
-    
-    try {
-      final offlineItems = menuItems.map((item) => 
-          OfflineMenuItem.fromMenuItem(item)).toList();
-      
-      // Clear existing items
-      await _menuItemsBox_.clear();
-      
-      // Add new items
-      for (final item in offlineItems) {
-        await _menuItemsBox_.put(item.id, item);
-      }
 
-      // Update sync metadata
+    try {
+      final itemsJson = menuItems.map((item) => {
+        'id': item.id,
+        'name': item.name,
+        'description': item.description,
+        'price': item.price,
+        'imageUrl': item.imageUrl,
+        'category': item.category,
+        'isSpecial': item.isSpecial,
+        'available': item.available,
+        'allowsSauceSelection': item.allowsSauceSelection,
+        'selectedSauces': item.selectedSauces,
+        'includedSauceCount': item.includedSauceCount,
+        'selectedBunType': item.selectedBunType,
+        'allowsHeatLevelSelection': item.allowsHeatLevelSelection,
+        'selectedHeatLevel': item.selectedHeatLevel,
+        'sizes': item.sizes,
+        'customizationCounts': item.customizationCounts,
+        'customizationCategories': item.customizationCategories,
+        'customizations': item.customizations,
+        'nutritionInfo': item.nutritionInfo,
+      }).toList();
+
+      await _prefs.setString(_menuItemsKey, jsonEncode(itemsJson));
       await _updateSyncMetadata('menu_items', menuItems.length);
-      
+
       AppLogger.info('Cached ${menuItems.length} menu items offline');
     } catch (e) {
       AppLogger.error('Failed to cache menu items', e);

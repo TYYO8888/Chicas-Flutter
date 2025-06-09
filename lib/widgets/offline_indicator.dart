@@ -52,6 +52,7 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      textDirection: TextDirection.ltr,
       children: [
         widget.child,
         if (!_isOnline) _buildOfflineBanner(),

@@ -457,13 +457,19 @@ router.get('/categories', (req, res) => {
   }
 });
 
-// 🍗 GET /api/menu/category/:categoryId - Get items by category
+// 🍗 GET /api/menu/category/:categoryId - Get items by category with pagination
 router.get('/category/:categoryId', (req, res) => {
   try {
     const { categoryId } = req.params;
-    logger.info(`Fetching menu items for category: ${categoryId}`);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const search = req.query.search || '';
+    const sortBy = req.query.sortBy || 'name';
+    const sortOrder = req.query.sortOrder || 'asc';
 
-    const items = menuData.items[categoryId] || [];
+    logger.info(`Fetching menu items for category: ${categoryId}, page: ${page}, limit: ${limit}`);
+
+    let items = menuData.items[categoryId] || [];
 
     if (items.length === 0) {
       return res.status(404).json({
@@ -472,15 +478,54 @@ router.get('/category/:categoryId', (req, res) => {
       });
     }
 
+    // Apply search filter
+    if (search) {
+      items = items.filter(item =>
+        item.name.toLowerCase().includes(search.toLowerCase()) ||
+        item.description.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    // Apply sorting
+    items.sort((a, b) => {
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+
+      if (typeof aValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+
+      if (sortOrder === 'desc') {
+        return bValue > aValue ? 1 : -1;
+      }
+      return aValue > bValue ? 1 : -1;
+    });
+
     // Add allowsHeatLevelSelection flag based on heatLevels array
     const processedItems = items.map(item => ({
       ...item,
       allowsHeatLevelSelection: !!(item.heatLevels && item.heatLevels.length > 0)
     }));
 
+    // Calculate pagination
+    const totalItems = processedItems.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedItems = processedItems.slice(startIndex, endIndex);
+
     res.json({
       success: true,
-      data: processedItems,
+      data: paginatedItems,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems,
+        itemsPerPage: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      },
       message: `Items for category ${categoryId} retrieved successfully`
     });
   } catch (error) {

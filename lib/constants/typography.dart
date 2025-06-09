@@ -80,4 +80,53 @@ class AppTypography {
     height: 1.42,
     letterSpacing: 0.1,
   );
+
+  // Title Text - Sofia Sans
+  static const titleLarge = TextStyle(
+    fontFamily: 'SofiaSans',
+    fontSize: 22,
+    height: 1.27,
+    fontWeight: FontWeight.w600,
+  );
+
+  static const titleMedium = TextStyle(
+    fontFamily: 'SofiaSans',
+    fontSize: 16,
+    height: 1.5,
+    letterSpacing: 0.15,
+    fontWeight: FontWeight.w500,
+  );
+
+  static const titleSmall = TextStyle(
+    fontFamily: 'SofiaSans',
+    fontSize: 14,
+    height: 1.42,
+    letterSpacing: 0.1,
+    fontWeight: FontWeight.w500,
+  );
+
+  // Label Text - Sofia Sans
+  static const labelLarge = TextStyle(
+    fontFamily: 'SofiaSans',
+    fontSize: 14,
+    height: 1.42,
+    letterSpacing: 0.1,
+    fontWeight: FontWeight.w500,
+  );
+
+  static const labelMedium = TextStyle(
+    fontFamily: 'SofiaSans',
+    fontSize: 12,
+    height: 1.33,
+    letterSpacing: 0.5,
+    fontWeight: FontWeight.w500,
+  );
+
+  static const labelSmall = TextStyle(
+    fontFamily: 'SofiaSans',
+    fontSize: 11,
+    height: 1.45,
+    letterSpacing: 0.5,
+    fontWeight: FontWeight.w500,
+  );
 }

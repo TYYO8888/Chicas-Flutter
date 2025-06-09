@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import '../screens/menu_screen.dart';
 import '../screens/cart_screen.dart';
 import '../screens/home_screen.dart';
+import '../screens/favorites_screen.dart';
+import '../screens/settings_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../widgets/navigation_menu_drawer.dart';
 import '../widgets/notification_banner.dart';
 import '../services/cart_service.dart';
 import '../services/notification_service.dart';
+import '../services/theme_service.dart' as theme_service;
+import '../widgets/theme_mode_selector.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({Key? key}) : super(key: key);
@@ -54,6 +58,58 @@ class _MainLayoutState extends State<MainLayout> {
     }
   }
 
+
+
+  Widget _buildFloatingActionButtons() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Test button (for development)
+        FloatingActionButton(
+          heroTag: "test",
+          onPressed: () {
+            Navigator.pushNamed(context, '/test');
+          },
+          backgroundColor: Colors.purple,
+          tooltip: 'Test Advanced Features',
+          child: const Icon(Icons.science, color: Colors.white),
+        ),
+        const SizedBox(height: 12),
+        // Settings button (moved to top)
+        FloatingActionButton(
+          heroTag: "settings",
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SettingsScreen(),
+              ),
+            );
+          },
+          backgroundColor: Colors.green,
+          tooltip: 'Settings',
+          child: const Icon(Icons.settings, color: Colors.white),
+        ),
+        const SizedBox(height: 12),
+        // Favorites button (moved to bottom)
+        FloatingActionButton(
+          heroTag: "favorites",
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const FavoritesScreen(),
+              ),
+            );
+          },
+          backgroundColor: Colors.pink,
+          tooltip: 'Favorites',
+          child: const Icon(Icons.favorite, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Check for route arguments to set initial page (only once)
@@ -90,6 +146,8 @@ class _MainLayoutState extends State<MainLayout> {
         ],
       ),
       endDrawer: const NavigationMenuDrawer(),
+      floatingActionButton: _buildFloatingActionButtons(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: _selectedIndex,
         onItemSelected: _onItemTapped,

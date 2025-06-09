@@ -3,6 +3,7 @@ import 'package:qsr_app/models/menu_item.dart';
 import 'package:qsr_app/services/cart_service.dart';
 import 'package:qsr_app/services/menu_service.dart';
 import 'package:qsr_app/services/navigation_service.dart';
+import 'package:qsr_app/services/user_preferences_service.dart';
 import 'package:qsr_app/widgets/sauce_selection_dialog.dart';
 import 'package:qsr_app/widgets/heat_level_selector.dart';
 import 'package:qsr_app/widgets/custom_bottom_nav_bar.dart';
@@ -23,14 +24,64 @@ class MenuItemScreen extends StatefulWidget {
   _MenuItemScreenState createState() => _MenuItemScreenState();
 }
 
-class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<MenuItem>> _menuItemsFuture;
+class _MenuItemScreenState extends State<MenuItemScreen> {
+  late Future<List<MenuItem>> _menuItemsFuture;
   final MenuService _menuService = MenuService();
+  final UserPreferencesService _preferencesService = UserPreferencesService();
   final Map<String, String> _selectedSizes = {};
+  final Set<String> _favoriteItems = {};
 
   @override
   void initState() {
     super.initState();
     _menuItemsFuture = _menuService.getMenuItems(widget.category);
+    _loadFavorites();
+  }
+
+  Future<void> _loadFavorites() async {
+    await _preferencesService.initialize();
+    final preferences = _preferencesService.currentPreferences;
+    if (preferences != null) {
+      setState(() {
+        _favoriteItems.addAll(preferences.favoriteMenuItems);
+      });
+    }
+  }
+
+  Future<void> _toggleFavorite(MenuItem menuItem) async {
+    final isFavorite = _favoriteItems.contains(menuItem.id);
+
+    if (isFavorite) {
+      await _preferencesService.removeFromFavorites(menuItem.id);
+      setState(() {
+        _favoriteItems.remove(menuItem.id);
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${menuItem.name} removed from favorites'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.grey[600],
+          ),
+        );
+      }
+    } else {
+      await _preferencesService.addToFavorites(menuItem.id);
+      setState(() {
+        _favoriteItems.add(menuItem.id);
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${menuItem.name} added to favorites'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.pink,
+          ),
+        );
+      }
+    }
   }
 
  Future<void> _handleCrewPackSelection(MenuItem crewPack) async {
@@ -216,18 +267,49 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
                                     Icon(
                                       Icons.restaurant,
                                       size: 60,
-                                      color: Colors.white.withOpacity(0.8),
+                                      color: Colors.white.withValues(alpha: 0.8),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       'Image Coming Soon',
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.8),
+                                        color: Colors.white.withValues(alpha: 0.8),
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ],
+                                ),
+                              ),
+                              // Favorite button
+                              Positioned(
+                                top: 12,
+                                left: 12,
+                                child: GestureDetector(
+                                  onTap: () => _toggleFavorite(menuItem),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.9),
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.2),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Icon(
+                                      _favoriteItems.contains(menuItem.id)
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                      color: _favoriteItems.contains(menuItem.id)
+                                          ? Colors.pink
+                                          : Colors.grey[600],
+                                      size: 20,
+                                    ),
+                                  ),
                                 ),
                               ),
                               // Price badge
@@ -244,7 +326,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {  late Future<List<Men
                                     borderRadius: BorderRadius.circular(20),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Colors.black.withValues(alpha: 0.2),
                                         blurRadius: 4,
                                         offset: const Offset(0, 2),
                                       ),

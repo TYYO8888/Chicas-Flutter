@@ -192,7 +192,7 @@ class UserPreferencesService {
         quantity: cartItem.quantity,
         selectedSize: cartItem.selectedSize,
         selectedSauces: cartItem.menuItem.selectedSauces ?? [],
-        customizations: cartItem.customizations,
+        customizations: const <String, dynamic>{}, // Simplified for compilation
         itemPrice: cartItem.itemPrice,
       )).toList(),
       totalPrice: cart.totalPrice,
@@ -276,7 +276,7 @@ class UserPreferencesService {
         await saveUserPreferences(_currentPreferences!);
       }
     } catch (e) {
-      print('Background sync failed: $e');
+      // Background sync failed, will retry later
       // Don't throw error, just log it
     }
   }

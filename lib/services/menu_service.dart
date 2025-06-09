@@ -82,33 +82,7 @@ class MenuService {
     }
   }
 
-  // 📋 Get all menu items across all categories
-  Future<List<MenuItem>> getAllMenuItems() async {
-    try {
-      AppLogger.info('Fetching all menu items');
-      final categories = await getMenuCategories();
-      final List<MenuItem> allItems = [];
 
-      for (final category in categories) {
-        final items = await getMenuItems(category.name);
-        allItems.addAll(items);
-      }
-
-      return allItems;
-    } catch (e) {
-      AppLogger.error('Failed to fetch all menu items', e);
-      // Return fallback data from all categories
-      final List<MenuItem> fallbackItems = [];
-      final categories = ['Sandwiches', 'Whole Wings', 'Chicken Pieces', 'Chicken Bites', 'Sides', 'Fixin\'s', 'Sauces', 'Crew Packs', 'Beverages'];
-
-      for (final category in categories) {
-        final items = await _getFallbackMenuItems(category);
-        fallbackItems.addAll(items);
-      }
-
-      return fallbackItems;
-    }
-  }
 
   // �🔄 Convert display category name to API category ID
   String _getCategoryId(String displayName) {

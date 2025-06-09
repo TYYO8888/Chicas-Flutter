@@ -1,4 +1,5 @@
 import '../models/menu_item.dart';
+import '../constants/menu_images.dart';
 
 class RecommendationService {
   // In a real app, this would call an AI service or backend API
@@ -13,7 +14,7 @@ class RecommendationService {
         name: 'Cajun Pepper Wings',
         description: 'Crispy wings tossed in our signature Cajun pepper sauce',
         price: 15.99,
-        imageUrl: 'assets/cajun_wings.jpg',
+        imageUrl: MenuImages.getImageByItemId('cajun_pepper_wings'),
         category: 'Wings',
       ),
       MenuItem(
@@ -21,7 +22,7 @@ class RecommendationService {
         name: 'The OG Sando',
         description: 'Our classic chicken sandwich with premium pickles',
         price: 11.99,
-        imageUrl: 'assets/og_sandwich.jpg',
+        imageUrl: MenuImages.getImageByItemId('og_sandwich'),
         category: 'Sandwiches',
       ),
       MenuItem(
@@ -29,7 +30,7 @@ class RecommendationService {
         name: 'Tenders Combo',
         description: 'Hand-breaded tenders with fries and sauce',
         price: 14.99,
-        imageUrl: 'assets/tenders.jpg',
+        imageUrl: MenuImages.getImageByItemId('tenders_combo'),
         category: 'Combos',
       ),
     ];
@@ -46,7 +47,7 @@ class RecommendationService {
         name: 'Thirsty Thursday',
         description: 'Get a free large drink with any combo purchase',
         price: 0.00,
-        imageUrl: 'assets/drink_deal.jpg',
+        imageUrl: MenuImages.getImageByItemId('thirsty_thursday'),
         category: 'Deals',
         isSpecial: true,
       ),

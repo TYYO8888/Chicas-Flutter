@@ -3,85 +3,76 @@ import 'package:flutter/material.dart';
 import 'screens/loading_screen.dart';
 import 'layouts/main_layout.dart';
 import 'screens/api_test_screen.dart';
+import 'screens/test_screen.dart';
 import 'services/navigation_service.dart';
+import 'services/theme_service.dart' as theme_service;
+import 'services/user_preferences_service.dart';
+import 'services/data_sync_service.dart';
+import 'themes/app_theme.dart';
+import 'widgets/offline_indicator.dart';
+
 
 // This is the main function that runs when the app starts.
-void main() {
-  runApp(const MyApp()); // We tell Flutter to run our main app widget, MyApp.
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize services
+  final themeService = theme_service.ThemeService();
+  final userPreferencesService = UserPreferencesService();
+  final dataSyncService = DataSyncService();
+
+  await themeService.initialize();
+  await userPreferencesService.initialize();
+  await dataSyncService.initialize();
+
+  runApp(MyApp(themeService: themeService)); // We tell Flutter to run our main app widget, MyApp.
 }
 
 // MyApp is like the main container for our whole app.
 // It sets up the basic look and feel using Material Design.
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final theme_service.ThemeService themeService;
+
+  const MyApp({super.key, required this.themeService});
 
   @override
   Widget build(BuildContext context) {
     // MaterialApp is like the main building block for a Material Design app.
     // It sets up things like the app's title, theme, and the first screen to show.
-    return MaterialApp(
-      title: "Chica's Chicken", // The name of our app
-      debugShowCheckedModeBanner: false,
-      navigatorKey: NavigationService.navigatorKey,
-      theme: ThemeData(
-        // Brand Colors from style guide
-        primaryColor: const Color(0xFFFF5C22), // Chica Orange
-        scaffoldBackgroundColor: Colors.white,
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(
-            fontFamily: 'SofiaRoughBlackThree',
-            color: Colors.black,
+    return ListenableBuilder(
+      listenable: themeService,
+      builder: (context, child) {
+        return OfflineIndicator(
+          child: MaterialApp(
+            title: "Chica's Chicken", // The name of our app
+            debugShowCheckedModeBanner: false,
+            navigatorKey: NavigationService.navigatorKey,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: _getThemeMode(),
+            initialRoute: '/',
+            routes: {
+              '/': (context) => const LoadingScreen(),
+              '/home': (context) => const MainLayout(),
+              '/api-test': (context) => const ApiTestScreen(),
+              '/test': (context) => const TestScreen(),
+
+            },
           ),
-          displayMedium: TextStyle(
-            fontFamily: 'SofiaRoughBlackThree',
-            color: Colors.black,
-          ),
-          displaySmall: TextStyle(
-            fontFamily: 'SofiaRoughBlackThree',
-            color: Colors.black,
-          ),
-          headlineLarge: TextStyle(
-            fontFamily: 'MontserratBlack',
-            color: Colors.black,
-          ),
-          bodyLarge: TextStyle(
-            fontFamily: 'SofiaSans',
-            color: Colors.black,
-          ),
-          bodyMedium: TextStyle(
-            fontFamily: 'SofiaSans',
-            color: Colors.black,
-          ),
-        ),
-        colorScheme: const ColorScheme(
-          primary: Color(0xFFFF5C22), // Chica Orange
-          secondary: Color(0xFF9B1C24),
-          surface: Colors.white,
-          onSurface: Colors.black,
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          brightness: Brightness.light,
-          error: Color(0xFF9B1C24),
-          onError: Colors.white,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          elevation: 0,
-          titleTextStyle: TextStyle(
-            fontFamily: 'SofiaRoughBlackThree',
-            color: Colors.black,
-            fontSize: 24,
-          ),
-        ),
-      ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const LoadingScreen(),
-        '/home': (context) => const MainLayout(),
-        '/api-test': (context) => const ApiTestScreen(),
+        );
       },
     );
+  }
+
+  ThemeMode _getThemeMode() {
+    switch (themeService.themeMode) {
+      case theme_service.ThemeMode.light:
+        return ThemeMode.light;
+      case theme_service.ThemeMode.dark:
+        return ThemeMode.dark;
+      case theme_service.ThemeMode.system:
+        return ThemeMode.system;
+    }
   }
 }
 

@@ -50,6 +50,7 @@ class _LoadingScreenState extends State<LoadingScreen>
               height: 150,
             ),
             const SizedBox(height: 24),
+
             // Animated Spinner
             RotationTransition(
               turns: _controller,

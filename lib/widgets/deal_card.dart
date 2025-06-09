@@ -89,6 +89,7 @@ class _DealCardState extends State<DealCard> with SingleTickerProviderStateMixin
             scale: _scaleAnimation.value,
             child: Card(
               elevation: _elevationAnimation.value,
+              color: Theme.of(context).cardColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -112,11 +113,12 @@ class _DealCardState extends State<DealCard> with SingleTickerProviderStateMixin
                                   widget.deal.imageUrl,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
-                                    return Container(                                color: AppColors.chicaOrange.withOpacity(0.2),
-                                child: const Icon(
-                                  Icons.fastfood,
-                                  size: 48,
-                                  color: AppColors.chicaOrange,
+                                    return Container(
+                                      color: Theme.of(context).cardColor,
+                                      child: Icon(
+                                        Icons.fastfood,
+                                        size: 48,
+                                        color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.5),
                                       ),
                                     );
                                   },
@@ -145,7 +147,7 @@ class _DealCardState extends State<DealCard> with SingleTickerProviderStateMixin
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
+                                    color: Colors.black.withValues(alpha: 0.2),
                                     blurRadius: 4,
                                     offset: const Offset(0, 2),
                                   ),
@@ -161,7 +163,7 @@ class _DealCardState extends State<DealCard> with SingleTickerProviderStateMixin
                             ).animate(onPlay: (controller) => controller.repeat())
                               .shimmer(
                                 duration: const Duration(seconds: 2),
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                               ),
                           ),
                       ],
@@ -172,14 +174,16 @@ class _DealCardState extends State<DealCard> with SingleTickerProviderStateMixin
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.deal.name,                            style: AppTypography.headlineSmall.copyWith(
-                              color: AppColors.textPrimary,
+                            widget.deal.name,
+                            style: AppTypography.headlineSmall.copyWith(
+                              color: Theme.of(context).textTheme.headlineSmall?.color,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            widget.deal.description,                            style: AppTypography.bodyMedium.copyWith(
-                              color: AppColors.textSecondary,
+                            widget.deal.description,
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: Theme.of(context).textTheme.bodyMedium?.color,
                             ),                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),

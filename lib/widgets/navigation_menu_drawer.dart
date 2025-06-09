@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../screens/coming_soon_screen.dart';
 import '../screens/notification_test_screen.dart';
+import '../screens/favorites_screen.dart';
+import '../screens/settings_screen.dart';
+import '../widgets/offline_indicator.dart';
+
 
 class NavigationMenuDrawer extends StatelessWidget {
   const NavigationMenuDrawer({Key? key}) : super(key: key);
@@ -157,6 +161,30 @@ class NavigationMenuDrawer extends StatelessWidget {
                       onTap: () => _navigateToComingSoon(context, 'My Account'),
                     ),
                     ListTile(
+                      leading: const Icon(Icons.favorite_outline),
+                      title: const Text('Favorites'),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.pink,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'NEW',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FavoritesScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    ListTile(
                       leading: const Icon(Icons.local_fire_department),
                       title: const Text('Special Offers'),
                       trailing: Container(
@@ -196,6 +224,30 @@ class NavigationMenuDrawer extends StatelessWidget {
                       leading: const Icon(Icons.help_outline),
                       title: const Text('Support & FAQ'),
                       onTap: () => _navigateToComingSoon(context, 'Support'),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.settings_outlined),
+                      title: const Text('Settings'),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'NEW',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SettingsScreen(),
+                          ),
+                        );
+                      },
                     ),
                     ListTile(
                       leading: const Icon(Icons.api),
@@ -239,7 +291,8 @@ class NavigationMenuDrawer extends StatelessWidget {
                           ),
                         );
                       },
-                    ),],
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 16),

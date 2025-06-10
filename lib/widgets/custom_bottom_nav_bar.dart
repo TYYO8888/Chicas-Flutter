@@ -61,9 +61,9 @@ class CustomBottomNavBar extends StatelessWidget {
                 label: 'CART',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.more_horiz),
-                activeIcon: Icon(Icons.more_horiz, size: 28),
-                label: 'MORE',
+                icon: Icon(Icons.stars),
+                activeIcon: Icon(Icons.stars, size: 28),
+                label: 'LOYALTY',
               ),
             ],            currentIndex: selectedIndex,
             selectedFontSize: 12,

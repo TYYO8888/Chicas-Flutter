@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/menu_screen.dart';
 import '../screens/cart_screen.dart';
 import '../screens/home_screen.dart';
+import '../screens/loyalty_screen.dart';
 import '../screens/favorites_screen.dart';
 import '../screens/settings_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
@@ -42,20 +43,17 @@ class _MainLayoutState extends State<MainLayout> {
       const Scaffold(body: Center(child: Text('SCAN COMING SOON'))), // Scan page placeholder
       MenuScreen(cartService: _cartService), // Menu page
       CartScreen(cartService: _cartService), // Cart page
-      const Scaffold(body: Center(child: Text('MORE OPTIONS'))), // More page placeholder
+      const LoyaltyScreen(), // Loyalty page
     ];
   }
 
   void _onItemTapped(int index) {
-    if (index == 4) { // More button
-      _scaffoldKey.currentState?.openEndDrawer();
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-      // Jump to the selected page
-      _pageController.jumpToPage(index);
-    }
+    // All tabs now navigate to their respective screens
+    setState(() {
+      _selectedIndex = index;
+    });
+    // Jump to the selected page
+    _pageController.jumpToPage(index);
   }
 
 

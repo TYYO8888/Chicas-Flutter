@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/cart.dart';
 import '../services/navigation_service.dart';
+import '../screens/payment_screen.dart';
 import 'feedback_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -16,6 +17,54 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _isLoading = false;
   bool _orderPlaced = false;
   String _orderId = '';
+
+  // Navigate to payment screen
+  void _navigateToPayment() {
+    final totalAmount = widget.cart.totalPrice * 1.12; // Include taxes
+    final orderId = 'CHK${DateTime.now().millisecondsSinceEpoch}';
+
+    // Create order details for payment
+    final orderDetails = {
+      'items': widget.cart.items.map((item) => {
+        'name': item.menuItem.name,
+        'quantity': item.quantity,
+        'price': item.itemPrice,
+        'total': item.itemPrice * item.quantity,
+        'customizations': item.customizations,
+        'selectedSauces': item.menuItem.selectedSauces,
+        'selectedSize': item.selectedSize,
+        'selectedBunType': item.menuItem.selectedBunType,
+      }).toList(),
+      'subtotal': widget.cart.totalPrice,
+      'gst': widget.cart.totalPrice * 0.05,
+      'pst': widget.cart.totalPrice * 0.07,
+      'total': totalAmount,
+    };
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentScreen(
+          totalAmount: totalAmount,
+          orderId: orderId,
+          orderDetails: orderDetails,
+        ),
+      ),
+    ).then((result) {
+      // Handle payment result
+      if (result != null && result['success'] == true) {
+        _handlePaymentSuccess(orderId, result);
+      }
+    });
+  }
+
+  // Handle successful payment
+  void _handlePaymentSuccess(String orderId, Map<String, dynamic> paymentResult) {
+    setState(() {
+      _orderPlaced = true;
+      _orderId = orderId;
+    });
+  }
 
   // This is like telling your friend to call the restaurant!
   Future<void> _submitOrder() async {
@@ -540,7 +589,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       width: double.infinity,
                       height: 54,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _submitOrder,
+                        onPressed: _isLoading ? null : _navigateToPayment,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.deepOrange,
                           foregroundColor: Colors.white,
@@ -559,14 +608,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                   SizedBox(width: 16),
                                   Text(
-                                    'Placing Order...',
+                                    'Processing...',
                                     style: TextStyle(fontSize: 18),
                                   ),
                                 ],
                               )
-                            : const Text(
-                                'Pay Now',
-                                style: TextStyle(fontSize: 18),
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.payment, size: 24),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'PROCEED TO PAYMENT',
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
                               ),
                       ),
                     ),

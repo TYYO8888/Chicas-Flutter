@@ -36,6 +36,13 @@ dependencies:
   dio: ^5.4.0 # Advanced HTTP client
   web_socket_channel: ^2.4.0 # WebSocket support for real-time notifications
 
+  # Revel Systems API Integration
+  json_annotation: ^4.8.1 # JSON serialization
+  crypto: ^3.0.3 # For API signature generation
+  uuid: ^4.2.1 # For unique request IDs
+  flutter_secure_storage: ^9.0.0 # Secure token storage
+  url_launcher: ^6.2.2 # For payment redirects
+
   # Offline storage
   hive: ^2.2.3 # NoSQL local database
   hive_flutter: ^1.1.0 # Hive Flutter integration
@@ -51,6 +58,7 @@ dev_dependencies:
   # Code generation
   build_runner: ^2.4.7
   hive_generator: ^2.0.1
+  json_serializable: ^6.7.1 # JSON code generation for Revel API models
 
 flutter:
   uses-material-design: true

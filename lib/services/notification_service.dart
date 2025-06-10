@@ -108,8 +108,13 @@ class NotificationService {
     }
   }
 
-  // 🌐 Initialize WebSocket connection
+  // 🌐 Initialize WebSocket connection (DISABLED FOR DEVELOPMENT)
   Future<void> _initializeWebSocket() async {
+    // 🚀 Performance: WebSocket disabled to prevent crashes during development
+    AppLogger.info('WebSocket connection disabled for development');
+    return;
+
+    /* Original WebSocket code commented out to prevent crashes
     try {
       final wsUrl = ApiConfig.baseUrl.replaceFirst('http', 'ws');
       _channel = WebSocketChannel.connect(Uri.parse(wsUrl));
@@ -131,6 +136,7 @@ class NotificationService {
     } catch (error) {
       AppLogger.error('Failed to initialize WebSocket: $error');
     }
+    */
   }
 
   // 📱 Register FCM token with backend
@@ -209,19 +215,19 @@ class NotificationService {
   // ❌ Handle WebSocket errors
   void _handleWebSocketError(error) {
     AppLogger.error('WebSocket error: $error');
-    // Attempt to reconnect after a delay
-    Timer(const Duration(seconds: 5), () {
-      _initializeWebSocket();
-    });
+    // Temporarily disabled auto-reconnection for development
+    // Timer(const Duration(seconds: 5), () {
+    //   _initializeWebSocket();
+    // });
   }
 
   // 🔌 Handle WebSocket connection closed
   void _handleWebSocketClosed() {
     AppLogger.warning('WebSocket connection closed');
-    // Attempt to reconnect after a delay
-    Timer(const Duration(seconds: 5), () {
-      _initializeWebSocket();
-    });
+    // Temporarily disabled auto-reconnection for development
+    // Timer(const Duration(seconds: 5), () {
+    //   _initializeWebSocket();
+    // });
   }
 
   // 🧹 Dispose resources

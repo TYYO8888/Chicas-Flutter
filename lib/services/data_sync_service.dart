@@ -10,8 +10,9 @@ import '../utils/logger.dart';
 
 class DataSyncService {
   static const String baseUrl = 'http://localhost:3000/api';
-  static const Duration syncInterval = Duration(minutes: 15);
-  static const Duration cacheValidityDuration = Duration(hours: 2);
+  // 🚀 Performance: Increased sync interval to reduce background processing
+  static const Duration syncInterval = Duration(minutes: 30); // Reduced frequency
+  static const Duration cacheValidityDuration = Duration(hours: 4); // Longer cache
 
   final SimpleOfflineStorage _offlineStorage = SimpleOfflineStorage();
   final MenuService _menuService = MenuService();
@@ -26,21 +27,23 @@ class DataSyncService {
   factory DataSyncService() => _instance;
   DataSyncService._internal();
 
-  // Initialize sync service
+  // 🚀 Performance: Optimized initialization
   Future<void> initialize() async {
     await _offlineStorage.initialize();
-    
+
     // Start listening to connectivity changes
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       _onConnectivityChanged,
     );
 
-    // Start periodic sync
-    _startPeriodicSync();
+    // 🚀 Performance: Delay periodic sync to reduce startup load
+    Future.delayed(const Duration(seconds: 10), () {
+      _startPeriodicSync();
+    });
 
-    // Perform initial sync if online
+    // 🚀 Performance: Perform initial sync asynchronously
     if (await _isOnline()) {
-      _performSync();
+      Future.microtask(() => _performSync());
     }
 
     AppLogger.info('Data sync service initialized');
@@ -143,7 +146,7 @@ class DataSyncService {
       AppLogger.info('Menu data synced: $totalItemsUpdated items, ${categories.length} categories');
     } catch (e) {
       AppLogger.error('Failed to sync menu data', e);
-      throw e;
+      rethrow; // 🚀 Performance: Use rethrow instead of throw e
     }
 
     return syncResult;

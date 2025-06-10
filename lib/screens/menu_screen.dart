@@ -4,18 +4,24 @@ import 'package:qsr_app/screens/menu_item_screen.dart';
 import '../constants/typography.dart';
 import '../constants/colors.dart';
 import '../services/cart_service.dart';
+import '../config/delivery_config.dart';
 
 class MenuScreen extends StatelessWidget {
   final CartService cartService;
+  final OrderType orderType;
 
-  const MenuScreen({super.key, required this.cartService});
+  const MenuScreen({
+    super.key,
+    required this.cartService,
+    this.orderType = OrderType.pickup,
+  });
 
   final List<String> menuCategories = const [
+    'Crew Packs',
     'Sandwiches',
     'Whole Wings',
     'Chicken Pieces',
     'Chicken Bites',
-    'Crew Packs',
     'Sides',
     'Fixin\'s',
     'Sauces',
@@ -24,15 +30,48 @@ class MenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(      appBar: AppBar(
-        title: Text(
-          'Menu',
-          style: AppTypography.displaySmall.copyWith(color: AppColors.textPrimary),
-        ).animate()
-          .fadeIn(duration: const Duration(milliseconds: 600))
-          .slideX(begin: -0.2, end: 0),
-        backgroundColor: Colors.white,
+    final orderTypeText = orderType == OrderType.pickup ? 'PICKUP' : 'DELIVERY';
+    final orderTypeIcon = orderType == OrderType.pickup ? Icons.store : Icons.delivery_dining;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'MENU',
+              style: AppTypography.displaySmall.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ).animate()
+              .fadeIn(duration: const Duration(milliseconds: 600))
+              .slideX(begin: -0.2, end: 0),
+            Row(
+              children: [
+                Icon(
+                  orderTypeIcon,
+                  size: 16,
+                  color: orderType == OrderType.pickup ? Colors.green : Colors.blue,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  orderTypeText,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: orderType == OrderType.pickup ? Colors.green : Colors.blue,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
+        toolbarHeight: 80, // Increased height for better spacing
+        titleSpacing: 20, // Better horizontal spacing
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -54,24 +93,103 @@ class MenuScreen extends StatelessWidget {
             childAspectRatio = 0.8;
           }
 
-          return GridView.builder(
-            padding: EdgeInsets.all(constraints.maxWidth < 600 ? 12.0 : 16.0),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: constraints.maxWidth < 600 ? 12.0 : 16.0,
-              mainAxisSpacing: constraints.maxWidth < 600 ? 12.0 : 16.0,
-              childAspectRatio: childAspectRatio,
-            ),
-            itemCount: menuCategories.length,
-            itemBuilder: (context, index) {
-              final category = menuCategories[index];
-              return MenuCategoryCard(
-                category: category,
-                index: index,
-                cartService: cartService,
-                isMobile: constraints.maxWidth < 600,
-              );
-            },
+          return CustomScrollView(
+            slivers: [
+              // Smart Ordering Tips Section
+              SliverToBoxAdapter(
+                child: Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).shadowColor.withValues(alpha: 0.1),
+                        spreadRadius: 1,
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'CHEAT DAYTIPS:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFF6B35),
+                          letterSpacing: 0.5,
+                        ),
+                      ).animate()
+                        .fadeIn()
+                        .slideX(
+                          begin: -0.2,
+                          end: 0,
+                          duration: const Duration(milliseconds: 600),
+                        ),
+                      const SizedBox(height: 12),
+                      const Column(
+                        children: [
+                          SmartOrderingTip(index: 0, text: 'Pair 2-3 chicken pieces with pickled vegetables'),
+                          SmartOrderingTip(index: 1, text: 'Extra Jalapeños & Pickles (cuz they\'re delish veggies!)'),
+                          SmartOrderingTip(index: 2, text: 'Skip the bun and make it a protein-focused meal'),
+                          SmartOrderingTip(index: 3, text: 'Choose "Whole Wings" — it\'s all protein!'),
+                          SmartOrderingTip(index: 4, text: 'Grab hot sauce instead of creamy sauces to minimize calories'),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Disclaimer
+                      Text(
+                        'While this menu isn\'t traditionally "diet-friendly," the high-quality protein source and customizable portions make it workable for flexible eating approaches when consumed mindfully.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                          fontStyle: FontStyle.italic,
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ).animate()
+                        .fadeIn(delay: const Duration(milliseconds: 800))
+                        .slideY(
+                          begin: 0.2,
+                          end: 0,
+                          delay: const Duration(milliseconds: 800),
+                          duration: const Duration(milliseconds: 600),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Menu Categories Grid
+              SliverPadding(
+                padding: EdgeInsets.all(constraints.maxWidth < 600 ? 12.0 : 16.0),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: constraints.maxWidth < 600 ? 12.0 : 16.0,
+                    mainAxisSpacing: constraints.maxWidth < 600 ? 12.0 : 16.0,
+                    childAspectRatio: childAspectRatio,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final category = menuCategories[index];
+                      return MenuCategoryCard(
+                        category: category,
+                        index: index,
+                        cartService: cartService,
+                        isMobile: constraints.maxWidth < 600,
+                      );
+                    },
+                    childCount: menuCategories.length,
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -371,5 +489,55 @@ class _MenuCategoryCardState extends State<MenuCategoryCard>
       curve: Curves.easeOutBack,
       duration: const Duration(milliseconds: 800),
     );
+  }
+}
+
+class SmartOrderingTip extends StatelessWidget {
+  final String text;
+  final int index;
+
+  const SmartOrderingTip({
+    Key? key,
+    required this.text,
+    required this.index,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 6, right: 12),
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              text.toUpperCase(),
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ).animate()
+      .fadeIn(delay: Duration(milliseconds: 200 + (index * 100)))
+      .slideX(
+        begin: 0.2,
+        end: 0,
+        delay: Duration(milliseconds: 200 + (index * 100)),
+        duration: const Duration(milliseconds: 600),
+      );
   }
 }

@@ -76,6 +76,8 @@ class _DealCardState extends State<DealCard> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Listener(
       onPointerDown: (_) => _handleHoverChanged(true),
       onPointerUp: (_) => _handleHoverChanged(false),
@@ -87,15 +89,40 @@ class _DealCardState extends State<DealCard> with SingleTickerProviderStateMixin
           animation: _controller,
           builder: (context, child) => Transform.scale(
             scale: _scaleAnimation.value,
-            child: Card(
-              elevation: _elevationAnimation.value,
-              color: Theme.of(context).cardColor,
-              shape: RoundedRectangleBorder(
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark
+                  ? Theme.of(context).cardColor
+                  : Colors.white,
                 borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: isDark
+                      ? Colors.black.withValues(alpha: 0.3)
+                      : Colors.grey.withValues(alpha: 0.3),
+                    blurRadius: _elevationAnimation.value + 4,
+                    offset: Offset(0, _elevationAnimation.value / 2),
+                    spreadRadius: 1,
+                  ),
+                  if (!isDark)
+                    BoxShadow(
+                      color: const Color(0xFFFF6B35).withValues(alpha: 0.1),
+                      blurRadius: _elevationAnimation.value + 8,
+                      offset: Offset(0, _elevationAnimation.value),
+                      spreadRadius: 2,
+                    ),
+                ],
+                border: isDark
+                  ? null
+                  : Border.all(
+                      color: Colors.grey.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
               ),
-              child: InkWell(
-                onTap: widget.onTap,
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
+                child: InkWell(
+                  onTap: widget.onTap,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -248,6 +275,7 @@ class _DealCardState extends State<DealCard> with SingleTickerProviderStateMixin
                     ),
                   ],
                 ),
+              ),
               ),
             ),
           ),

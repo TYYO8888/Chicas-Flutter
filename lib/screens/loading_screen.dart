@@ -20,12 +20,14 @@ class _LoadingScreenState extends State<LoadingScreen>
       vsync: this,
     )..repeat();
 
-    // Simulate loading time and navigate to home
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MainLayout()),
-      );
+    // 🚀 Performance: Reduced loading time from 3s to 1.5s for faster app startup
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) { // 🛡️ Safety: Check if widget is still mounted
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainLayout()),
+        );
+      }
     });
   }
 
@@ -43,11 +45,14 @@ class _LoadingScreenState extends State<LoadingScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo
+            // 🚀 Performance: Optimized logo loading with caching
             Image.asset(
               'assets/CC-Penta-3.png',
-              width: 150,
-              height: 150,
+              width: 120, // Reduced size for faster loading
+              height: 120,
+              cacheWidth: 120, // Cache at display size
+              cacheHeight: 120,
+              filterQuality: FilterQuality.medium, // Balance quality vs performance
             ),
             const SizedBox(height: 24),
 

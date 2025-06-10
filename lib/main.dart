@@ -2,12 +2,11 @@
 import 'package:flutter/material.dart';
 import 'screens/loading_screen.dart';
 import 'layouts/main_layout.dart';
-import 'screens/api_test_screen.dart';
-import 'screens/test_screen.dart';
 import 'services/navigation_service.dart';
 import 'services/theme_service.dart' as theme_service;
 import 'services/user_preferences_service.dart';
 import 'services/data_sync_service.dart';
+import 'services/performance_service.dart';
 import 'themes/app_theme.dart';
 import 'widgets/offline_indicator.dart';
 
@@ -16,14 +15,21 @@ import 'widgets/offline_indicator.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize services
+  // 🚀 Performance: Initialize services asynchronously for faster startup
   final themeService = theme_service.ThemeService();
   final userPreferencesService = UserPreferencesService();
   final dataSyncService = DataSyncService();
+  final performanceService = PerformanceService();
 
+  // Initialize critical services first (theme for immediate UI)
   await themeService.initialize();
-  await userPreferencesService.initialize();
-  await dataSyncService.initialize();
+
+  // Initialize other services in parallel for faster startup
+  await Future.wait([
+    userPreferencesService.initialize(),
+    dataSyncService.initialize(),
+    performanceService.initialize(),
+  ]);
 
   runApp(MyApp(themeService: themeService)); // We tell Flutter to run our main app widget, MyApp.
 }
@@ -42,22 +48,22 @@ class MyApp extends StatelessWidget {
     return ListenableBuilder(
       listenable: themeService,
       builder: (context, child) {
-        return OfflineIndicator(
-          child: MaterialApp(
-            title: "Chica's Chicken", // The name of our app
-            debugShowCheckedModeBanner: false,
-            navigatorKey: NavigationService.navigatorKey,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: _getThemeMode(),
-            initialRoute: '/',
-            routes: {
-              '/': (context) => const LoadingScreen(),
-              '/home': (context) => const MainLayout(),
-              '/api-test': (context) => const ApiTestScreen(),
-              '/test': (context) => const TestScreen(),
-
-            },
+        return PerformanceMonitor(
+          child: OfflineIndicator(
+            child: MaterialApp(
+              title: "Chica's Chicken", // The name of our app
+              debugShowCheckedModeBanner: false,
+              navigatorKey: NavigationService.navigatorKey,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: _getThemeMode(),
+              initialRoute: '/',
+              routes: {
+                '/': (context) => const LoadingScreen(),
+                '/home': (context) => const MainLayout(),
+                // 🚀 Developer routes removed for production
+              },
+            ),
           ),
         );
       },

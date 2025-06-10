@@ -36,6 +36,12 @@ dependencies:
   dio: ^5.4.0 # Advanced HTTP client
   web_socket_channel: ^2.4.0 # WebSocket support for real-time notifications
 
+  # Game Integration
+  webview_flutter: ^4.4.4 # For web-based Godot games
+  flutter_inappwebview: ^6.0.0 # Advanced WebView with better game support
+  permission_handler: ^11.1.0 # For game permissions (camera, microphone, etc.)
+  wakelock_plus: ^1.2.5 # Keep screen awake during games
+
   # Revel Systems API Integration
   json_annotation: ^4.8.1 # JSON serialization
   crypto: ^3.0.3 # For API signature generation
@@ -65,6 +71,10 @@ flutter:
   assets:
     - assets/
     - assets/CC-Penta-3.png
+    - assets/games/
+    - assets/games/chicken_catch/
+    - assets/games/spice_mixer/
+    - assets/games/delivery_dash/
 
   fonts:
     - family: SofiaRoughBlackThree

@@ -193,6 +193,128 @@ class LoyaltyService {
     }
   }
 
+  /// 🎮 Award points for game completion
+  Future<PointsTransaction> awardPointsForGame({
+    required String userId,
+    required String gameId,
+    required int gamePoints,
+    required double gameScore,
+    required int timeSpent,
+    String? description,
+  }) async {
+    try {
+      // Convert game points to loyalty points (1:1 ratio by default)
+      final loyaltyPoints = _convertGamePointsToLoyalty(gamePoints);
+
+      final response = await _apiService.post('/api/users/$userId/loyalty/award', {
+        'points': loyaltyPoints,
+        'gameId': gameId,
+        'gameScore': gameScore,
+        'timeSpent': timeSpent,
+        'type': 'game_completion',
+        'description': description ?? 'Points earned from playing $gameId',
+        'metadata': {
+          'originalGamePoints': gamePoints,
+          'conversionRatio': _getGamePointConversionRatio(gameId),
+        },
+      });
+
+      return PointsTransaction.fromJson(response['data']);
+    } catch (e) {
+      debugPrint('Failed to award game points: $e');
+      throw Exception('Failed to award game loyalty points');
+    }
+  }
+
+  /// 🎯 Award daily challenge bonus
+  Future<PointsTransaction> awardDailyChallengeBonus({
+    required String userId,
+    required String challengeId,
+    required int bonusPoints,
+  }) async {
+    try {
+      final response = await _apiService.post('/api/users/$userId/loyalty/award', {
+        'points': bonusPoints,
+        'challengeId': challengeId,
+        'type': 'daily_challenge',
+        'description': 'Daily challenge bonus: $challengeId',
+      });
+
+      return PointsTransaction.fromJson(response['data']);
+    } catch (e) {
+      debugPrint('Failed to award daily challenge bonus: $e');
+      throw Exception('Failed to award daily challenge bonus');
+    }
+  }
+
+  /// 🔥 Award streak bonus
+  Future<PointsTransaction> awardStreakBonus({
+    required String userId,
+    required int streakDays,
+    required int bonusPoints,
+  }) async {
+    try {
+      final response = await _apiService.post('/api/users/$userId/loyalty/award', {
+        'points': bonusPoints,
+        'streakDays': streakDays,
+        'type': 'streak_bonus',
+        'description': '$streakDays-day gaming streak bonus!',
+      });
+
+      return PointsTransaction.fromJson(response['data']);
+    } catch (e) {
+      debugPrint('Failed to award streak bonus: $e');
+      throw Exception('Failed to award streak bonus');
+    }
+  }
+
+  /// ⚡ Award multiplier event bonus
+  Future<PointsTransaction> awardMultiplierBonus({
+    required String userId,
+    required String eventId,
+    required int basePoints,
+    required double multiplier,
+  }) async {
+    try {
+      final bonusPoints = (basePoints * (multiplier - 1.0)).round();
+
+      final response = await _apiService.post('/api/users/$userId/loyalty/award', {
+        'points': bonusPoints,
+        'eventId': eventId,
+        'basePoints': basePoints,
+        'multiplier': multiplier,
+        'type': 'multiplier_bonus',
+        'description': '${multiplier}x multiplier event bonus!',
+      });
+
+      return PointsTransaction.fromJson(response['data']);
+    } catch (e) {
+      debugPrint('Failed to award multiplier bonus: $e');
+      throw Exception('Failed to award multiplier bonus');
+    }
+  }
+
+  /// 🔄 Convert game points to loyalty points
+  int _convertGamePointsToLoyalty(int gamePoints) {
+    // Default 1:1 conversion, can be customized per game
+    return gamePoints;
+  }
+
+  /// 📊 Get game point conversion ratio for specific game
+  double _getGamePointConversionRatio(String gameId) {
+    // Different games can have different conversion rates
+    switch (gameId) {
+      case 'chicken_catch':
+        return 1.0; // 1 game point = 1 loyalty point
+      case 'spice_mixer':
+        return 1.5; // 1 game point = 1.5 loyalty points (harder game)
+      case 'delivery_dash':
+        return 0.8; // 1 game point = 0.8 loyalty points (easier game)
+      default:
+        return 1.0;
+    }
+  }
+
   /// 👥 Award referral bonus
   Future<PointsTransaction> awardReferralBonus({
     required String userId,

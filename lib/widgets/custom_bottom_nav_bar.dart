@@ -46,9 +46,9 @@ class CustomBottomNavBar extends StatelessWidget {
                 label: 'HOME',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.qr_code_scanner),
-                activeIcon: Icon(Icons.qr_code_scanner, size: 28),
-                label: 'SCAN',
+                icon: Icon(Icons.sports_esports),
+                activeIcon: Icon(Icons.sports_esports, size: 28),
+                label: 'GAMES',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.restaurant_menu),

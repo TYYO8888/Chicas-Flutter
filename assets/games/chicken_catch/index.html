@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chicken Catch - Chica's Chicken Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #FF6B35, #FF8A50);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #gameCanvas {
+            background: #87CEEB;
+            border: 3px solid #FF6B35;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            max-width: 100%;
+            max-height: 80vh;
+        }
+        
+        #gameUI {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        #startScreen, #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+        
+        .button {
+            background: #FF6B35;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .button:hover {
+            background: #FF8A50;
+            transform: scale(1.05);
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="gameUI">
+            <div>Score: <span id="score">0</span></div>
+            <div>Time: <span id="timer">60</span>s</div>
+        </div>
+        
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        
+        <div id="startScreen">
+            <h1>🐔 CHICKEN CATCH</h1>
+            <p>Catch falling chicken pieces to earn rewards!</p>
+            <p>Move your basket left and right to catch as many as possible!</p>
+            <button class="button" onclick="startGame()">START GAME</button>
+        </div>
+        
+        <div id="gameOverScreen" class="hidden">
+            <h1>🎉 GAME OVER!</h1>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <p id="rewardMessage"></p>
+            <button class="button" onclick="restartGame()">PLAY AGAIN</button>
+            <button class="button" onclick="exitGame()">EXIT</button>
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        let canvas, ctx;
+        let gameState = 'start'; // 'start', 'playing', 'gameOver'
+        let score = 0;
+        let timeLeft = 60;
+        let gameTimer;
+        
+        // Game objects
+        let basket = { x: 175, y: 550, width: 50, height: 30 };
+        let chickens = [];
+        let lastChickenSpawn = 0;
+        
+        // Touch/mouse controls
+        let isDragging = false;
+        let lastTouchX = 0;
+        
+        // Initialize game
+        function initGame() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Add touch controls
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+            
+            // Add mouse controls for testing
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            
+            // Notify Flutter that game is ready
+            sendMessageToFlutter('gameReady', {});
+        }
+        
+        function startGame() {
+            gameState = 'playing';
+            score = 0;
+            timeLeft = 60;
+            chickens = [];
+            basket.x = 175;
+            
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            
+            // Start game timer
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+            
+            // Start game loop
+            gameLoop();
+        }
+        
+        function gameLoop() {
+            if (gameState !== 'playing') return;
+            
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function update() {
+            // Spawn chickens
+            if (Date.now() - lastChickenSpawn > 1000 + Math.random() * 1000) {
+                spawnChicken();
+                lastChickenSpawn = Date.now();
+            }
+            
+            // Update chickens
+            for (let i = chickens.length - 1; i >= 0; i--) {
+                let chicken = chickens[i];
+                chicken.y += chicken.speed;
+                
+                // Check collision with basket
+                if (chicken.x < basket.x + basket.width &&
+                    chicken.x + chicken.width > basket.x &&
+                    chicken.y < basket.y + basket.height &&
+                    chicken.y + chicken.height > basket.y) {
+                    
+                    // Caught chicken!
+                    score += 10;
+                    document.getElementById('score').textContent = score;
+                    chickens.splice(i, 1);
+                    
+                    // Send score update to Flutter
+                    sendMessageToFlutter('scoreUpdate', { score: score });
+                    continue;
+                }
+                
+                // Remove chickens that fell off screen
+                if (chicken.y > canvas.height) {
+                    chickens.splice(i, 1);
+                }
+            }
+        }
+        
+        function draw() {
+            // Clear canvas
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw basket
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(basket.x, basket.y, basket.width, basket.height);
+            ctx.fillStyle = '#D2691E';
+            ctx.fillRect(basket.x + 5, basket.y + 5, basket.width - 10, basket.height - 10);
+            
+            // Draw chickens
+            chickens.forEach(chicken => {
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(chicken.x, chicken.y, chicken.width, chicken.height);
+                
+                // Simple chicken face
+                ctx.fillStyle = '#FF6B35';
+                ctx.fillRect(chicken.x + 5, chicken.y + 5, 5, 5);
+                ctx.fillRect(chicken.x + 15, chicken.y + 5, 5, 5);
+            });
+        }
+        
+        function spawnChicken() {
+            chickens.push({
+                x: Math.random() * (canvas.width - 25),
+                y: -25,
+                width: 25,
+                height: 25,
+                speed: 2 + Math.random() * 3
+            });
+        }
+        
+        function endGame() {
+            gameState = 'gameOver';
+            clearInterval(gameTimer);
+            
+            document.getElementById('finalScore').textContent = score;
+            
+            // Calculate reward message
+            let rewardMessage = '';
+            if (score >= 200) {
+                rewardMessage = '🎉 Amazing! You earned a 15% discount!';
+            } else if (score >= 150) {
+                rewardMessage = '🎊 Great job! You earned a 10% discount!';
+            } else if (score >= 100) {
+                rewardMessage = '👏 Good work! You earned a 5% discount!';
+            } else {
+                rewardMessage = '💪 Keep practicing! Better luck next time!';
+            }
+            
+            document.getElementById('rewardMessage').textContent = rewardMessage;
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+            
+            // Send completion to Flutter
+            sendMessageToFlutter('gameCompleted', { 
+                score: score,
+                timeSpent: 60 - timeLeft
+            });
+        }
+        
+        function restartGame() {
+            startGame();
+        }
+        
+        function exitGame() {
+            sendMessageToFlutter('gameExit', {});
+        }
+        
+        // Touch controls
+        function handleTouchStart(e) {
+            e.preventDefault();
+            isDragging = true;
+            lastTouchX = e.touches[0].clientX;
+        }
+        
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!isDragging || gameState !== 'playing') return;
+            
+            let touch = e.touches[0];
+            let deltaX = touch.clientX - lastTouchX;
+            
+            basket.x += deltaX;
+            basket.x = Math.max(0, Math.min(canvas.width - basket.width, basket.x));
+            
+            lastTouchX = touch.clientX;
+        }
+        
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            isDragging = false;
+        }
+        
+        // Mouse controls (for testing)
+        function handleMouseDown(e) {
+            isDragging = true;
+            lastTouchX = e.clientX;
+        }
+        
+        function handleMouseMove(e) {
+            if (!isDragging || gameState !== 'playing') return;
+            
+            let deltaX = e.clientX - lastTouchX;
+            basket.x += deltaX;
+            basket.x = Math.max(0, Math.min(canvas.width - basket.width, basket.x));
+            
+            lastTouchX = e.clientX;
+        }
+        
+        function handleMouseUp(e) {
+            isDragging = false;
+        }
+        
+        // Communication with Flutter
+        function sendMessageToFlutter(type, data) {
+            const message = JSON.stringify({ type: type, ...data });
+            
+            // For WebView communication
+            if (window.gameMessage) {
+                window.gameMessage(message);
+            }
+            
+            // For console logging (fallback)
+            console.log(message);
+        }
+        
+        // Receive messages from Flutter
+        window.receiveFlutterMessage = function(message) {
+            try {
+                const data = JSON.parse(message);
+                
+                switch (data.type) {
+                    case 'initialize':
+                        console.log('Game initialized with data:', data.data);
+                        break;
+                    case 'pause':
+                        if (gameState === 'playing') {
+                            gameState = 'paused';
+                            clearInterval(gameTimer);
+                        }
+                        break;
+                    case 'resume':
+                        if (gameState === 'paused') {
+                            gameState = 'playing';
+                            gameTimer = setInterval(() => {
+                                timeLeft--;
+                                document.getElementById('timer').textContent = timeLeft;
+                                if (timeLeft <= 0) endGame();
+                            }, 1000);
+                            gameLoop();
+                        }
+                        break;
+                }
+            } catch (e) {
+                console.error('Error parsing Flutter message:', e);
+            }
+        };
+        
+        // Initialize when page loads
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>

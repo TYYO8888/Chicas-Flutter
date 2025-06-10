@@ -4,6 +4,7 @@ import '../screens/cart_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/loyalty_screen.dart';
 import '../screens/favorites_screen.dart';
+import '../screens/games_hub_screen.dart';
 
 import '../screens/order_type_selection_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
@@ -11,8 +12,7 @@ import '../widgets/navigation_menu_drawer.dart';
 import '../widgets/notification_banner.dart';
 import '../services/cart_service.dart';
 import '../services/notification_service.dart';
-import '../services/theme_service.dart' as theme_service;
-import '../widgets/theme_mode_selector.dart';
+
 
 class MainLayout extends StatefulWidget {
   const MainLayout({Key? key}) : super(key: key);
@@ -42,7 +42,7 @@ class _MainLayoutState extends State<MainLayout> {
     // 🚀 Performance: Lazy load pages to reduce initial memory usage
     _pages = [
       HomeScreen(cartService: _cartService), // Home/Offers page - load immediately
-      const _ScanPlaceholder(), // Scan page placeholder - lightweight
+      const GamesHubScreen(), // Games hub - play and earn rewards
       OrderTypeSelectionScreen(cartService: _cartService), // Order type selection page
       CartScreen(cartService: _cartService), // Cart page
       const LoyaltyScreen(), // Loyalty page
@@ -147,48 +147,6 @@ class _MainLayoutState extends State<MainLayout> {
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: _selectedIndex,
         onItemSelected: _onItemTapped,
-      ),
-    );
-  }
-}
-
-// 🚀 Performance: Lightweight placeholder widget for scan page
-class _ScanPlaceholder extends StatelessWidget {
-  const _ScanPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.qr_code_scanner,
-              size: 80,
-              color: Theme.of(context).primaryColor,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'SCAN COMING SOON',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.headlineSmall?.color,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'QR code scanning feature\nwill be available soon!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).textTheme.bodyMedium?.color,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/loyalty_dashboard.dart';
+import '../widgets/unified_loyalty_dashboard.dart';
 
 /// 🏆 Loyalty Screen
 /// Main screen for loyalty program features
@@ -41,7 +41,7 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
           ),
         ],
       ),
-      body: const LoyaltyDashboard(
+      body: const UnifiedLoyaltyDashboard(
         userId: _userId,
       ),
     );

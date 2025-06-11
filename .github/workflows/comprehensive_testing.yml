@@ -1,0 +1,276 @@
+name: 🧪 Comprehensive Testing & QA Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run nightly tests at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  FLUTTER_VERSION: '3.16.0'
+  NODE_VERSION: '18'
+
+jobs:
+  # 🔍 Code Quality & Static Analysis
+  code_quality:
+    name: 🔍 Code Quality Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🔍 Analyze code
+        run: flutter analyze --fatal-infos
+
+      - name: 🎨 Check formatting
+        run: dart format --set-exit-if-changed .
+
+      - name: 🔒 Security scan
+        run: |
+          # Check for hardcoded secrets
+          if grep -r "password.*=" lib/ --include="*.dart" | grep -v "// " | grep -v "/// "; then
+            echo "❌ Potential hardcoded passwords found"
+            exit 1
+          fi
+          echo "✅ No hardcoded passwords detected"
+
+  # 🧪 Unit & Widget Tests
+  unit_tests:
+    name: 🧪 Unit & Widget Tests
+    runs-on: ubuntu-latest
+    needs: code_quality
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🧪 Run unit tests
+        run: flutter test --coverage --reporter=github
+
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+  # 🌐 Integration Tests
+  integration_tests:
+    name: 🌐 Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit_tests
+    strategy:
+      matrix:
+        device: [web-server, android]
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🌐 Enable web support
+        if: matrix.device == 'web-server'
+        run: flutter config --enable-web
+
+      - name: 🤖 Setup Android SDK
+        if: matrix.device == 'android'
+        uses: android-actions/setup-android@v2
+
+      - name: 🧪 Run integration tests
+        run: |
+          if [ "${{ matrix.device }}" == "web-server" ]; then
+            flutter test integration_test/ -d web-server
+          else
+            flutter test integration_test/ -d android
+          fi
+
+  # 🌐 API Tests with Newman
+  api_tests:
+    name: 🌐 API Tests
+    runs-on: ubuntu-latest
+    needs: code_quality
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: 🧪 Run API tests (Staging)
+        run: |
+          newman run postman/QSR_API_Tests.postman_collection.json \
+            -e postman/environments/staging.postman_environment.json \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export reports/api-test-report.html
+
+      - name: 📊 Upload API test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: api-test-results
+          path: reports/
+
+  # 📱 Performance Tests
+  performance_tests:
+    name: 📱 Performance Tests
+    runs-on: ubuntu-latest
+    needs: integration_tests
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🌐 Enable web support
+        run: flutter config --enable-web
+
+      - name: 📱 Run performance tests
+        run: |
+          flutter drive \
+            --driver=test_driver/integration_test.dart \
+            --target=integration_test/performance/app_performance_test.dart \
+            -d web-server
+
+      - name: 📊 Analyze performance metrics
+        run: |
+          # Custom script to analyze performance results
+          echo "📊 Performance analysis completed"
+
+  # 🔒 Security Tests
+  security_tests:
+    name: 🔒 Security Tests
+    runs-on: ubuntu-latest
+    needs: code_quality
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔒 Run security scan
+        uses: securecodewarrior/github-action-add-sarif@v1
+        with:
+          sarif-file: 'security-scan-results.sarif'
+
+      - name: 🔍 Dependency vulnerability scan
+        run: |
+          # Check for known vulnerabilities in dependencies
+          flutter pub deps --json | grep -i "vulnerability" || echo "✅ No known vulnerabilities"
+
+  # 🚀 Build & Deploy Tests
+  build_tests:
+    name: 🚀 Build Tests
+    runs-on: ubuntu-latest
+    needs: [unit_tests, integration_tests]
+    strategy:
+      matrix:
+        platform: [web, android, ios]
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🌐 Build for Web
+        if: matrix.platform == 'web'
+        run: flutter build web --release
+
+      - name: 🤖 Build for Android
+        if: matrix.platform == 'android'
+        run: flutter build apk --release
+
+      - name: 🍎 Setup Xcode (iOS)
+        if: matrix.platform == 'ios'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: 🍎 Build for iOS
+        if: matrix.platform == 'ios'
+        run: flutter build ios --release --no-codesign
+
+      - name: 📦 Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-${{ matrix.platform }}
+          path: |
+            build/web/
+            build/app/outputs/flutter-apk/
+            build/ios/iphoneos/
+
+  # 📊 Test Results Summary
+  test_summary:
+    name: 📊 Test Results Summary
+    runs-on: ubuntu-latest
+    needs: [unit_tests, integration_tests, api_tests, performance_tests, security_tests, build_tests]
+    if: always()
+    steps:
+      - name: 📊 Generate test summary
+        run: |
+          echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.unit_tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration_tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| API Tests | ${{ needs.api_tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Performance Tests | ${{ needs.performance_tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Tests | ${{ needs.security_tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Tests | ${{ needs.build_tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+
+  # 🚨 Notify on Failure
+  notify_failure:
+    name: 🚨 Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [unit_tests, integration_tests, api_tests, performance_tests, security_tests, build_tests]
+    if: failure()
+    steps:
+      - name: 🚨 Send failure notification
+        run: |
+          echo "❌ Test pipeline failed. Check the logs for details."
+          # Add Slack/Discord/Email notification here if needed

@@ -9,8 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-// NOTE: Uncomment when implementing Sentry
-// import 'package:sentry_flutter/sentry_flutter.dart';
+// Sentry for crash reporting
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 // NOTE: Uncomment when implementing Firebase Crashlytics
 // import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -232,7 +232,7 @@ class CrashReportingService {
         'extra': extra,
         'user_id': _userId,
         'timestamp': DateTime.now().toIso8601String(),
-        ...?_userContext,
+        ..._userContext,
       };
       
       // Log to console in debug mode

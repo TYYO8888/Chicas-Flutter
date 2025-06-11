@@ -206,7 +206,7 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
           ),
         ),
         title: Text(description),
-        subtitle: Text('${DateTime.now().subtract(Duration(days: index)).toString().split(' ')[0]}'),
+        subtitle: Text(DateTime.now().subtract(Duration(days: index)).toString().split(' ')[0]),
         trailing: Text(
           '${isEarned ? '+' : ''}$points pts',
           style: TextStyle(
@@ -339,7 +339,7 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('You are about to redeem:'),
+            const Text('You are about to redeem:'),
             const SizedBox(height: 8),
             Text(
               reward['name'] as String,
@@ -380,7 +380,7 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
       SnackBar(
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.check_circle,
               color: Colors.white,
             ),

@@ -303,10 +303,10 @@ class _LoyaltyGameIntegrationTestState extends State<LoyaltyGameIntegrationTest>
           ),
         ],
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(20),
             child: Text(
               '📊 LIVE LOYALTY DASHBOARD',
@@ -317,7 +317,7 @@ class _LoyaltyGameIntegrationTestState extends State<LoyaltyGameIntegrationTest>
               ),
             ),
           ),
-          const UnifiedLoyaltyDashboard(userId: 'user_123'),
+          UnifiedLoyaltyDashboard(userId: 'user_123'),
         ],
       ),
     ).animate()

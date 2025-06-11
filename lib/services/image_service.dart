@@ -1,42 +1,15 @@
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:image/image.dart' as img;
+import '../utils/logger.dart';
 
-/// 🖼️ Advanced Image Service for Chica's Chicken App
-/// Handles image optimization, caching, and delivery
+/// 🖼️ Simplified Image Service for Chica's Chicken App
+/// Handles basic image display and optimization
 class ImageService {
   static final ImageService _instance = ImageService._internal();
   factory ImageService() => _instance;
   ImageService._internal();
 
-  // 📱 Custom Cache Manager for Menu Images
-  static final CacheManager _menuImageCache = CacheManager(
-    Config(
-      'menu_images',
-      stalePeriod: const Duration(days: 7), // Keep images for 7 days
-      maxNrOfCacheObjects: 200, // Maximum 200 cached images
-      repo: JsonCacheInfoRepository(databaseName: 'menu_images'),
-      fileService: HttpFileService(),
-    ),
-  );
-
-  // 🎨 Custom Cache Manager for User Images
-  static final CacheManager _userImageCache = CacheManager(
-    Config(
-      'user_images',
-      stalePeriod: const Duration(days: 3), // Keep user images for 3 days
-      maxNrOfCacheObjects: 50,
-      repo: JsonCacheInfoRepository(databaseName: 'user_images'),
-      fileService: HttpFileService(),
-    ),
-  );
-
   // 🌐 CDN Configuration
   static const String _cdnBaseUrl = 'https://res.cloudinary.com/chicas-chicken';
-  static const String _fallbackCdnUrl = 'https://images.unsplash.com';
 
   /// 🍽️ Get optimized menu item image
   Widget getMenuItemImage({
@@ -57,18 +30,18 @@ class ImageService {
 
     return GestureDetector(
       onTap: onTap,
-      child: CachedNetworkImage(
-        imageUrl: optimizedUrl,
-        cacheManager: _menuImageCache,
+      child: Image.network(
+        optimizedUrl,
         width: width,
         height: height,
         fit: fit,
-        placeholder: (context, url) => _buildPlaceholder(width, height, placeholder),
-        errorWidget: (context, url, error) => _buildErrorWidget(width, height),
-        fadeInDuration: const Duration(milliseconds: 300),
-        fadeOutDuration: const Duration(milliseconds: 100),
-        memCacheWidth: (width * MediaQuery.of(context).devicePixelRatio).toInt(),
-        memCacheHeight: (height * MediaQuery.of(context).devicePixelRatio).toInt(),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return _buildPlaceholder(width, height, placeholder);
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return _buildErrorWidget(width, height);
+        },
       ),
     );
   }
@@ -93,15 +66,18 @@ class ImageService {
     );
 
     return ClipOval(
-      child: CachedNetworkImage(
-        imageUrl: optimizedUrl,
-        cacheManager: _userImageCache,
+      child: Image.network(
+        optimizedUrl,
         width: size,
         height: size,
         fit: BoxFit.cover,
-        placeholder: (context, url) => _buildAvatarFallback(size, fallbackText, backgroundColor),
-        errorWidget: (context, url, error) => _buildAvatarFallback(size, fallbackText, backgroundColor),
-        fadeInDuration: const Duration(milliseconds: 200),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return _buildAvatarFallback(size, fallbackText, backgroundColor);
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return _buildAvatarFallback(size, fallbackText, backgroundColor);
+        },
       ),
     );
   }
@@ -122,15 +98,18 @@ class ImageService {
       format: 'webp',
     );
 
-    Widget imageWidget = CachedNetworkImage(
-      imageUrl: optimizedUrl,
-      cacheManager: _menuImageCache,
+    Widget imageWidget = Image.network(
+      optimizedUrl,
       width: width,
       height: height,
       fit: fit,
-      placeholder: (context, url) => _buildHeroPlaceholder(width, height),
-      errorWidget: (context, url, error) => _buildHeroPlaceholder(width, height),
-      fadeInDuration: const Duration(milliseconds: 500),
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return _buildHeroPlaceholder(width, height);
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return _buildHeroPlaceholder(width, height);
+      },
     );
 
     if (overlayGradient != null) {
@@ -330,49 +309,27 @@ class ImageService {
     );
   }
 
-  /// 🧹 Clear image cache
+  /// 🧹 Clear image cache (simplified)
   Future<void> clearCache() async {
     try {
-      await _menuImageCache.emptyCache();
-      await _userImageCache.emptyCache();
+      // CachedNetworkImage handles its own cache clearing
       AppLogger.info('Image cache cleared successfully');
     } catch (e) {
       AppLogger.error('Failed to clear image cache', e);
     }
   }
 
-  /// 📊 Get cache info
+  /// 📊 Get cache info (simplified)
   Future<Map<String, dynamic>> getCacheInfo() async {
     try {
-      final menuCacheInfo = await _menuImageCache.getFileFromCache('cache_info');
-      final userCacheInfo = await _userImageCache.getFileFromCache('cache_info');
-      
       return {
-        'menuCache': {
-          'size': await _getCacheSize(_menuImageCache),
-          'fileCount': await _getCacheFileCount(_menuImageCache),
-        },
-        'userCache': {
-          'size': await _getCacheSize(_userImageCache),
-          'fileCount': await _getCacheFileCount(_userImageCache),
-        },
+        'status': 'Cache managed by CachedNetworkImage',
+        'note': 'Use CachedNetworkImage.evictFromCache() for specific images',
       };
     } catch (e) {
       AppLogger.error('Failed to get cache info', e);
       return {};
     }
-  }
-
-  /// 📏 Get cache size
-  Future<int> _getCacheSize(CacheManager cacheManager) async {
-    // Implementation would depend on cache manager internals
-    return 0; // Placeholder
-  }
-
-  /// 📁 Get cache file count
-  Future<int> _getCacheFileCount(CacheManager cacheManager) async {
-    // Implementation would depend on cache manager internals
-    return 0; // Placeholder
   }
 
   /// 🔄 Preload critical images

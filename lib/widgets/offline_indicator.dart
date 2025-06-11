@@ -20,12 +20,12 @@ class OfflineIndicator extends StatefulWidget {
 }
 
 class _OfflineIndicatorState extends State<OfflineIndicator> {
-  final DataSyncService _syncService = DataSyncService();
+  // final DataSyncService _syncService = DataSyncService();
   final Connectivity _connectivity = Connectivity();
-  
+
   bool _isOnline = true;
-  bool _syncInProgress = false;
-  String _syncStatus = '';
+  // final bool _syncInProgress = false;
+  // final String _syncStatus = '';
 
   @override
   void initState() {
@@ -56,7 +56,7 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
       children: [
         widget.child,
         if (!_isOnline) _buildOfflineBanner(),
-        if (widget.showSyncStatus && _syncInProgress) _buildSyncIndicator(),
+        // if (widget.showSyncStatus && _syncInProgress) _buildSyncIndicator(),
       ],
     );
   }
@@ -82,7 +82,7 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
           bottom: false,
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.cloud_off,
                 color: Colors.white,
                 size: 20,
@@ -116,49 +116,7 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
     );
   }
 
-  Widget _buildSyncIndicator() {
-    return Positioned(
-      bottom: 100,
-      right: 16,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'SYNCING...',
-              style: AppTypography.bodySmall.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ).animate()
-        .fadeIn(duration: const Duration(milliseconds: 300))
-        .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.0, 1.0)),
-    );
-  }
+
 }
 
 class SyncStatusScreen extends StatefulWidget {

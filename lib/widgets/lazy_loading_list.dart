@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
-import '../services/api_service.dart';
 
 /// 🔄 Lazy Loading List Widget with Pagination
 /// Efficiently loads and displays large lists of data
@@ -300,8 +299,8 @@ class MenuItemsLazyList extends StatelessWidget {
 
   /// 📊 Load menu items with pagination
   Future<List<MenuItem>> _loadMenuItems(int page, int limit) async {
-    final apiService = ApiService();
-    
+    // final apiService = ApiService();
+
     // Simulate API call with pagination
     await Future.delayed(const Duration(milliseconds: 500));
     

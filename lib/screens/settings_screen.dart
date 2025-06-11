@@ -43,7 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final mediaQuery = MediaQuery.of(context);
     setState(() {
       _highContrastEnabled = mediaQuery.highContrast;
-      _largeTextEnabled = mediaQuery.textScaleFactor > 1.0;
+      _largeTextEnabled = mediaQuery.textScaler.scale(1.0) > 1.0;
       _reduceAnimationsEnabled = mediaQuery.disableAnimations;
     });
   }
@@ -226,12 +226,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           AccessibleButton(
             onPressed: () => _showAccessibilityHelp(),
             semanticLabel: 'Learn more about accessibility features',
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.help_outline),
-                const SizedBox(width: 8),
-                const Text('ACCESSIBILITY HELP'),
+                Icon(Icons.help_outline),
+                SizedBox(width: 8),
+                Text('ACCESSIBILITY HELP'),
               ],
             ),
           ),
@@ -374,7 +374,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       trailing: isSystemSetting 
-          ? Icon(
+          ? const Icon(
               Icons.settings,
               color: AppColors.textSecondary,
             )

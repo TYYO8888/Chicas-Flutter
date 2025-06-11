@@ -123,10 +123,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             Center(
               child: Column(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.feedback,
                     size: 80,
-                    color: const Color(0xFFFF5C22),
+                    color: Color(0xFFFF5C22),
                   ),
                   const SizedBox(height: 16),
                   const Text(

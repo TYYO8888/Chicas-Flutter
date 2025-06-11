@@ -16,13 +16,11 @@ class AppTheme {
         brightness: Brightness.light,
         primary: AppColors.primary,
         secondary: AppColors.secondary,
-        surface: Colors.white,
-        background: AppColors.background,
+        surface: AppColors.background,
         error: AppColors.error,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: AppColors.textPrimary,
-        onBackground: AppColors.textPrimary,
         onError: Colors.white,
       ),
 
@@ -37,11 +35,11 @@ class AppTheme {
           fontWeight: FontWeight.bold,
         ),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
-        iconTheme: IconThemeData(color: AppColors.textPrimary),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
 
       // Card Theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: Colors.white,
         elevation: 2,
         shadowColor: Colors.black.withValues(alpha: 0.1),
@@ -82,7 +80,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: BorderSide(color: AppColors.primary),
+          side: const BorderSide(color: AppColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -107,11 +105,11 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: AppColors.primary, width: 2),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: AppColors.error),
+          borderSide: const BorderSide(color: AppColors.error),
         ),
         labelStyle: AppTypography.bodyMedium.copyWith(
           color: AppColors.textSecondary,
@@ -135,7 +133,7 @@ class AppTheme {
       ),
 
       // Tab Bar Theme
-      tabBarTheme: TabBarTheme(
+      tabBarTheme: TabBarThemeData(
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.textSecondary,
         indicatorColor: AppColors.primary,
@@ -158,7 +156,7 @@ class AppTheme {
       ),
 
       // Dialog Theme
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -173,7 +171,7 @@ class AppTheme {
       ),
 
       // Icon Theme
-      iconTheme: IconThemeData(
+      iconTheme: const IconThemeData(
         color: AppColors.textPrimary,
         size: 24,
       ),
@@ -241,13 +239,11 @@ class AppTheme {
         brightness: Brightness.dark,
         primary: darkPrimary,
         secondary: darkSecondary,
-        surface: darkSurface,
-        background: darkBackground,
+        surface: darkBackground,
         error: const Color(0xFFCF6679),
         onPrimary: Colors.black,
         onSecondary: Colors.black,
         onSurface: darkTextPrimary,
-        onBackground: darkTextPrimary,
         onError: Colors.black,
       ),
 
@@ -266,7 +262,7 @@ class AppTheme {
       ),
 
       // Card Theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: darkCard,
         elevation: 4,
         shadowColor: Colors.black.withValues(alpha: 0.3),
@@ -360,7 +356,7 @@ class AppTheme {
       ),
 
       // Tab Bar Theme
-      tabBarTheme: TabBarTheme(
+      tabBarTheme: TabBarThemeData(
         labelColor: darkPrimary,
         unselectedLabelColor: darkTextSecondary,
         indicatorColor: darkPrimary,
@@ -383,7 +379,7 @@ class AppTheme {
       ),
 
       // Dialog Theme
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: darkSurface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../config/delivery_config.dart';
 import '../screens/delivery/city_selection_screen.dart';
 import '../services/cart_service.dart';

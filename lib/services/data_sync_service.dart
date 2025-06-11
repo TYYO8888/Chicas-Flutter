@@ -241,6 +241,38 @@ class DataSyncService {
     await _offlineStorage.clearCache();
   }
 
+  // Perform full sync (missing method)
+  Future<SyncResult> performFullSync() async {
+    try {
+      AppLogger.info('Starting full sync...');
+
+      // Sync categories first
+      final categories = await getMenuCategories();
+
+      // Sync menu items for all categories
+      int totalMenuItems = 0;
+      for (final category in categories) {
+        final menuItems = await getMenuItems(category.name);
+        totalMenuItems += menuItems.length;
+      }
+
+      AppLogger.info('Full sync completed successfully');
+      return SyncResult(
+        success: true,
+        message: 'Full sync completed successfully',
+        menuItemsUpdated: totalMenuItems,
+        categoriesUpdated: categories.length,
+        ordersSynced: 0,
+      );
+    } catch (e) {
+      AppLogger.error('Full sync failed', e);
+      return SyncResult(
+        success: false,
+        message: 'Full sync failed: $e',
+      );
+    }
+  }
+
   // Dispose resources
   void dispose() {
     _syncTimer?.cancel();

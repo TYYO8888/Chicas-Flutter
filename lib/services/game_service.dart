@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'unified_loyalty_service.dart';
@@ -210,12 +209,25 @@ class GameService extends ChangeNotifier {
     try {
       _gameRewards[rewardId]['isRedeemed'] = true;
       _gameRewards[rewardId]['redeemedAt'] = DateTime.now().toIso8601String();
-      
+
       await _saveGameRewards();
       notifyListeners();
       return true;
     } catch (e) {
       debugPrint('🎮 Error redeeming reward $rewardId: $e');
+      return false;
+    }
+  }
+
+  /// Perform full sync of game data (missing method)
+  Future<bool> performFullSync() async {
+    try {
+      await _loadGameProgress();
+      await _loadGameRewards();
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint('🎮 Error performing full sync: $e');
       return false;
     }
   }

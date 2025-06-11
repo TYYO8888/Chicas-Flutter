@@ -21,7 +21,7 @@ class UnifiedLoyaltyService extends ChangeNotifier {
   LoyaltyAccount? _currentAccount;
   List<PointsTransaction> _transactionHistory = [];
   Map<String, dynamic> _gameStats = {};
-  Map<String, dynamic> _dailyChallenges = {};
+  final Map<String, dynamic> _dailyChallenges = {};
   int _currentStreak = 0;
   DateTime? _lastGamePlayDate;
   
@@ -93,7 +93,7 @@ class UnifiedLoyaltyService extends ChangeNotifier {
       points: actualPoints,
       type: 'game_completion',
       description: 'Points earned from $gameId (Score: ${gameScore.toStringAsFixed(0)})',
-      timestamp: DateTime.now(),
+      createdAt: DateTime.now(),
       metadata: {
         'gameId': gameId,
         'gameScore': gameScore,
@@ -126,7 +126,7 @@ class UnifiedLoyaltyService extends ChangeNotifier {
       points: bonusPoints,
       type: 'daily_challenge',
       description: 'Daily challenge completed: $challengeId',
-      timestamp: DateTime.now(),
+      createdAt: DateTime.now(),
       metadata: {'challengeId': challengeId},
     );
     
@@ -153,7 +153,7 @@ class UnifiedLoyaltyService extends ChangeNotifier {
       points: bonusPoints,
       type: 'streak_bonus',
       description: '$streakDays-day gaming streak bonus!',
-      timestamp: DateTime.now(),
+      createdAt: DateTime.now(),
       metadata: {'streakDays': streakDays},
     );
     
@@ -175,7 +175,7 @@ class UnifiedLoyaltyService extends ChangeNotifier {
       points: bonusPoints,
       type: 'multiplier_bonus',
       description: '${multiplier}x multiplier event bonus!',
-      timestamp: DateTime.now(),
+      createdAt: DateTime.now(),
       metadata: {
         'eventId': eventId,
         'basePoints': basePoints,
@@ -200,7 +200,7 @@ class UnifiedLoyaltyService extends ChangeNotifier {
       points: points,
       type: 'purchase',
       description: 'Points earned from order #$orderId',
-      timestamp: DateTime.now(),
+      createdAt: DateTime.now(),
       metadata: {
         'orderId': orderId,
         'orderAmount': orderAmount,
@@ -226,7 +226,7 @@ class UnifiedLoyaltyService extends ChangeNotifier {
       points: -pointsToRedeem,
       type: 'redemption',
       description: 'Points redeemed for order discount',
-      timestamp: DateTime.now(),
+      createdAt: DateTime.now(),
       metadata: {'orderId': orderId},
     );
     
@@ -242,7 +242,7 @@ class UnifiedLoyaltyService extends ChangeNotifier {
 
   /// Get available daily challenges
   List<DailyChallenge> getDailyChallenges() {
-    final today = DateTime.now();
+    // final today = DateTime.now();
     final challenges = <DailyChallenge>[];
     
     // Game-based challenges
@@ -324,14 +324,14 @@ class UnifiedLoyaltyService extends ChangeNotifier {
 
   int _getDailyGamePoints() {
     final today = DateTime.now();
-    final todayStr = '${today.year}-${today.month}-${today.day}';
-    
+    // final todayStr = '${today.year}-${today.month}-${today.day}';
+
     return _transactionHistory
-        .where((t) => 
-            t.type == 'game_completion' && 
-            t.timestamp.year == today.year &&
-            t.timestamp.month == today.month &&
-            t.timestamp.day == today.day)
+        .where((t) =>
+            t.type == 'game_completion' &&
+            t.createdAt.year == today.year &&
+            t.createdAt.month == today.month &&
+            t.createdAt.day == today.day)
         .fold(0, (sum, t) => sum + t.points);
   }
 
@@ -393,9 +393,9 @@ class UnifiedLoyaltyService extends ChangeNotifier {
     // Check if user played yesterday
     final playedYesterday = _transactionHistory.any((t) =>
         t.type == 'game_completion' &&
-        t.timestamp.year == yesterday.year &&
-        t.timestamp.month == yesterday.month &&
-        t.timestamp.day == yesterday.day);
+        t.createdAt.year == yesterday.year &&
+        t.createdAt.month == yesterday.month &&
+        t.createdAt.day == yesterday.day);
     
     if (playedYesterday || _lastGamePlayDate == null) {
       _currentStreak++;

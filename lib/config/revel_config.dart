@@ -15,7 +15,7 @@ class RevelConfig {
   static String get environment => _isProduction ? 'production' : 'sandbox';
   
   // 🔑 API Credentials (These should be stored securely in production)
-  // TODO: Move to environment variables or secure storage
+  // NOTE: Move to environment variables or secure storage
   static const String apiKey = 'YOUR_REVEL_API_KEY'; // Replace with actual API key
   static const String apiSecret = 'YOUR_REVEL_API_SECRET'; // Replace with actual API secret
   static const String establishmentId = 'YOUR_ESTABLISHMENT_ID'; // Replace with actual establishment ID

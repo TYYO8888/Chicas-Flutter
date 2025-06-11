@@ -144,6 +144,7 @@ class MenuService {
             category: 'Sandwiches',
             sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
             allowsHeatLevelSelection: true,
+            allowsExtras: true,
           ),
           MenuItem(
             id: 'sweet_heat_sando',
@@ -153,6 +154,7 @@ class MenuService {
             imageUrl: 'assets/sandwiches.png',
             category: 'Sandwiches',
             sizes: {'Texas Toast': 13.00, 'Brioche Bun': 14.00},
+            allowsExtras: true,
           ),
           MenuItem(
             id: 'buffalo_sando',

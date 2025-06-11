@@ -81,8 +81,8 @@ class _CustomCarouselState extends State<CustomCarousel> {
                   margin: const EdgeInsets.symmetric(horizontal: 4.0),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(
-                      _currentPage == index ? 0.9 : 0.4,
+                    color: Colors.white.withValues(
+                      alpha: _currentPage == index ? 0.9 : 0.4,
                     ),
                   ),
                 ),

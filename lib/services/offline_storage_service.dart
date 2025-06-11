@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import '../models/offline_data.dart';
 import '../models/menu_item.dart';
 import '../models/menu_category.dart';
 import '../utils/logger.dart';
@@ -127,17 +126,40 @@ class OfflineStorageService {
   // Get cached menu items
   Future<List<MenuItem>> getCachedMenuItems({String? category}) async {
     await _ensureInitialized();
-    
+
     try {
-      final offlineItems = _menuItemsBox_.values.toList();
-      
-      List<OfflineMenuItem> filteredItems = offlineItems;
+      final cachedData = _prefs.getString(_menuItemsKey);
+      if (cachedData == null) return [];
+
+      final itemsJson = jsonDecode(cachedData) as List;
+      List<MenuItem> items = itemsJson.map((json) => MenuItem(
+        id: json['id'],
+        name: json['name'],
+        description: json['description'],
+        price: json['price'].toDouble(),
+        imageUrl: json['imageUrl'],
+        category: json['category'],
+        isSpecial: json['isSpecial'] ?? false,
+        available: json['available'] ?? true,
+        allowsSauceSelection: json['allowsSauceSelection'] ?? false,
+        selectedSauces: json['selectedSauces']?.cast<String>() ?? [],
+        includedSauceCount: json['includedSauceCount'] ?? 0,
+        selectedBunType: json['selectedBunType'],
+        allowsHeatLevelSelection: json['allowsHeatLevelSelection'] ?? false,
+        selectedHeatLevel: json['selectedHeatLevel'],
+        sizes: json['sizes']?.cast<String>() ?? [],
+        customizationCounts: json['customizationCounts']?.cast<String, int>() ?? {},
+        customizationCategories: json['customizationCategories']?.cast<String>() ?? [],
+        customizations: json['customizations']?.cast<String, dynamic>() ?? {},
+        nutritionInfo: json['nutritionInfo']?.cast<String, dynamic>() ?? {},
+      )).toList();
+
       if (category != null) {
-        filteredItems = offlineItems.where((item) => 
+        items = items.where((item) =>
             item.category.toLowerCase() == category.toLowerCase()).toList();
       }
-      
-      return filteredItems.map((item) => item.toMenuItem()).toList();
+
+      return items;
     } catch (e) {
       AppLogger.error('Failed to get cached menu items', e);
       return [];
@@ -146,13 +168,20 @@ class OfflineStorageService {
 
   // Check if menu items are cached
   bool hasMenuItemsCache() {
-    return _isInitialized && _menuItemsBox_.isNotEmpty;
+    return _isInitialized && _prefs.containsKey(_menuItemsKey);
   }
 
   // Get cache age for menu items
   DateTime? getMenuItemsCacheAge() {
-    final metadata = _syncMetadataBox_.get('menu_items');
-    return metadata?.lastSyncTime;
+    final metadataJson = _prefs.getString('${_syncMetadataKey}_menu_items');
+    if (metadataJson == null) return null;
+
+    try {
+      final metadata = jsonDecode(metadataJson);
+      return DateTime.parse(metadata['lastSyncTime']);
+    } catch (e) {
+      return null;
+    }
   }
 
   // Categories Storage
@@ -160,24 +189,18 @@ class OfflineStorageService {
   // Cache menu categories
   Future<void> cacheMenuCategories(List<MenuCategory> categories) async {
     await _ensureInitialized();
-    
-    try {
-      // Clear existing categories
-      await _categoriesBox_.clear();
-      
-      // Add new categories
-      for (final category in categories) {
-        final offlineCategory = OfflineMenuCategory(
-          id: category.id,
-          name: category.name,
-          displayOrder: category.displayOrder,
-          lastUpdated: DateTime.now(),
-        );
-        await _categoriesBox_.put(category.id, offlineCategory);
-      }
 
+    try {
+      final categoriesJson = categories.map((category) => {
+        'id': category.id,
+        'name': category.name,
+        'displayOrder': category.displayOrder,
+        'lastUpdated': DateTime.now().toIso8601String(),
+      }).toList();
+
+      await _prefs.setString(_categoriesKey, jsonEncode(categoriesJson));
       await _updateSyncMetadata('categories', categories.length);
-      
+
       AppLogger.info('Cached ${categories.length} categories offline');
     } catch (e) {
       AppLogger.error('Failed to cache categories', e);
@@ -187,16 +210,20 @@ class OfflineStorageService {
   // Get cached categories
   Future<List<MenuCategory>> getCachedCategories() async {
     await _ensureInitialized();
-    
+
     try {
-      final offlineCategories = _categoriesBox_.values.toList();
-      offlineCategories.sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
-      
-      return offlineCategories.map((category) => MenuCategory(
-        id: category.id,
-        name: category.name,
-        displayOrder: category.displayOrder,
+      final cachedData = _prefs.getString(_categoriesKey);
+      if (cachedData == null) return [];
+
+      final categoriesJson = jsonDecode(cachedData) as List;
+      List<MenuCategory> categories = categoriesJson.map((json) => MenuCategory(
+        id: json['id'],
+        name: json['name'],
+        displayOrder: json['displayOrder'],
       )).toList();
+
+      categories.sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
+      return categories;
     } catch (e) {
       AppLogger.error('Failed to get cached categories', e);
       return [];
@@ -281,32 +308,30 @@ class OfflineStorageService {
   // Save pending order (for when offline)
   Future<void> savePendingOrder(Map<String, dynamic> orderData) async {
     await _ensureInitialized();
-    
+
     try {
-      final offlineOrder = OfflineOrder(
-        id: orderData['id'],
-        customerId: orderData['customerId'] ?? 'guest',
-        items: (orderData['items'] as List).map((item) => OfflineOrderItem(
-          menuItemId: item['menuItemId'],
-          menuItemName: item['menuItemName'],
-          quantity: item['quantity'],
-          unitPrice: item['unitPrice'].toDouble(),
-          totalPrice: item['totalPrice'].toDouble(),
-          selectedSize: item['selectedSize'],
-          selectedSauces: item['selectedSauces']?.cast<String>(),
-          customizations: item['customizations'],
-        )).toList(),
-        subtotal: orderData['subtotal'].toDouble(),
-        tax: orderData['tax'].toDouble(),
-        total: orderData['total'].toDouble(),
-        status: 'pending',
-        createdAt: DateTime.parse(orderData['createdAt'] ?? DateTime.now().toIso8601String()),
-        synced: false,
-        metadata: orderData['metadata'],
-      );
-      
-      await _ordersBox_.put(orderData['id'], offlineOrder);
-      
+      // Get existing pending orders
+      final existingOrders = await getPendingOrders();
+
+      // Add new order
+      final orderToSave = {
+        'id': orderData['id'],
+        'customerId': orderData['customerId'] ?? 'guest',
+        'items': orderData['items'],
+        'subtotal': orderData['subtotal'],
+        'tax': orderData['tax'],
+        'total': orderData['total'],
+        'status': 'pending',
+        'createdAt': orderData['createdAt'] ?? DateTime.now().toIso8601String(),
+        'synced': false,
+        'metadata': orderData['metadata'],
+      };
+
+      existingOrders.add(orderToSave);
+
+      // Save back to SharedPreferences
+      await _prefs.setString(_pendingOrdersKey, jsonEncode(existingOrders));
+
       AppLogger.info('Pending order saved: ${orderData['id']}');
     } catch (e) {
       AppLogger.error('Failed to save pending order', e);
@@ -314,29 +339,42 @@ class OfflineStorageService {
   }
 
   // Get pending orders
-  Future<List<OfflineOrder>> getPendingOrders() async {
+  Future<List<Map<String, dynamic>>> getPendingOrders() async {
     await _ensureInitialized();
-    
-    return _ordersBox_.values.where((order) => !order.synced).toList();
+
+    try {
+      final cachedData = _prefs.getString(_pendingOrdersKey);
+      if (cachedData == null) return [];
+
+      final ordersJson = jsonDecode(cachedData) as List;
+      return ordersJson.cast<Map<String, dynamic>>();
+    } catch (e) {
+      AppLogger.error('Failed to get pending orders', e);
+      return [];
+    }
   }
 
   // Mark order as synced
   Future<void> markOrderAsSynced(String orderId) async {
     await _ensureInitialized();
-    
+
     try {
-      final order = _ordersBox_.get(orderId);
-      if (order != null) {
-        await _ordersBox_.delete(orderId);
-        
-        // Also update in SQLite
-        await _database.update(
-          _orderHistoryTable,
-          {'synced': 1},
-          where: 'id = ?',
-          whereArgs: [orderId],
-        );
-      }
+      // Get pending orders and remove the synced one
+      final pendingOrders = await getPendingOrders();
+      final updatedOrders = pendingOrders.where((order) => order['id'] != orderId).toList();
+
+      // Save updated list
+      await _prefs.setString(_pendingOrdersKey, jsonEncode(updatedOrders));
+
+      // Also update in SQLite
+      await _database.update(
+        _orderHistoryTable,
+        {'synced': 1},
+        where: 'id = ?',
+        whereArgs: [orderId],
+      );
+
+      AppLogger.info('Order marked as synced: $orderId');
     } catch (e) {
       AppLogger.error('Failed to mark order as synced', e);
     }
@@ -346,33 +384,53 @@ class OfflineStorageService {
 
   // Update sync metadata
   Future<void> _updateSyncMetadata(String dataType, int recordCount) async {
-    final metadata = SyncMetadata(
-      dataType: dataType,
-      lastSyncTime: DateTime.now(),
-      recordCount: recordCount,
-      syncInProgress: false,
-    );
-    
-    await _syncMetadataBox_.put(dataType, metadata);
+    final metadata = {
+      'dataType': dataType,
+      'lastSyncTime': DateTime.now().toIso8601String(),
+      'recordCount': recordCount,
+      'syncInProgress': false,
+    };
+
+    await _prefs.setString('${_syncMetadataKey}_$dataType', jsonEncode(metadata));
   }
 
   // Get sync status
   Map<String, dynamic> getSyncStatus() {
-    final menuItemsMetadata = _syncMetadataBox_.get('menu_items');
-    final categoriesMetadata = _syncMetadataBox_.get('categories');
-    
+    // Get menu items metadata
+    final menuItemsMetadataJson = _prefs.getString('${_syncMetadataKey}_menu_items');
+    Map<String, dynamic>? menuItemsMetadata;
+    if (menuItemsMetadataJson != null) {
+      try {
+        menuItemsMetadata = jsonDecode(menuItemsMetadataJson);
+      } catch (e) {
+        menuItemsMetadata = null;
+      }
+    }
+
+    // Get categories metadata
+    final categoriesMetadataJson = _prefs.getString('${_syncMetadataKey}_categories');
+    Map<String, dynamic>? categoriesMetadata;
+    if (categoriesMetadataJson != null) {
+      try {
+        categoriesMetadata = jsonDecode(categoriesMetadataJson);
+      } catch (e) {
+        categoriesMetadata = null;
+      }
+    }
+
     return {
       'menuItems': {
-        'lastSync': menuItemsMetadata?.lastSyncTime?.toIso8601String(),
-        'recordCount': menuItemsMetadata?.recordCount ?? 0,
+        'lastSync': menuItemsMetadata?['lastSyncTime'],
+        'recordCount': menuItemsMetadata?['recordCount'] ?? 0,
         'hasCache': hasMenuItemsCache(),
       },
       'categories': {
-        'lastSync': categoriesMetadata?.lastSyncTime?.toIso8601String(),
-        'recordCount': categoriesMetadata?.recordCount ?? 0,
-        'hasCache': _categoriesBox_.isNotEmpty,
+        'lastSync': categoriesMetadata?['lastSyncTime'],
+        'recordCount': categoriesMetadata?['recordCount'] ?? 0,
+        'hasCache': _prefs.containsKey(_categoriesKey),
       },
-      'pendingOrders': _ordersBox_.length,
+      'pendingOrders': _prefs.getString(_pendingOrdersKey) != null ?
+          (jsonDecode(_prefs.getString(_pendingOrdersKey)!) as List).length : 0,
       'isOnline': false, // Will be updated by connectivity check
     };
   }
@@ -380,12 +438,18 @@ class OfflineStorageService {
   // Clear all cached data
   Future<void> clearCache() async {
     await _ensureInitialized();
-    
+
     try {
-      await _menuItemsBox_.clear();
-      await _categoriesBox_.clear();
-      await _syncMetadataBox_.clear();
-      
+      await _prefs.remove(_menuItemsKey);
+      await _prefs.remove(_categoriesKey);
+      await _prefs.remove(_pendingOrdersKey);
+
+      // Clear sync metadata
+      final keys = _prefs.getKeys().where((key) => key.startsWith(_syncMetadataKey));
+      for (final key in keys) {
+        await _prefs.remove(key);
+      }
+
       AppLogger.info('All cached data cleared');
     } catch (e) {
       AppLogger.error('Failed to clear cache', e);
@@ -402,10 +466,6 @@ class OfflineStorageService {
   // Close all resources
   Future<void> dispose() async {
     if (_isInitialized) {
-      await _menuItemsBox_.close();
-      await _ordersBox_.close();
-      await _categoriesBox_.close();
-      await _syncMetadataBox_.close();
       await _database.close();
       _isInitialized = false;
     }

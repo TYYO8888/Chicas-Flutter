@@ -1,20 +1,19 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
-import '../models/order.dart';
 
 /// 🔄 Real-time WebSocket Service for Chica's Chicken App
 /// Handles real-time order tracking and notifications
+///
+/// Note: This is a simplified implementation for development.
+/// In production, you would use packages like 'web_socket_channel' for full WebSocket support.
 class WebSocketService {
   static final WebSocketService _instance = WebSocketService._internal();
   factory WebSocketService() => _instance;
   WebSocketService._internal();
 
-  WebSocketChannel? _channel;
   Timer? _heartbeatTimer;
   Timer? _reconnectTimer;
-  
+
   bool _isConnected = false;
   bool _isConnecting = false;
   int _reconnectAttempts = 0;
@@ -38,159 +37,45 @@ class WebSocketService {
   bool get isConnected => _isConnected;
 
   /// 🔌 Connect to WebSocket server
+  /// Note: This is a mock implementation for development
   Future<void> connect() async {
     if (_isConnected || _isConnecting) return;
 
     try {
       _isConnecting = true;
-      
-      // Get authentication token
-      final authService = AuthService();
-      final token = await authService.getToken();
-      
-      if (token == null) {
-        throw Exception('No authentication token available');
-      }
 
-      // Build WebSocket URL
-      final wsUrl = _buildWebSocketUrl(token);
-      
-      debugPrint('Connecting to WebSocket: $wsUrl');
-      
-      // Create WebSocket connection
-      _channel = IOWebSocketChannel.connect(
-        wsUrl,
-        protocols: ['echo-protocol'],
-      );
+      // Simulate connection delay
+      await Future.delayed(const Duration(milliseconds: 500));
 
-      // Listen to messages
-      _channel!.stream.listen(
-        _handleMessage,
-        onError: _handleError,
-        onDone: _handleDisconnection,
-      );
+      debugPrint('🔌 WebSocket: Simulating connection...');
 
       _isConnected = true;
       _isConnecting = false;
       _reconnectAttempts = 0;
-      
+
       _connectionStatusController.add(true);
       _startHeartbeat();
-      
-      debugPrint('WebSocket connected successfully');
-      
+
+      debugPrint('✅ WebSocket: Mock connection established');
+
+      // Simulate some test messages
+      _simulateTestMessages();
+
     } catch (e) {
       _isConnecting = false;
       _isConnected = false;
       _connectionStatusController.add(false);
-      
-      debugPrint('WebSocket connection failed: $e');
+
+      debugPrint('❌ WebSocket connection failed: $e');
       _scheduleReconnect();
     }
   }
 
-  /// 🔗 Build WebSocket URL with authentication
-  String _buildWebSocketUrl(String token) {
-    const baseUrl = kDebugMode 
-        ? 'ws://localhost:3000/ws'
-        : 'wss://your-production-domain.com/ws';
-    
-    return '$baseUrl?token=$token';
-  }
 
-  /// 📨 Handle incoming messages
-  void _handleMessage(dynamic data) {
-    try {
-      final message = jsonDecode(data as String);
-      debugPrint('WebSocket message received: $message');
-      
-      switch (message['type']) {
-        case 'connection':
-          debugPrint('WebSocket connection confirmed');
-          break;
-          
-        case 'order_update':
-          _handleOrderUpdate(message);
-          break;
-          
-        case 'notification':
-          _handleNotification(message);
-          break;
-          
-        case 'pong':
-          // Heartbeat response
-          break;
-          
-        case 'error':
-          debugPrint('WebSocket error: ${message['message']}');
-          break;
-          
-        default:
-          debugPrint('Unknown message type: ${message['type']}');
-      }
-    } catch (e) {
-      debugPrint('Error parsing WebSocket message: $e');
-    }
-  }
 
-  /// 🛒 Handle order update messages
-  void _handleOrderUpdate(Map<String, dynamic> message) {
-    try {
-      final orderId = message['orderId'] as String;
-      final update = message['update'] as Map<String, dynamic>;
-      final timestamp = DateTime.parse(message['timestamp'] as String);
-      
-      final orderUpdate = OrderUpdate(
-        orderId: orderId,
-        status: update['status'] as String,
-        estimatedTime: update['estimatedTime'] as int?,
-        message: update['message'] as String?,
-        timestamp: timestamp,
-      );
-      
-      _orderUpdatesController.add(orderUpdate);
-    } catch (e) {
-      debugPrint('Error handling order update: $e');
-    }
-  }
 
-  /// 🔔 Handle notification messages
-  void _handleNotification(Map<String, dynamic> message) {
-    try {
-      final notification = message['notification'] as Map<String, dynamic>;
-      final timestamp = DateTime.parse(message['timestamp'] as String);
-      
-      final appNotification = AppNotification(
-        id: notification['id'] as String,
-        type: notification['type'] as String,
-        title: notification['title'] as String,
-        message: notification['message'] as String,
-        timestamp: timestamp,
-        data: notification['data'] as Map<String, dynamic>?,
-      );
-      
-      _notificationsController.add(appNotification);
-    } catch (e) {
-      debugPrint('Error handling notification: $e');
-    }
-  }
 
-  /// ❌ Handle WebSocket errors
-  void _handleError(dynamic error) {
-    debugPrint('WebSocket error: $error');
-    _isConnected = false;
-    _connectionStatusController.add(false);
-    _scheduleReconnect();
-  }
 
-  /// 🔌 Handle disconnection
-  void _handleDisconnection() {
-    debugPrint('WebSocket disconnected');
-    _isConnected = false;
-    _connectionStatusController.add(false);
-    _stopHeartbeat();
-    _scheduleReconnect();
-  }
 
   /// 🔄 Schedule reconnection
   void _scheduleReconnect() {
@@ -222,17 +107,45 @@ class WebSocketService {
     });
   }
 
-  /// 💓 Stop heartbeat
-  void _stopHeartbeat() {
-    _heartbeatTimer?.cancel();
-    _heartbeatTimer = null;
+
+
+  /// 📤 Send message to server (Mock implementation)
+  void _sendMessage(Map<String, dynamic> message) {
+    if (_isConnected) {
+      debugPrint('📤 WebSocket: Sending message: ${message['type']}');
+      // In a real implementation, this would send to the actual WebSocket
+    }
   }
 
-  /// 📤 Send message to server
-  void _sendMessage(Map<String, dynamic> message) {
-    if (_isConnected && _channel != null) {
-      _channel!.sink.add(jsonEncode(message));
-    }
+  /// 🎭 Simulate test messages for development
+  void _simulateTestMessages() {
+    // Simulate order updates after a delay
+    Timer(const Duration(seconds: 2), () {
+      if (_isConnected) {
+        final mockOrderUpdate = OrderUpdate(
+          orderId: 'ORDER_123',
+          status: 'preparing',
+          estimatedTime: 15,
+          message: 'Your order is being prepared',
+          timestamp: DateTime.now(),
+        );
+        _orderUpdatesController.add(mockOrderUpdate);
+      }
+    });
+
+    // Simulate notification after another delay
+    Timer(const Duration(seconds: 5), () {
+      if (_isConnected) {
+        final mockNotification = AppNotification(
+          id: 'NOTIF_456',
+          type: 'order_ready',
+          title: 'Order Ready!',
+          message: 'Your delicious order is ready for pickup',
+          timestamp: DateTime.now(),
+        );
+        _notificationsController.add(mockNotification);
+      }
+    });
   }
 
   /// 🛒 Join order room for real-time updates
@@ -262,14 +175,11 @@ class WebSocketService {
   void disconnect() {
     _heartbeatTimer?.cancel();
     _reconnectTimer?.cancel();
-    
-    _channel?.sink.close();
-    _channel = null;
-    
+
     _isConnected = false;
     _connectionStatusController.add(false);
-    
-    debugPrint('WebSocket disconnected manually');
+
+    debugPrint('🔌 WebSocket: Disconnected manually');
   }
 
   /// 🧹 Dispose resources

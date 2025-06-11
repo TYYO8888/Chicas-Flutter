@@ -1,11 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
+// import 'package:flutter_inappwebview/flutter_inappwebview.dart'; // NOTE: Add when needed
+// import 'package:wakelock_plus/wakelock_plus.dart'; // NOTE: Add when needed
 import '../services/game_service.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../services/navigation_service.dart';
-import 'dart:convert';
 
 /// 🎮 Game Screen - Displays and manages Godot games
 /// 
@@ -25,11 +25,10 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   final GameService _gameService = GameService();
-  InAppWebViewController? _webViewController;
+  // InAppWebViewController? _webViewController; // NOTE: Add when webview is needed
   bool _isLoading = true;
   bool _hasError = false;
   String _errorMessage = '';
-  DateTime? _gameStartTime;
   
   @override
   void initState() {
@@ -41,7 +40,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    WakelockPlus.disable();
+    // WakelockPlus.disable(); // NOTE: Add when wakelock is needed
     super.dispose();
   }
 
@@ -60,7 +59,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   Future<void> _initializeGame() async {
     try {
       // Keep screen awake during gameplay
-      await WakelockPlus.enable();
+      // await WakelockPlus.enable(); // NOTE: Add when wakelock is needed
       
       // Load game configuration
       final success = await _gameService.loadGame(widget.gameId);
@@ -72,7 +71,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         return;
       }
       
-      _gameStartTime = DateTime.now();
+      // Game started successfully
     } catch (e) {
       setState(() {
         _hasError = true;
@@ -132,46 +131,60 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   Widget _buildGameContent(GameConfig game) {
     return Stack(
       children: [
-        // Game WebView
-        InAppWebView(
-          initialUrlRequest: URLRequest(
-            url: WebUri('file:///android_asset/flutter_assets/${game.webUrl}'),
+        // Game Placeholder (WebView will be added later)
+        Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF1a1a1a),
+                Color(0xFF2d2d2d),
+              ],
+            ),
           ),
-          initialSettings: InAppWebViewSettings(
-            javaScriptEnabled: true,
-            domStorageEnabled: true,
-            allowsInlineMediaPlayback: true,
-            mediaPlaybackRequiresUserGesture: false,
-            transparentBackground: true,
-            supportZoom: false,
-            disableHorizontalScroll: true,
-            disableVerticalScroll: true,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.sports_esports,
+                  size: 80,
+                  color: Color(0xFFFF6B35),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  game.name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  game.description,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                ElevatedButton(
+                  onPressed: () => _simulateGameCompletion(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF6B35),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  ),
+                  child: const Text('Play Demo'),
+                ),
+              ],
+            ),
           ),
-          onWebViewCreated: (controller) {
-            _webViewController = controller;
-            _setupGameCommunication();
-          },
-          onLoadStart: (controller, url) {
-            setState(() {
-              _isLoading = true;
-            });
-          },
-          onLoadStop: (controller, url) {
-            setState(() {
-              _isLoading = false;
-            });
-            _initializeGameSession();
-          },
-          onReceivedError: (controller, request, error) {
-            setState(() {
-              _hasError = true;
-              _errorMessage = 'Failed to load game: ${error.description}';
-              _isLoading = false;
-            });
-          },
-          onConsoleMessage: (controller, consoleMessage) {
-            _handleGameMessage(consoleMessage.message);
-          },
         ),
         
         // Loading overlay
@@ -257,111 +270,42 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     );
   }
 
-  void _setupGameCommunication() {
-    // Add JavaScript interface for game communication
-    _webViewController?.addJavaScriptHandler(
-      handlerName: 'gameMessage',
-      callback: (args) {
-        if (args.isNotEmpty) {
-          _handleGameMessage(args[0].toString());
-        }
-      },
-    );
-  }
-
-  void _initializeGameSession() {
-    // Send game configuration to Godot
-    final gameConfig = {
-      'gameId': widget.gameId,
-      'playerData': _getPlayerData(),
-      'settings': _getGameSettings(),
-    };
-    
-    _sendMessageToGame('initialize', gameConfig);
-  }
-
-  void _handleGameMessage(String message) {
-    try {
-      final data = json.decode(message);
-      final type = data['type'];
-      
-      switch (type) {
-        case 'gameReady':
-          _onGameReady();
-          break;
-        case 'gameCompleted':
-          _onGameCompleted(data);
-          break;
-        case 'gameError':
-          _onGameError(data['message']);
-          break;
-        case 'scoreUpdate':
-          _onScoreUpdate(data['score']);
-          break;
-      }
-    } catch (e) {
-      debugPrint('🎮 Error parsing game message: $e');
-    }
-  }
-
-  void _sendMessageToGame(String type, Map<String, dynamic> data) {
-    final message = json.encode({
-      'type': type,
-      'data': data,
+  void _simulateGameCompletion() async {
+    // Simulate a game completion for demo purposes
+    setState(() {
+      _isLoading = true;
     });
-    
-    _webViewController?.evaluateJavascript(
-      source: 'if (window.receiveFlutterMessage) window.receiveFlutterMessage(\'$message\');',
-    );
-  }
 
-  Map<String, dynamic> _getPlayerData() {
-    // Get player data from your existing services
-    return {
-      'playerId': 'player_123', // Replace with actual player ID
-      'level': 1,
-      'preferences': {},
-    };
-  }
+    // Simulate game play time
+    await Future.delayed(const Duration(seconds: 2));
 
-  Map<String, dynamic> _getGameSettings() {
-    return {
-      'soundEnabled': true,
-      'vibrationEnabled': true,
-      'difficulty': 'normal',
-    };
-  }
+    final score = 100.0 + (DateTime.now().millisecondsSinceEpoch % 900);
+    final timeSpent = 30 + (DateTime.now().millisecondsSinceEpoch % 60);
 
-  void _onGameReady() {
+    final result = await _gameService.completeGame(widget.gameId, score, timeSpent);
+
     setState(() {
       _isLoading = false;
     });
-  }
 
-  void _onGameCompleted(Map<String, dynamic> data) async {
-    final score = (data['score'] ?? 0).toDouble();
-    final timeSpent = _gameStartTime != null 
-        ? DateTime.now().difference(_gameStartTime!).inSeconds 
-        : 0;
-    
-    final result = await _gameService.completeGame(widget.gameId, score, timeSpent);
-    
     if (mounted) {
       _showGameResultDialog(result);
     }
   }
 
-  void _onGameError(String message) {
-    setState(() {
-      _hasError = true;
-      _errorMessage = message;
+
+
+  void _sendMessageToGame(String type, Map<String, dynamic> data) {
+    // NOTE: Send message to game when webview is implemented
+    final message = json.encode({
+      'type': type,
+      'data': data,
     });
+
+    debugPrint('🎮 Would send to game: $message');
   }
 
-  void _onScoreUpdate(double score) {
-    // Handle real-time score updates if needed
-    debugPrint('🎮 Score update: $score');
-  }
+
 
   void _pauseGame() {
     _sendMessageToGame('pause', {});

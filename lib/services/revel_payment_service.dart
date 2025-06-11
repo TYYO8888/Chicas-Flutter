@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../models/payment_method.dart';
 import '../models/revel_models.dart';
 import '../services/revel_api_service.dart';

@@ -24,7 +24,7 @@ class _NotificationTestScreenState extends State<NotificationTestScreen> {
   
   bool _isLoading = false;
   String _status = 'Ready to test notifications';
-  List<Map<String, dynamic>> _receivedNotifications = [];
+  final List<Map<String, dynamic>> _receivedNotifications = [];
 
   @override
   void initState() {
@@ -336,7 +336,7 @@ class _NotificationTestScreenState extends State<NotificationTestScreen> {
                                           if (notification['orderId'] != null)
                                             Text(
                                               'Order: ${notification['orderId']}',
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 color: AppColors.primary,
                                                 fontWeight: FontWeight.w500,
                                               ),

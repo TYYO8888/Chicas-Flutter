@@ -1,18 +1,15 @@
 // 🔧 API Configuration
 // This file contains all the API endpoints and configuration
 
+import 'package:flutter/foundation.dart';
+
 class ApiConfig {
   // 🌐 Base URLs
   static const String _baseUrlDev = 'http://localhost:3000';
   static const String _baseUrlProd = 'https://your-app.appspot.com';
 
-  // For web development, we need to handle CORS
-  static const String _baseUrlWeb = 'http://localhost:3000';
-  
-  // 🎯 Current environment
-  static const bool _isDevelopment = true; // Change to false for production
-  
-  static String get baseUrl => _isDevelopment ? _baseUrlWeb : _baseUrlProd;
+  // Get the appropriate base URL based on environment
+  static String get baseUrl => kDebugMode ? _baseUrlDev : _baseUrlProd;
   static String get apiUrl => '$baseUrl/api';
   
   // 🔐 Authentication Endpoints

@@ -314,12 +314,13 @@ class _CartScreenState extends State<CartScreen> {
                                 overflow: TextOverflow.ellipsis,
                               ),
 
-                              // Customizations
+                              // Customizations and Extras
                               if (cartItem.menuItem.selectedSauces?.isNotEmpty == true ||
                                   cartItem.menuItem.selectedBunType != null ||
                                   cartItem.selectedSize != null ||
                                   cartItem.crewPackCustomization != null ||
-                                  cartItem.customizations != null) ...[
+                                  cartItem.customizations != null ||
+                                  cartItem.extras != null) ...[
                                 const SizedBox(height: 12),
                                 const Text(
                                   'Customizations:',
@@ -469,6 +470,115 @@ class _CartScreenState extends State<CartScreen> {
                                             color: Colors.blue,
                                           ),
                                         ),
+                                      ],
+                                    ),
+                                  ),
+
+                                // Display extras
+                                if (cartItem.extras != null && cartItem.extras!.totalExtrasCount > 0)
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFF6B35).withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: const Color(0xFFFF6B35).withValues(alpha: 0.3)),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.add_circle, size: 14, color: Color(0xFFFF6B35)),
+                                            const SizedBox(width: 6),
+                                            const Text(
+                                              'Extras:',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xFFFF6B35),
+                                              ),
+                                            ),
+                                            const Spacer(),
+                                            Text(
+                                              '+\$${cartItem.extras!.totalExtrasPrice.toStringAsFixed(2)}',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFFFF6B35),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        ...cartItem.extras!.selectedExtras.entries.expand((entry) {
+                                          return entry.value.map((selectedExtra) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(bottom: 4),
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    width: 16,
+                                                    height: 16,
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFFFF6B35),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        '${selectedExtra.quantity}',
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 10,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Expanded(
+                                                    child: Text(
+                                                      selectedExtra.extra.name,
+                                                      style: const TextStyle(
+                                                        fontSize: 11,
+                                                        fontWeight: FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '+\$${selectedExtra.totalPrice.toStringAsFixed(2)}',
+                                                    style: const TextStyle(
+                                                      fontSize: 10,
+                                                      color: Color(0xFFFF6B35),
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          });
+                                        }).toList(),
+                                        if (cartItem.extras!.specialInstructions?.isNotEmpty == true) ...[
+                                          const SizedBox(height: 8),
+                                          const Divider(height: 1),
+                                          const SizedBox(height: 8),
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.note, size: 12, color: Colors.grey),
+                                              const SizedBox(width: 6),
+                                              Expanded(
+                                                child: Text(
+                                                  'Note: ${cartItem.extras!.specialInstructions}',
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
+                                                    color: Colors.grey,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ],
                                     ),
                                   ),
@@ -699,7 +809,6 @@ class CartItemCard extends StatefulWidget {
 
 class _CartItemCardState extends State<CartItemCard>
     with SingleTickerProviderStateMixin {
-  bool _isHovered = false;
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
   late final Animation<double> _elevationAnimation;
@@ -737,7 +846,6 @@ class _CartItemCardState extends State<CartItemCard>
   void _handleHoverChanged(bool isHovered) {
     if (!mounted) return;
     setState(() {
-      _isHovered = isHovered;
       if (isHovered) {
         _controller.forward();
       } else {

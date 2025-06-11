@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_preferences.dart';
@@ -32,7 +33,7 @@ class UserPreferencesService {
     try {
       await syncWithServer();
     } catch (e) {
-      print('Failed to sync with server: $e');
+      debugPrint('Failed to sync with server: $e');
       // Continue with local preferences
     }
   }
@@ -51,7 +52,7 @@ class UserPreferencesService {
         final prefsMap = jsonDecode(prefsJson);
         _currentPreferences = UserPreferences.fromJson(prefsMap);
       } catch (e) {
-        print('Error loading local preferences: $e');
+        debugPrint('Error loading local preferences: $e');
         _currentPreferences = _createDefaultPreferences();
       }
     } else {
@@ -128,7 +129,7 @@ class UserPreferencesService {
         await saveUserPreferences(_currentPreferences!);
       }
     } catch (e) {
-      print('Sync failed: $e');
+      debugPrint('Sync failed: $e');
       // Continue with local preferences
     }
   }

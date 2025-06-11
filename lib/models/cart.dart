@@ -1,5 +1,6 @@
 import 'package:qsr_app/models/menu_item.dart';
 import 'package:qsr_app/models/crew_pack_selection.dart';
+import 'package:qsr_app/models/menu_extras.dart';
 
 class CartItem {
   final MenuItem menuItem;
@@ -7,6 +8,7 @@ class CartItem {
   String? selectedSize;
   Map<String, List<MenuItem>>? customizations;
   CrewPackCustomization? crewPackCustomization;
+  MenuItemExtras? extras;
 
   CartItem({
     required this.menuItem,
@@ -14,6 +16,7 @@ class CartItem {
     this.selectedSize,
     this.customizations,
     this.crewPackCustomization,
+    this.extras,
   });
 
   double get itemPrice {
@@ -24,6 +27,12 @@ class CartItem {
     if (crewPackCustomization != null) {
       return crewPackCustomization!.totalPrice;
     }
+
+    // Add extras price
+    if (extras != null) {
+      basePrice += extras!.totalExtrasPrice;
+    }
+
     return basePrice;
   }
 }

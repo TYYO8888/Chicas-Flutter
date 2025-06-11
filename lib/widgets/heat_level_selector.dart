@@ -77,7 +77,7 @@ class _HeatLevelSelectorState extends State<HeatLevelSelector> {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isSelected ? heatLevel.color.withOpacity(0.1) : Colors.white,
+            color: isSelected ? heatLevel.color.withValues(alpha: 0.1) : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isSelected ? heatLevel.color : Colors.grey[300]!,

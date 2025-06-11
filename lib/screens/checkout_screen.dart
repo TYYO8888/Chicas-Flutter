@@ -14,7 +14,7 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  bool _isLoading = false;
+  final bool _isLoading = false;
   bool _orderPlaced = false;
   String _orderId = '';
 
@@ -66,64 +66,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     });
   }
 
-  // This is like telling your friend to call the restaurant!
-  Future<void> _submitOrder() async {
-    setState(() {
-      _isLoading = true;
-    });
 
-    try {
-      // Simulating an API call to the restaurant
-      // TODO: Replace with actual Revel API endpoint
-      // Example: https://api.revel.com/v1/orders
-      await Future.delayed(const Duration(seconds: 2)); // Like waiting on hold!
-
-      /* When integrating with Revel's API, the order submission will look something like:
-      final response = await http.post(
-        Uri.parse('https://api.revel.com/v1/orders'),
-        headers: {
-          'Authorization': 'Bearer YOUR_API_TOKEN',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'establishment_id': 'YOUR_ESTABLISHMENT_ID',
-          'items': widget.cart.items.map((item) => {
-            'product_id': item.menuItem.revelProductId,
-            'quantity': item.quantity,
-            'modifiers': item.menuItem.selectedSauces?.map((sauce) => {
-              'modifier_id': sauce.revelModifierId,
-            }).toList(),
-            // Add other Revel-specific fields as needed
-          }).toList(),
-        }),
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Failed to place order');
-      }
-      */
-
-      // For now, we'll just simulate a successful order
-      final orderId = 'CHK${DateTime.now().millisecondsSinceEpoch}';
-      setState(() {
-        _isLoading = false;
-        _orderPlaced = true;
-        _orderId = orderId;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Oops! Something went wrong. Please try again.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +120,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           MaterialPageRoute(
                             builder: (context) => FeedbackScreen(
                               orderId: _orderId,
-                              customerEmail: 'customer@example.com', // TODO: Get from user profile
+                              customerEmail: 'customer@example.com', // NOTE: Get from user profile
                             ),
                           ),
                         );

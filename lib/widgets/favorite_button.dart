@@ -135,7 +135,7 @@ class SaveOrderDialog extends StatefulWidget {
 
 class _SaveOrderDialogState extends State<SaveOrderDialog> {
   final TextEditingController _nameController = TextEditingController();
-  final UserPreferencesService _preferencesService = UserPreferencesService();
+  // final UserPreferencesService _preferencesService = UserPreferencesService();
 
   @override
   void dispose() {

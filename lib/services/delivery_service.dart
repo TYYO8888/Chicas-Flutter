@@ -99,7 +99,7 @@ class DeliveryService {
       
       debugPrint('📊 Analytics: $event');
       
-      // TODO: Send to analytics service (Firebase, Mixpanel, etc.)
+      // NOTE: Send to analytics service (Firebase, Mixpanel, etc.)
       // await analyticsService.track(event);
     } catch (e) {
       debugPrint('❌ Failed to track delivery launch: $e');

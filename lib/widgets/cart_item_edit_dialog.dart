@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/cart.dart';
-import '../models/menu_item.dart';
 import '../services/cart_service.dart';
 
 class CartItemEditDialog extends StatefulWidget {

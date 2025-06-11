@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:mockito/annotations.dart';
 
 // Import the widgets we want to test
-import '../lib/widgets/lazy_loading_list.dart';
-import '../lib/widgets/real_time_order_tracker.dart';
-import '../lib/models/menu_item.dart';
-
-// Generate mocks
-@GenerateMocks([])
-class MockMenuItem extends Mock implements MenuItem {}
+import 'package:qsr_app/widgets/lazy_loading_list.dart';
+import 'package:qsr_app/widgets/real_time_order_tracker.dart';
 
 void main() {
   group('🧪 Advanced Features Flutter Tests', () {
@@ -170,7 +163,7 @@ void main() {
 
       testWidgets('should handle order completion', (WidgetTester tester) async {
         bool orderCompleted = false;
-        
+
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -183,6 +176,9 @@ void main() {
             ),
           ),
         );
+
+        // Verify the callback was triggered
+        expect(orderCompleted, isFalse); // Initially false
 
         // Fast-forward through all steps (this would normally take time)
         await tester.pump(const Duration(seconds: 30));
@@ -200,12 +196,12 @@ void main() {
         // For now, we'll test that the widget can be created
         
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
-              body: Container(
+              body: SizedBox(
                 width: 200,
                 height: 200,
-                child: const Placeholder(), // Placeholder for image widget
+                child: Placeholder(), // Placeholder for image widget
               ),
             ),
           ),

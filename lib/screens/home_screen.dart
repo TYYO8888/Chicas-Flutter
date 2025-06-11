@@ -150,10 +150,13 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: RefreshIndicator(
         onRefresh: () async {
+          // Store ScaffoldMessenger reference before async operation
+          final scaffoldMessenger = ScaffoldMessenger.of(context);
+
           // 🚀 Performance: Lightweight refresh - just show feedback
           await Future.delayed(const Duration(milliseconds: 500));
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text('Content refreshed!'),
                 duration: Duration(seconds: 1),
@@ -175,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
+                        gradient: const LinearGradient(
                           colors: [Colors.amber, Colors.orange],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -189,16 +192,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.stars,
                             color: Colors.white,
                             size: 20,
                           ),
-                          const SizedBox(width: 6),
-                          const Text(
+                          SizedBox(width: 6),
+                          Text(
                             '1,250 pts',
                             style: TextStyle(
                               color: Colors.white,
@@ -280,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Main heading
-                      Text(
+                      const Text(
                         'CRAVING CRUNCH? MAKE YOUR CHEAT DAY COUNT!',
                         style: TextStyle(
                           fontSize: 22,
@@ -320,12 +323,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 20),
 
                       // INDULGE section
-                      Text(
+                      const Text(
                         'INDULGE. IT\'S THE ULTIMATE YUMMY!',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFFFF6B35),
+                          color: Color(0xFFFF6B35),
                           letterSpacing: 0.5,
                         ),
                         textAlign: TextAlign.center,

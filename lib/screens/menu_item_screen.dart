@@ -9,6 +9,8 @@ import 'package:qsr_app/widgets/heat_level_selector.dart';
 import 'package:qsr_app/widgets/custom_bottom_nav_bar.dart';
 import 'package:qsr_app/screens/crew_pack_customization_screen.dart';
 import 'package:qsr_app/models/crew_pack_selection.dart';
+import 'package:qsr_app/screens/menu_item_extras_screen.dart';
+import 'package:qsr_app/models/menu_extras.dart';
 
 class MenuItemScreen extends StatefulWidget {
   final String category;
@@ -21,7 +23,7 @@ class MenuItemScreen extends StatefulWidget {
   });
 
   @override
-  _MenuItemScreenState createState() => _MenuItemScreenState();
+  State<MenuItemScreen> createState() => _MenuItemScreenState();
 }
 
 class _MenuItemScreenState extends State<MenuItemScreen> {
@@ -85,6 +87,9 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
   }
 
  Future<void> _handleCrewPackSelection(MenuItem crewPack) async {
+    // Store ScaffoldMessenger reference before async operation
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -92,7 +97,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
       ),
     );
 
-    if (result != null) {
+    if (result != null && mounted) {
       // Extract the crew pack customization data
       final crewPackCustomization = result['sandwiches'] as CrewPackCustomization?;
       final customizations = result['customizations'] as Map<String, List<MenuItem>>?;
@@ -110,7 +115,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
         crewPackCustomization: crewPackCustomization,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text('${crewPack.name} added to cart'),
           duration: const Duration(seconds: 2),
@@ -162,6 +167,12 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
   void _addToCart(MenuItem menuItem) {
     String? selectedSize = _selectedSizes[menuItem.name];
 
+    // Check if item allows extras and should show extras screen
+    if (menuItem.allowsExtras || _shouldShowExtrasForCategory(menuItem.category)) {
+      _showExtrasScreen(menuItem, selectedSize);
+      return;
+    }
+
     // Check if sauce selection is required
     if (menuItem.allowsSauceSelection &&
         (menuItem.selectedSauces == null ||
@@ -201,6 +212,44 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
     );
   }
 
+  bool _shouldShowExtrasForCategory(String category) {
+    // Categories that should show extras screen
+    const extrasCategories = [
+      'sandwiches',
+      'crew packs',
+      'whole wings',
+      'chicken pieces',
+    ];
+    return extrasCategories.contains(category.toLowerCase());
+  }
+
+  Future<void> _showExtrasScreen(MenuItem menuItem, String? selectedSize) async {
+    // Store ScaffoldMessenger reference before async operation
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    final result = await Navigator.of(context).push<MenuItemExtras>(
+      MaterialPageRoute(
+        builder: (context) => MenuItemExtrasScreen(menuItem: menuItem),
+      ),
+    );
+
+    if (result != null && mounted) {
+      // Add item with extras to cart
+      widget.cartService.addToCart(
+        menuItem,
+        selectedSize: selectedSize,
+        extras: result,
+      );
+
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('${menuItem.name} added to cart'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -232,7 +281,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                     borderRadius: BorderRadius.circular(16.0),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 8.0,
                         offset: const Offset(0, 4),
                       ),
@@ -252,8 +301,8 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                const Color(0xFFFF5C22).withOpacity(0.8),
-                                const Color(0xFF9B1C24).withOpacity(0.8),
+                                const Color(0xFFFF5C22).withValues(alpha: 0.8),
+                                const Color(0xFF9B1C24).withValues(alpha: 0.8),
                               ],
                             ),
                           ),
@@ -525,7 +574,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                                     backgroundColor: const Color(0xFFFF5C22),
                                     foregroundColor: Colors.white,
                                     elevation: 2,
-                                    shadowColor: const Color(0xFFFF5C22).withOpacity(0.3),
+                                    shadowColor: const Color(0xFFFF5C22).withValues(alpha: 0.3),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),

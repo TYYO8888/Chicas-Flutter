@@ -293,7 +293,7 @@ class _SyncStatusScreenState extends State<SyncStatusScreen> {
           ),
           if (!isOnline) ...[
             const SizedBox(height: 12),
-            AccessibleAlert(
+            const AccessibleAlert(
               message: 'Sync is only available when connected to the internet',
               type: AlertType.info,
             ),

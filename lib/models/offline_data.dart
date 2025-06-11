@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'menu_item.dart';
 
 // Note: For now, we'll use simple classes without Hive annotations

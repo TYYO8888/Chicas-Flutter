@@ -1,6 +1,7 @@
 import 'package:qsr_app/models/cart.dart';
 import 'package:qsr_app/models/menu_item.dart';
 import 'package:qsr_app/models/crew_pack_selection.dart';
+import 'package:qsr_app/models/menu_extras.dart';
 
 class CartService {
   static final CartService _instance = CartService._internal();
@@ -19,6 +20,7 @@ class CartService {
     String? selectedSize,
     Map<String, List<MenuItem>>? customizations,
     CrewPackCustomization? crewPackCustomization,
+    MenuItemExtras? extras,
   }) {
     // Clone the menu item to preserve all customizations
     final clonedMenuItem = menuItem.clone();
@@ -30,27 +32,31 @@ class CartService {
         quantity: 1,
         selectedSize: selectedSize,
         crewPackCustomization: crewPackCustomization,
+        extras: extras,
       ));
     }
     // For crew packs or customizable items, always add as a new item
-    else if (customizations != null) {
+    else if (customizations != null || extras != null) {
       _cart.items.add(CartItem(
         menuItem: clonedMenuItem,
         quantity: 1,
         selectedSize: selectedSize,
         customizations: customizations,
+        extras: extras,
       ));
     } else {
-      // For regular items, check if they have customizations (like selected sauces)
+      // For regular items, check if they have customizations (like selected sauces) or extras
       // If they do, always add as a new item to preserve the customizations
       if (clonedMenuItem.selectedSauces?.isNotEmpty == true ||
           clonedMenuItem.selectedBunType != null ||
-          selectedSize != null) {
-        // Item has customizations, add as new item
+          selectedSize != null ||
+          extras != null) {
+        // Item has customizations or extras, add as new item
         _cart.items.add(CartItem(
           menuItem: clonedMenuItem,
           quantity: 1,
           selectedSize: selectedSize,
+          extras: extras,
         ));
       } else {
         // Check if identical item exists and update quantity
@@ -82,6 +88,7 @@ class CartService {
             menuItem: clonedMenuItem,
             quantity: 1,
             selectedSize: selectedSize,
+            extras: extras,
           ));
         }
       }
@@ -192,4 +199,11 @@ class CartService {
 
   // Check if cart is empty
   bool get isEmpty => _cart.items.isEmpty;
+
+  // Get cart items (missing method)
+  List<CartItem> getCartItems() {
+    return _cart.items;
+  }
+
+
 }

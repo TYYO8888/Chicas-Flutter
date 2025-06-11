@@ -29,7 +29,7 @@ class _RealTimeOrderTrackerState extends State<RealTimeOrderTracker>
   int _currentStep = 0;
   String _currentStatus = 'Order Received';
   String _estimatedTime = '15-20 minutes';
-  bool _isComplete = false;
+  // bool _isComplete = false;
 
   final List<OrderStep> _orderSteps = [
     OrderStep(
@@ -128,7 +128,7 @@ class _RealTimeOrderTrackerState extends State<RealTimeOrderTracker>
   /// ✅ Complete the order
   void _completeOrder() {
     setState(() {
-      _isComplete = true;
+      // _isComplete = true;
       _currentStatus = 'Order Complete!';
       _estimatedTime = 'Ready now';
     });

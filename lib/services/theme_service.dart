@@ -62,7 +62,7 @@ class ThemeService extends ChangeNotifier {
         _themeMode = userPrefs.darkModeEnabled ? ThemeMode.dark : ThemeMode.light;
       }
     } catch (e) {
-      print('Error loading theme mode: $e');
+      debugPrint('Error loading theme mode: $e');
       _themeMode = ThemeMode.system;
     }
   }
@@ -78,7 +78,7 @@ class ThemeService extends ChangeNotifier {
         await _preferencesService.setDarkMode(_themeMode == ThemeMode.dark);
       }
     } catch (e) {
-      print('Error saving theme mode: $e');
+      debugPrint('Error saving theme mode: $e');
     }
   }
 
@@ -187,11 +187,9 @@ class ThemeService extends ChangeNotifier {
         primary: Colors.black,
         secondary: Colors.black,
         surface: Colors.white,
-        background: Colors.white,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: Colors.black,
-        onBackground: Colors.black,
       ),
       textTheme: baseTheme.textTheme.apply(
         bodyColor: Colors.black,
@@ -214,11 +212,9 @@ class ThemeService extends ChangeNotifier {
         primary: Colors.white,
         secondary: Colors.white,
         surface: Colors.black,
-        background: Colors.black,
         onPrimary: Colors.black,
         onSecondary: Colors.black,
         onSurface: Colors.white,
-        onBackground: Colors.white,
       ),
       textTheme: baseTheme.textTheme.apply(
         bodyColor: Colors.white,
@@ -254,10 +250,6 @@ class ThemeService extends ChangeNotifier {
   }
 
   // Dispose resources
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }
 
 // Theme mode selector widget

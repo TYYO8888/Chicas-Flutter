@@ -547,7 +547,7 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
                   ),
                 ),
                 Text(
-                  _formatDate(transaction.timestamp),
+                  _formatDate(transaction.createdAt),
                   style: TextStyle(
                     fontSize: 11,
                     color: Colors.grey[600],
@@ -624,11 +624,11 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
   int _getPurchasePointsToday() {
     final today = DateTime.now();
     return _loyaltyService.transactionHistory
-        .where((t) => 
-            t.type == 'purchase' && 
-            t.timestamp.year == today.year &&
-            t.timestamp.month == today.month &&
-            t.timestamp.day == today.day)
+        .where((t) =>
+            t.type == 'purchase' &&
+            t.createdAt.year == today.year &&
+            t.createdAt.month == today.month &&
+            t.createdAt.day == today.day)
         .fold(0, (sum, t) => sum + t.points);
   }
 }

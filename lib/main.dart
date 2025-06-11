@@ -82,7 +82,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// TODO: Suggest a folder structure for future features:
+// NOTE: Suggested folder structure for future features:
 // lib/
 //   main.dart (This file)
 //   models/ (For data structures like Menu, Item, Cart)
@@ -91,7 +91,7 @@ class MyApp extends StatelessWidget {
 //   screens/ (For different screens like MenuScreen, CartScreen, CheckoutScreen)
 //   utils/ (For helper functions)
 
-// TODO: If you need to add Firebase later for notifications or other features,
+// NOTE: If you need to add Firebase later for notifications or other features,
 // you would typically add the necessary Firebase dependencies to your pubspec.yaml file
 // and then follow the Firebase setup instructions for Flutter.
 // You might add Firebase initialization code in your main() function

@@ -54,7 +54,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with TickerProviderSt
       _favoriteOrders = _preferencesService.getFavoriteOrders();
       
     } catch (e) {
-      print('Error loading favorites: $e');
+      debugPrint('Error loading favorites: $e');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -101,7 +101,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with TickerProviderSt
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.favorite_border,
               size: 64,
               color: AppColors.textSecondary,
@@ -141,7 +141,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with TickerProviderSt
                 borderRadius: BorderRadius.circular(8),
                 color: AppColors.primary.withValues(alpha: 0.1),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.restaurant,
                 color: AppColors.primary,
               ),
@@ -181,7 +181,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with TickerProviderSt
                 ),
                 IconButton(
                   onPressed: () => _addToCart(item),
-                  icon: Icon(Icons.add_shopping_cart, color: AppColors.primary),
+                  icon: const Icon(Icons.add_shopping_cart, color: AppColors.primary),
                   tooltip: 'Add to cart',
                 ),
               ],
@@ -200,7 +200,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with TickerProviderSt
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.bookmark_border,
               size: 64,
               color: AppColors.textSecondary,
@@ -240,7 +240,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with TickerProviderSt
                 borderRadius: BorderRadius.circular(8),
                 color: AppColors.primary.withValues(alpha: 0.1),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.bookmark,
                 color: AppColors.primary,
               ),
@@ -271,7 +271,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with TickerProviderSt
               children: [
                 IconButton(
                   onPressed: () => _reorderFavorite(order),
-                  icon: Icon(Icons.add_shopping_cart, color: AppColors.primary),
+                  icon: const Icon(Icons.add_shopping_cart, color: AppColors.primary),
                   tooltip: 'Add to cart',
                 ),
                 IconButton(

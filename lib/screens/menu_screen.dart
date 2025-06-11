@@ -5,6 +5,7 @@ import '../constants/typography.dart';
 import '../constants/colors.dart';
 import '../services/cart_service.dart';
 import '../config/delivery_config.dart';
+import '../utils/debug_helper.dart';
 
 class MenuScreen extends StatelessWidget {
   final CartService cartService;
@@ -72,6 +73,13 @@ class MenuScreen extends StatelessWidget {
         elevation: 0,
         toolbarHeight: 80, // Increased height for better spacing
         titleSpacing: 20, // Better horizontal spacing
+        actions: [
+          IconButton(
+            onPressed: () => DebugHelper.showDebugMenu(context),
+            icon: const Icon(Icons.bug_report),
+            tooltip: 'Debug Extras System',
+          ),
+        ]
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -115,12 +123,12 @@ class MenuScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'CHEAT DAY TIPS:',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFFFF6B35),
+                          color: Color(0xFFFF6B35),
                           letterSpacing: 0.5,
                         ),
                       ).animate()
@@ -217,7 +225,6 @@ class MenuCategoryCard extends StatefulWidget {
 
 class _MenuCategoryCardState extends State<MenuCategoryCard>
     with SingleTickerProviderStateMixin {
-  bool _isHovered = false;
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
   late final Animation<double> _elevationAnimation;
@@ -255,7 +262,6 @@ class _MenuCategoryCardState extends State<MenuCategoryCard>
   void _handleHoverChanged(bool isHovered) {
     if (!mounted) return;
     setState(() {
-      _isHovered = isHovered;
       if (isHovered) {
         _controller.forward();
       } else {
@@ -264,30 +270,7 @@ class _MenuCategoryCardState extends State<MenuCategoryCard>
     });
   }
 
-  IconData _getCategoryIcon(String category) {
-    switch (category.toLowerCase()) {
-      case 'sandwiches':
-        return Icons.lunch_dining;
-      case 'whole wings':
-        return Icons.local_fire_department;
-      case 'chicken pieces':
-        return Icons.restaurant;
-      case 'chicken bites':
-        return Icons.fastfood;
-      case 'crew packs':
-        return Icons.group;
-      case 'sides':
-        return Icons.rice_bowl;
-      case 'fixin\'s':
-        return Icons.add_circle;
-      case 'sauces':
-        return Icons.water_drop;
-      case 'beverages':
-        return Icons.local_drink;
-      default:
-        return Icons.restaurant_menu;
-    }
-  }
+
 
   String _getCategorySubtitle(String category) {
     switch (category.toLowerCase()) {
@@ -362,7 +345,7 @@ class _MenuCategoryCardState extends State<MenuCategoryCard>
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16.0),
-                        gradient: LinearGradient(
+                        gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [

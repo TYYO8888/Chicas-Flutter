@@ -35,6 +35,7 @@ const menuData = {
         available: true,
         heatLevels: ['MILD', 'MEDIUM', 'MEDIUM / HOT', 'HOT AF'],
         sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 },
+        allowsExtras: true,
         nutritionInfo: { calories: 650, protein: 35, carbs: 45, fat: 28 }
       },
       {
@@ -45,6 +46,7 @@ const menuData = {
         imageUrl: 'assets/sandwiches.png',
         category: 'sandwiches',
         available: true,
+        allowsExtras: true,
         sizes: { 'Texas Toast': 13.00, 'Brioche Bun': 14.00 }
       },
       {

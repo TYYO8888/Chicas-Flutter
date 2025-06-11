@@ -288,7 +288,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Available Points:'),
+                const Text('Available Points:'),
                 Text(
                   '${_loyaltyAccount!.currentPoints} pts',
                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -298,7 +298,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Point Value:'),
+                const Text('Point Value:'),
                 Text(
                   '\$${_loyaltyAccount!.dollarValue.toStringAsFixed(2)}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -323,7 +323,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       },
                     ),
                   ),
-                  Text('${_pointsToRedeem} pts'),
+                  Text('$_pointsToRedeem pts'),
                 ],
               ),
             ] else ...[
@@ -508,7 +508,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 MaterialPageRoute(
                   builder: (context) => FeedbackScreen(
                     orderId: widget.orderId,
-                    customerEmail: 'customer@example.com', // TODO: Get from user profile
+                    customerEmail: 'customer@example.com', // NOTE: Get from user profile
                   ),
                 ),
               );

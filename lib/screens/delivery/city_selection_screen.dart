@@ -472,6 +472,8 @@ class _CitySelectionScreenState extends State<CitySelectionScreen>
 
   /// 🚚 Handle Delivery Selection and Launch URL
   Future<void> _handleDeliverySelection(BuildContext context, String cityName) async {
+    // Store ScaffoldMessenger reference before async operations
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     // For delivery, launch external URL
     final deliveryUrl = DeliveryConfig.getCityDeliveryUrl(cityName);
@@ -506,12 +508,14 @@ class _CitySelectionScreenState extends State<CitySelectionScreen>
           mode: LaunchMode.inAppBrowserView,
         );
 
-        if (!inAppLaunched) {
-          _showErrorSnackBar(context, 'Could not open delivery service for $cityName');
+        if (!inAppLaunched && mounted) {
+          _showErrorSnackBarDirect(scaffoldMessenger, 'Could not open delivery service for $cityName');
         }
       }
     } catch (e) {
-      _showErrorSnackBar(context, 'Error opening delivery service: ${e.toString()}');
+      if (mounted) {
+        _showErrorSnackBarDirect(scaffoldMessenger, 'Error opening delivery service: ${e.toString()}');
+      }
     }
   }
 
@@ -570,6 +574,38 @@ class _CitySelectionScreenState extends State<CitySelectionScreen>
           textColor: Colors.white,
           onPressed: () {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+  }
+
+  /// ❌ Show Error SnackBar (Direct ScaffoldMessenger)
+  void _showErrorSnackBarDirect(ScaffoldMessengerState scaffoldMessenger, String message) {
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
+        action: SnackBarAction(
+          label: 'DISMISS',
+          textColor: Colors.white,
+          onPressed: () {
+            scaffoldMessenger.hideCurrentSnackBar();
           },
         ),
       ),

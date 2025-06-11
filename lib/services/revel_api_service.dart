@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -30,9 +29,9 @@ class RevelApiService {
     
     _dio = Dio(BaseOptions(
       baseUrl: RevelConfig.baseUrl,
-      connectTimeout: Duration(seconds: RevelConfig.connectTimeout),
-      receiveTimeout: Duration(seconds: RevelConfig.receiveTimeout),
-      sendTimeout: Duration(seconds: RevelConfig.sendTimeout),
+      connectTimeout: const Duration(seconds: RevelConfig.connectTimeout),
+      receiveTimeout: const Duration(seconds: RevelConfig.receiveTimeout),
+      sendTimeout: const Duration(seconds: RevelConfig.sendTimeout),
       headers: RevelConfig.defaultHeaders,
     ));
 
@@ -327,7 +326,7 @@ class RevelApiService {
           error.requestOptions.extra['retryCount'] = retryCount + 1;
           
           // Wait before retry
-          await Future.delayed(Duration(seconds: RevelConfig.retryDelay));
+          await Future.delayed(const Duration(seconds: RevelConfig.retryDelay));
           
           try {
             final response = await _dio.fetch(error.requestOptions);

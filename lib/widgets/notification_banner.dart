@@ -164,7 +164,7 @@ class _NotificationBannerState extends State<NotificationBanner>
                     boxShadow: [
                       BoxShadow(
                         color: _getNotificationColor(_currentNotification!['type'])
-                            .withOpacity(0.2),
+                            .withValues(alpha: 0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -176,7 +176,7 @@ class _NotificationBannerState extends State<NotificationBanner>
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: _getNotificationColor(_currentNotification!['type'])
-                              .withOpacity(0.1),
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
@@ -239,7 +239,7 @@ class _NotificationBannerState extends State<NotificationBanner>
     ).animate()
       .shimmer(
         duration: const Duration(seconds: 2),
-        color: _getNotificationColor(_currentNotification!['type']).withOpacity(0.3),
+        color: _getNotificationColor(_currentNotification!['type']).withValues(alpha: 0.3),
       );
   }
 }

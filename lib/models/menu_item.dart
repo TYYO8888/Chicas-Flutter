@@ -31,6 +31,10 @@ class MenuItem {
   // Nutrition information
   Map<String, dynamic>? nutritionInfo;
 
+  // Extras system
+  bool allowsExtras;
+  List<String>? availableExtraCategories;
+
   MenuItem({
     required this.id,
     required this.name,
@@ -51,6 +55,8 @@ class MenuItem {
     this.customizationCategories,
     this.customizations,
     this.nutritionInfo,
+    this.allowsExtras = false,
+    this.availableExtraCategories,
   });
 
   // Clone method for creating copies of menu items
@@ -75,6 +81,8 @@ class MenuItem {
       customizationCategories: customizationCategories != null ? List.from(customizationCategories!) : null,
       customizations: customizations != null ? Map.from(customizations!) : null,
       nutritionInfo: nutritionInfo != null ? Map.from(nutritionInfo!) : null,
+      allowsExtras: allowsExtras,
+      availableExtraCategories: availableExtraCategories != null ? List.from(availableExtraCategories!) : null,
     );
   }
 
@@ -108,6 +116,10 @@ class MenuItem {
           : null,
       customizations: json['customizations'],
       nutritionInfo: json['nutritionInfo'],
+      allowsExtras: json['allowsExtras'] ?? false,
+      availableExtraCategories: json['availableExtraCategories'] != null
+          ? List<String>.from(json['availableExtraCategories'])
+          : null,
     );
   }
 
@@ -133,6 +145,8 @@ class MenuItem {
       'customizationCategories': customizationCategories,
       'customizations': customizations,
       'nutritionInfo': nutritionInfo,
+      'allowsExtras': allowsExtras,
+      'availableExtraCategories': availableExtraCategories,
     };
   }
 }

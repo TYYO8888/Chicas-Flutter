@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'dart:convert';
 import 'dart:io';
 import '../models/payment_method.dart';
 import 'api_service.dart';
@@ -15,45 +13,10 @@ class PaymentService {
   final ApiService _apiService = ApiService();
   
   // Payment method configurations
-  static const String _stripePublishableKey = 'pk_test_your_stripe_publishable_key';
-  static const String _paypalClientId = 'your_paypal_client_id';
+  // static const String _stripePublishableKey = 'pk_test_your_stripe_publishable_key';
+  // static const String _paypalClientId = 'your_paypal_client_id';
   
-  /// 🍎 Apple Pay Configuration
-  static const Map<String, dynamic> _applePayConfig = {
-    'merchantIdentifier': 'merchant.com.chicaschicken.app',
-    'displayName': "Chica's Chicken",
-    'merchantCapabilities': ['3DS', 'debit', 'credit'],
-    'supportedNetworks': ['visa', 'mastercard', 'amex', 'discover'],
-    'countryCode': 'US',
-    'currencyCode': 'USD',
-  };
 
-  /// 🤖 Google Pay Configuration
-  static const Map<String, dynamic> _googlePayConfig = {
-    'environment': 'TEST', // Change to 'PRODUCTION' for live
-    'apiVersion': 2,
-    'apiVersionMinor': 0,
-    'allowedPaymentMethods': [
-      {
-        'type': 'CARD',
-        'parameters': {
-          'allowedAuthMethods': ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
-          'allowedCardNetworks': ['AMEX', 'DISCOVER', 'JCB', 'MASTERCARD', 'VISA']
-        },
-        'tokenizationSpecification': {
-          'type': 'PAYMENT_GATEWAY',
-          'parameters': {
-            'gateway': 'stripe',
-            'gatewayMerchantId': 'your_stripe_merchant_id'
-          }
-        }
-      }
-    ],
-    'merchantInfo': {
-      'merchantId': 'your_google_pay_merchant_id',
-      'merchantName': "Chica's Chicken"
-    }
-  };
 
   /// 💳 Get available payment methods
   Future<List<PaymentMethodOption>> getAvailablePaymentMethods() async {
@@ -149,21 +112,18 @@ class PaymentService {
       switch (paymentMethod.type) {
         case PaymentType.card:
           return await _processCardPayment(amount, orderId, orderDetails);
-        
+
         case PaymentType.applePay:
           return await _processApplePayPayment(amount, orderId, orderDetails);
-        
+
         case PaymentType.googlePay:
           return await _processGooglePayPayment(amount, orderId, orderDetails);
-        
+
         case PaymentType.paypal:
           return await _processPayPalPayment(amount, orderId, orderDetails);
-        
+
         case PaymentType.cash:
           return await _processCashPayment(amount, orderId, orderDetails);
-        
-        default:
-          throw Exception('Unsupported payment method');
       }
     } catch (e) {
       return PaymentResult(
@@ -182,7 +142,7 @@ class PaymentService {
   ) async {
     try {
       // Create payment intent on backend
-      final paymentIntent = await _apiService.createPaymentIntent(amount, orderId);
+      await _apiService.createPaymentIntent(amount, orderId);
 
       // In a real implementation, this would use flutter_stripe
       // For now, we'll simulate a successful payment
@@ -211,20 +171,20 @@ class PaymentService {
   ) async {
     try {
       // Configure Apple Pay payment request
-      final paymentRequest = {
-        'countryCode': _applePayConfig['countryCode'],
-        'currencyCode': _applePayConfig['currencyCode'],
-        'merchantIdentifier': _applePayConfig['merchantIdentifier'],
-        'paymentSummaryItems': [
-          {
-            'label': "Chica's Chicken Order",
-            'amount': amount.toString(),
-            'type': 'final'
-          }
-        ],
-        'merchantCapabilities': _applePayConfig['merchantCapabilities'],
-        'supportedNetworks': _applePayConfig['supportedNetworks'],
-      };
+      // final paymentRequest = {
+      //   'countryCode': _applePayConfig['countryCode'],
+      //   'currencyCode': _applePayConfig['currencyCode'],
+      //   'merchantIdentifier': _applePayConfig['merchantIdentifier'],
+      //   'paymentSummaryItems': [
+      //     {
+      //       'label': "Chica's Chicken Order",
+      //       'amount': amount.toString(),
+      //       'type': 'final'
+      //     }
+      //   ],
+      //   'merchantCapabilities': _applePayConfig['merchantCapabilities'],
+      //   'supportedNetworks': _applePayConfig['supportedNetworks'],
+      // };
 
       // In a real implementation, this would use the pay package
       // For now, we'll simulate Apple Pay
@@ -253,15 +213,15 @@ class PaymentService {
   ) async {
     try {
       // Configure Google Pay payment request
-      final paymentRequest = {
-        ..._googlePayConfig,
-        'transactionInfo': {
-          'totalPriceStatus': 'FINAL',
-          'totalPrice': amount.toString(),
-          'currencyCode': 'USD',
-          'countryCode': 'US'
-        }
-      };
+      // final paymentRequest = {
+      //   ..._googlePayConfig,
+      //   'transactionInfo': {
+      //     'totalPriceStatus': 'FINAL',
+      //     'totalPrice': amount.toString(),
+      //     'currencyCode': 'USD',
+      //     'countryCode': 'US'
+      //   }
+      // };
 
       // In a real implementation, this would use the pay package
       // For now, we'll simulate Google Pay
@@ -340,7 +300,7 @@ class PaymentService {
     String? reason,
   }) async {
     try {
-      // TODO: Implement refund API when backend is ready
+      // NOTE: Implement refund API when backend is ready
       debugPrint('Refund requested for transaction: $transactionId, amount: \$${amount.toStringAsFixed(2)}');
       return true;
     } catch (e) {
@@ -352,7 +312,7 @@ class PaymentService {
   /// 📊 Get payment history (placeholder for future implementation)
   Future<List<PaymentTransaction>> getPaymentHistory(String userId) async {
     try {
-      // TODO: Implement payment history API when backend is ready
+      // NOTE: Implement payment history API when backend is ready
       // For now, return mock data
       return [
         PaymentTransaction(
@@ -380,7 +340,7 @@ class PaymentService {
     required PaymentMethodData paymentMethodData,
   }) async {
     try {
-      // TODO: Implement save payment method API when backend is ready
+      // NOTE: Implement save payment method API when backend is ready
       debugPrint('Payment method saved for user: $userId');
       return true;
     } catch (e) {
@@ -392,7 +352,7 @@ class PaymentService {
   /// 📋 Get saved payment methods (placeholder for future implementation)
   Future<List<PaymentMethodData>> getSavedPaymentMethods(String userId) async {
     try {
-      // TODO: Implement get saved payment methods API when backend is ready
+      // NOTE: Implement get saved payment methods API when backend is ready
       // For now, return mock data
       return [
         PaymentMethodData(

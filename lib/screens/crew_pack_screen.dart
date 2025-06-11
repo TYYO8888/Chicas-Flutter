@@ -16,7 +16,6 @@ class CrewPackScreen extends StatefulWidget {
 class _CrewPackScreenState extends State<CrewPackScreen> {
   final MenuService _menuService = MenuService();
   final CartService _cartService = CartService();
-  Map<String, List<MenuItem>> _categoryItems = {};
 
   @override
   void initState() {
@@ -29,9 +28,7 @@ class _CrewPackScreenState extends State<CrewPackScreen> {
     for (String category in widget.crewPack.customizationCategories ?? []) {
       items[category] = await _menuService.getMenuItems(category);
     }
-    setState(() {
-      _categoryItems = items;
-    });
+    // Items loaded successfully - UI will be updated via FutureBuilder
   }
 
   Future<void> _startCustomization() async {

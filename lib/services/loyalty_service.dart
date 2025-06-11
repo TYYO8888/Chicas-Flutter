@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/loyalty_program.dart';
-// import '../models/user.dart'; // TODO: Create user model
-// import 'api_service.dart'; // TODO: Implement API integration
+// import '../models/user.dart'; // NOTE: Create user model
+// import 'api_service.dart'; // NOTE: Implement API integration
 
 /// 🏆 Loyalty Program Service for Chica's Chicken
 /// Manages points, rewards, and loyalty program features
@@ -10,7 +10,8 @@ class LoyaltyService {
   factory LoyaltyService() => _instance;
   LoyaltyService._internal();
 
-  // final ApiService _apiService = ApiService(); // TODO: Implement API integration
+  // Mock API service for now - replace with real ApiService when backend is ready
+  final _MockApiService _apiService = _MockApiService();
   
   // Loyalty program configuration
   static const double _pointsPerDollar = 1.0;
@@ -21,7 +22,7 @@ class LoyaltyService {
   /// 🏆 Get user's loyalty information
   Future<LoyaltyAccount> getLoyaltyAccount(String userId) async {
     try {
-      // TODO: Implement API call when backend is ready
+      // NOTE: Implement API call when backend is ready
     // final response = await _apiService.get('/api/users/$userId/loyalty');
       // Return mock data for now
       return LoyaltyAccount(
@@ -522,5 +523,90 @@ class LoyaltyService {
         memberSince: DateTime.now(),
       );
     }
+  }
+}
+
+/// 🔧 Mock API Service for testing
+/// Replace with real ApiService when backend is ready
+class _MockApiService {
+  /// Mock GET request
+  Future<Map<String, dynamic>> get(String endpoint, {Map<String, String>? queryParams}) async {
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    // Return mock data based on endpoint
+    return {
+      'success': true,
+      'data': _getMockData(endpoint),
+    };
+  }
+
+  /// Mock POST request
+  Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> data) async {
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    // Return mock success response
+    return {
+      'success': true,
+      'data': _getMockPostResponse(endpoint, data),
+    };
+  }
+
+  /// Generate mock data based on endpoint
+  dynamic _getMockData(String endpoint) {
+    if (endpoint.contains('/loyalty/history')) {
+      return [];
+    } else if (endpoint.contains('/loyalty/rewards')) {
+      return [];
+    } else if (endpoint.contains('/loyalty/challenges')) {
+      return [];
+    } else if (endpoint.contains('/loyalty/leaderboard')) {
+      return [];
+    } else if (endpoint.contains('/loyalty/statistics')) {
+      return {
+        'totalPointsEarned': 0,
+        'totalPointsRedeemed': 0,
+        'totalOrdersWithPoints': 0,
+        'averagePointsPerOrder': 0,
+        'favoriteRewardCategory': 'beverage',
+        'memberSince': DateTime.now().toIso8601String(),
+      };
+    } else if (endpoint.contains('/loyalty/tier-progress')) {
+      return {
+        'currentTier': 'bronze',
+        'currentPoints': 0,
+        'pointsToNextTier': 1000,
+        'nextTier': 'silver',
+      };
+    }
+
+    return {};
+  }
+
+  /// Generate mock POST response
+  Map<String, dynamic> _getMockPostResponse(String endpoint, Map<String, dynamic> data) {
+    if (endpoint.contains('/loyalty/award')) {
+      return {
+        'id': 'mock_transaction_${DateTime.now().millisecondsSinceEpoch}',
+        'userId': 'mock_user',
+        'points': data['points'] ?? 0,
+        'type': data['type'] ?? 'unknown',
+        'description': data['description'] ?? 'Mock transaction',
+        'timestamp': DateTime.now().toIso8601String(),
+      };
+    } else if (endpoint.contains('/loyalty/redeem')) {
+      return {
+        'success': true,
+        'discountAmount': (data['points'] ?? 0) * 0.01,
+        'remainingPoints': 1000,
+      };
+    } else if (endpoint.contains('/referral-code')) {
+      return {
+        'referralCode': 'CHICA123456',
+      };
+    }
+
+    return {'success': true};
   }
 }

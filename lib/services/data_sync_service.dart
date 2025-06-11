@@ -130,8 +130,7 @@ class DataSyncService {
 
       // Sync categories
       final categories = await _menuService.getMenuCategories();
-      // Temporarily disabled to fix compilation
-      // await _offlineStorage.cacheMenuCategories(categories);
+      await _offlineStorage.cacheMenuCategories(categories);
       syncResult.categoriesUpdated = categories.length;
 
       // Sync menu items for each category

@@ -1,30 +1,30 @@
 @echo off
-REM 🧪 Comprehensive Testing Script for QSR Flutter App (Windows)
+REM Comprehensive Testing Script for QSR Flutter App (Windows)
 REM Runs all test suites and generates reports
 
-echo 🧪 Starting Comprehensive Test Suite for QSR App
+echo Starting Comprehensive Test Suite for QSR App
 echo.
 
 REM Create reports directory
 if not exist reports mkdir reports
 
-echo ℹ️  Checking prerequisites...
+echo Checking prerequisites...
 
 REM Check Flutter
 flutter --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Flutter is not installed
+    echo ERROR: Flutter is not installed
     exit /b 1
 )
 
 REM Check Node.js
 node --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Node.js is not installed
+    echo ERROR: Node.js is not installed
     exit /b 1
 )
 
-echo ✅ Prerequisites check completed
+echo SUCCESS: Prerequisites check completed
 echo.
 
 REM Install dependencies
@@ -163,78 +163,38 @@ if not errorlevel 1 (
 echo.
 
 REM 8. Generate Summary Report
-echo ℹ️  📊 Generating test summary report...
+echo Generating test summary report...
 
-(
-echo ^<!DOCTYPE html^>
-echo ^<html^>
-echo ^<head^>
-echo     ^<title^>QSR App - Test Results Summary^</title^>
-echo     ^<style^>
-echo         body { font-family: Arial, sans-serif; margin: 20px; }
-echo         .header { background: #2196F3; color: white; padding: 20px; border-radius: 8px; }
-echo         .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
-echo         .success { background: #e8f5e8; border-color: #4caf50; }
-echo         .warning { background: #fff3cd; border-color: #ffc107; }
-echo         .error { background: #f8d7da; border-color: #dc3545; }
-echo         .timestamp { color: #666; font-size: 0.9em; }
-echo     ^</style^>
-echo ^</head^>
-echo ^<body^>
-echo     ^<div class="header"^>
-echo         ^<h1^>🧪 QSR App - Comprehensive Test Results^</h1^>
-echo         ^<p class="timestamp"^>Generated on: %date% %time%^</p^>
-echo     ^</div^>
-echo     
-echo     ^<div class="section success"^>
-echo         ^<h2^>✅ Test Suite Completion^</h2^>
-echo         ^<p^>All test suites have been executed. Check individual reports for detailed results.^</p^>
-echo     ^</div^>
-echo     
-echo     ^<div class="section"^>
-echo         ^<h2^>📋 Available Reports^</h2^>
-echo         ^<ul^>
-echo             ^<li^>^<a href="analysis_report.txt"^>Code Analysis Report^</a^>^</li^>
-echo             ^<li^>^<a href="unit_test_results.json"^>Unit Test Results^</a^>^</li^>
-echo             ^<li^>^<a href="widget_test_results.json"^>Widget Test Results^</a^>^</li^>
-echo             ^<li^>^<a href="integration_test_results.json"^>Integration Test Results^</a^>^</li^>
-echo             ^<li^>^<a href="api_test_report.html"^>API Test Report^</a^>^</li^>
-echo             ^<li^>^<a href="security_report.txt"^>Security Scan Report^</a^>^</li^>
-echo             ^<li^>^<a href="performance_report.txt"^>Performance Analysis^</a^>^</li^>
-echo         ^</ul^>
-echo     ^</div^>
-echo     
-echo     ^<div class="section"^>
-echo         ^<h2^>🚀 Next Steps^</h2^>
-echo         ^<ol^>
-echo             ^<li^>Review any failed tests and fix issues^</li^>
-echo             ^<li^>Check code coverage and add tests for uncovered areas^</li^>
-echo             ^<li^>Address any security warnings^</li^>
-echo             ^<li^>Monitor performance metrics^</li^>
-echo             ^<li^>Deploy to staging environment for UAT^</li^>
-echo         ^</ol^>
-echo     ^</div^>
-echo ^</body^>
-echo ^</html^>
-) > reports\test_summary.html
+echo QSR App - Test Results Summary > reports\test_summary.txt
+echo ================================ >> reports\test_summary.txt
+echo Generated on: %date% %time% >> reports\test_summary.txt
+echo. >> reports\test_summary.txt
+echo Available Reports: >> reports\test_summary.txt
+echo - analysis_report.txt >> reports\test_summary.txt
+echo - unit_test_results.json >> reports\test_summary.txt
+echo - widget_test_results.json >> reports\test_summary.txt
+echo - integration_test_results.json >> reports\test_summary.txt
+echo - api_test_output.txt >> reports\test_summary.txt
+echo - security_report.txt >> reports\test_summary.txt
+echo - performance_report.txt >> reports\test_summary.txt
 
-echo ✅ Test summary report generated at reports\test_summary.html
+echo SUCCESS: Test summary report generated at reports\test_summary.txt
 
 echo.
-echo ✅ 🎉 Comprehensive test suite completed!
+echo SUCCESS: Comprehensive test suite completed!
 echo.
-echo 📊 Summary:
+echo Summary:
 echo - Reports generated in: .\reports\
-echo - Open reports\test_summary.html for overview
+echo - Open reports\test_summary.txt for overview
 echo - Check individual report files for detailed results
 echo.
-echo 🔗 Useful commands:
+echo Useful commands:
 echo - flutter test: Run unit tests only
 echo - flutter test integration_test\: Run integration tests only
 echo - newman run postman\collection.json: Run API tests only
 echo.
 
 REM Open summary report
-start reports\test_summary.html
+start reports\test_summary.txt
 
 pause

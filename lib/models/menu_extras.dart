@@ -305,6 +305,9 @@ class MenuExtrasData {
         return _getWingsExtras();
       case 'chicken pieces':
         return _getChickenPiecesExtras();
+      case 'chicken bites':
+      case 'chicken-bites':
+        return _getChickenBitesExtras();
       default:
         return _getDefaultExtras();
     }
@@ -321,7 +324,7 @@ class MenuExtrasData {
           MenuExtra(
             id: 'combo_upgrade',
             name: 'Make it a Combo!',
-            description: 'Add fries and drink',
+            description: 'Choose your drink and side (+\$8.50)',
             price: 8.50,
             category: MenuExtraCategory.combo,
             isPopular: true,
@@ -433,9 +436,9 @@ class MenuExtrasData {
         maxSelection: 1,
         extras: [
           MenuExtra(
-            id: 'wings_combo_upgrade',
+            id: 'combo_upgrade',
             name: 'Make it a Combo!',
-            description: 'Add fries and drink',
+            description: 'Choose your drink and side (+\$8.50)',
             price: 8.50,
             category: MenuExtraCategory.combo,
             isPopular: true,
@@ -461,9 +464,9 @@ class MenuExtrasData {
         maxSelection: 1,
         extras: [
           MenuExtra(
-            id: 'pieces_combo_upgrade',
+            id: 'combo_upgrade',
             name: 'Make it a Combo!',
-            description: 'Add fries and drink',
+            description: 'Choose your drink and side (+\$8.50)',
             price: 8.50,
             category: MenuExtraCategory.combo,
             isPopular: true,
@@ -550,6 +553,63 @@ class MenuExtrasData {
         description: 'Spicy pickled jalapeño slices',
         price: 3.00,
         category: MenuExtraCategory.pickle,
+      ),
+    ];
+  }
+
+  static List<MenuExtraSection> _getChickenBitesExtras() {
+    return [
+      MenuExtraSection(
+        id: 'combo',
+        title: 'Make it a Combo!',
+        description: 'Choose up to 1',
+        maxSelection: 1,
+        extras: [
+          MenuExtra(
+            id: 'combo_upgrade',
+            name: 'Make it a Combo!',
+            description: 'Choose your drink and side (+\$8.50)',
+            price: 8.50,
+            category: MenuExtraCategory.combo,
+            isPopular: true,
+          ),
+        ],
+      ),
+      MenuExtraSection(
+        id: 'sauces',
+        title: 'Dipping Sauces',
+        description: 'Choose up to 3',
+        maxSelection: 3,
+        extras: [
+          MenuExtra(
+            id: 'ranch',
+            name: 'Ranch',
+            description: 'Creamy ranch dipping sauce',
+            price: 0.75,
+            category: MenuExtraCategory.sauce,
+          ),
+          MenuExtra(
+            id: 'honey_mustard',
+            name: 'Honey Mustard',
+            description: 'Sweet and tangy honey mustard',
+            price: 0.75,
+            category: MenuExtraCategory.sauce,
+          ),
+          MenuExtra(
+            id: 'bbq_sauce',
+            name: 'BBQ Sauce',
+            description: 'Smoky barbecue sauce',
+            price: 0.75,
+            category: MenuExtraCategory.sauce,
+          ),
+          MenuExtra(
+            id: 'buffalo_sauce',
+            name: 'Buffalo Sauce',
+            description: 'Spicy buffalo wing sauce',
+            price: 0.75,
+            category: MenuExtraCategory.sauce,
+          ),
+        ],
       ),
     ];
   }

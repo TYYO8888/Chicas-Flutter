@@ -17,6 +17,14 @@ class HeatLevel {
 }
 
 class HeatLevels {
+  static const plain = HeatLevel(
+    name: 'PLAIN',
+    description: 'NO SPICE',
+    stars: 0,
+    color: Colors.grey,
+    icon: Icons.circle_outlined,
+  );
+
   static const mild = HeatLevel(
     name: 'MILD',
     description: 'NO HEAT',
@@ -50,6 +58,7 @@ class HeatLevels {
   );
 
   static const List<HeatLevel> all = [
+    plain,
     mild,
     medium,
     mediumHot,

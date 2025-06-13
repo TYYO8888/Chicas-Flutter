@@ -209,73 +209,45 @@ fi
 echo ""
 
 # 8. Generate Summary Report
-print_status "INFO" "📊 Generating test summary report..."
+print_status "INFO" "Generating test summary report..."
 
-cat > reports/test_summary.html << EOF
-<!DOCTYPE html>
-<html>
-<head>
-    <title>QSR App - Test Results Summary</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .header { background: #2196F3; color: white; padding: 20px; border-radius: 8px; }
-        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
-        .success { background: #e8f5e8; border-color: #4caf50; }
-        .warning { background: #fff3cd; border-color: #ffc107; }
-        .error { background: #f8d7da; border-color: #dc3545; }
-        .timestamp { color: #666; font-size: 0.9em; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>🧪 QSR App - Comprehensive Test Results</h1>
-        <p class="timestamp">Generated on: $(date)</p>
-    </div>
-    
-    <div class="section success">
-        <h2>✅ Test Suite Completion</h2>
-        <p>All test suites have been executed. Check individual reports for detailed results.</p>
-    </div>
-    
-    <div class="section">
-        <h2>📋 Available Reports</h2>
-        <ul>
-            <li><a href="analysis_report.txt">Code Analysis Report</a></li>
-            <li><a href="unit_test_results.json">Unit Test Results</a></li>
-            <li><a href="widget_test_results.json">Widget Test Results</a></li>
-            <li><a href="integration_test_results.json">Integration Test Results</a></li>
-            <li><a href="api_test_report.html">API Test Report</a></li>
-            <li><a href="coverage_html/index.html">Code Coverage Report</a></li>
-            <li><a href="security_report.txt">Security Scan Report</a></li>
-            <li><a href="performance_report.txt">Performance Analysis</a></li>
-        </ul>
-    </div>
-    
-    <div class="section">
-        <h2>🚀 Next Steps</h2>
-        <ol>
-            <li>Review any failed tests and fix issues</li>
-            <li>Check code coverage and add tests for uncovered areas</li>
-            <li>Address any security warnings</li>
-            <li>Monitor performance metrics</li>
-            <li>Deploy to staging environment for UAT</li>
-        </ol>
-    </div>
-</body>
-</html>
+cat > reports/test_summary.txt << 'EOF'
+QSR App - Test Results Summary
+==============================
+Generated on: $(date)
+
+Test Suite Completion
+All test suites have been executed. Check individual reports for detailed results.
+
+Available Reports:
+- analysis_report.txt
+- unit_test_results.json
+- widget_test_results.json
+- integration_test_results.json
+- api_test_report.html
+- coverage_html/index.html
+- security_report.txt
+- performance_report.txt
+
+Next Steps:
+1. Review any failed tests and fix issues
+2. Check code coverage and add tests for uncovered areas
+3. Address any security warnings
+4. Monitor performance metrics
+5. Deploy to staging environment for UAT
 EOF
 
-print_status "SUCCESS" "Test summary report generated at reports/test_summary.html"
+print_status "SUCCESS" "Test summary report generated at reports/test_summary.txt"
 
 echo ""
-print_status "SUCCESS" "🎉 Comprehensive test suite completed!"
+print_status "SUCCESS" "Comprehensive test suite completed!"
 echo ""
-echo "📊 Summary:"
+echo "Summary:"
 echo "- Reports generated in: ./reports/"
-echo "- Open reports/test_summary.html for overview"
+echo "- Open reports/test_summary.txt for overview"
 echo "- Check individual report files for detailed results"
 echo ""
-echo "🔗 Useful commands:"
+echo "Useful commands:"
 echo "- flutter test: Run unit tests only"
 echo "- flutter test integration_test/: Run integration tests only"
 echo "- newman run postman/collection.json: Run API tests only"
@@ -283,5 +255,5 @@ echo ""
 
 # Open summary report if on macOS
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    open reports/test_summary.html
+    open reports/test_summary.txt
 fi

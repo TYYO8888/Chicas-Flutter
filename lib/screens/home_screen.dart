@@ -251,6 +251,160 @@ class _HomeScreenState extends State<HomeScreen> {
                   curve: GSAPCurves.power2InOut,
                 ),
 
+              // TASTE CHICA'S NASHVILLE HEAT! Section
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFFFF6B35),
+                        const Color(0xFFE64A19),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        spreadRadius: 2,
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Main heading
+                      const Text(
+                        'TASTE CHICA\'S',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1.0,
+                        ),
+                        textAlign: TextAlign.center,
+                      ).animate()
+                        .fadeIn()
+                        .slideY(
+                          begin: -0.3,
+                          end: 0,
+                          duration: AnimationDurations.normal,
+                          curve: GSAPCurves.power2InOut,
+                        ),
+                      const Text(
+                        'NASHVILLE HEAT!',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF8B4513), // Brown color
+                          letterSpacing: 1.0,
+                        ),
+                        textAlign: TextAlign.center,
+                      ).animate()
+                        .fadeIn(delay: const Duration(milliseconds: 200))
+                        .slideY(
+                          begin: -0.3,
+                          end: 0,
+                          delay: const Duration(milliseconds: 200),
+                          duration: AnimationDurations.normal,
+                          curve: GSAPCurves.power2InOut,
+                        ),
+                      const SizedBox(height: 16),
+
+                      // Description text
+                      Text(
+                        'Have you tasted authentic Nashville-style hot chicken? Chica\'s Chicken brings the heat with freshly prepared, mouth-watering dishes. Order now for pickup or delivery!',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white.withValues(alpha: 0.95),
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ).animate()
+                        .fadeIn(delay: const Duration(milliseconds: 400))
+                        .slideY(
+                          begin: 0.2,
+                          end: 0,
+                          delay: const Duration(milliseconds: 400),
+                          duration: AnimationDurations.normal,
+                          curve: GSAPCurves.power2InOut,
+                        ),
+                      const SizedBox(height: 16),
+
+                      // Call to action text
+                      const Text(
+                        'START HERE! Gotta click ORDER NOW to start ordering process.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                          letterSpacing: 0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ).animate()
+                        .fadeIn(delay: const Duration(milliseconds: 600))
+                        .slideX(
+                          begin: -0.3,
+                          end: 0,
+                          delay: const Duration(milliseconds: 600),
+                          duration: AnimationDurations.normal,
+                          curve: GSAPCurves.power2InOut,
+                        ),
+                      const SizedBox(height: 20),
+
+                      // ORDER NOW Button
+                      Container(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/order-type');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF8B4513), // Brown color
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 4,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.restaurant_menu, size: 20),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'ORDER NOW',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward, size: 16),
+                            ],
+                          ),
+                        ),
+                      ).animate()
+                        .fadeIn(delay: const Duration(milliseconds: 800))
+                        .slideY(
+                          begin: 0.3,
+                          end: 0,
+                          delay: const Duration(milliseconds: 800),
+                          duration: AnimationDurations.normal,
+                          curve: GSAPCurves.backOut,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+
                 // Craving Crunch? Make Your Cheat Day Count!
               Padding(
                 padding: const EdgeInsets.all(24.0),

@@ -2,6 +2,7 @@ import 'package:qsr_app/models/cart.dart';
 import 'package:qsr_app/models/menu_item.dart';
 import 'package:qsr_app/models/crew_pack_selection.dart';
 import 'package:qsr_app/models/menu_extras.dart';
+import 'package:qsr_app/models/combo_selection.dart';
 
 class CartService {
   static final CartService _instance = CartService._internal();
@@ -21,12 +22,22 @@ class CartService {
     Map<String, List<MenuItem>>? customizations,
     CrewPackCustomization? crewPackCustomization,
     MenuItemExtras? extras,
+    ComboMeal? comboMeal,
   }) {
     // Clone the menu item to preserve all customizations
     final clonedMenuItem = menuItem.clone();
 
+    // For combo meals, always add as a new item
+    if (comboMeal != null) {
+      _cart.items.add(CartItem(
+        menuItem: clonedMenuItem,
+        quantity: 1,
+        selectedSize: selectedSize,
+        comboMeal: comboMeal,
+      ));
+    }
     // For crew packs with sandwich selections, always add as a new item
-    if (crewPackCustomization != null) {
+    else if (crewPackCustomization != null) {
       _cart.items.add(CartItem(
         menuItem: clonedMenuItem,
         quantity: 1,
@@ -205,5 +216,21 @@ class CartService {
     return _cart.items;
   }
 
+  /// Add a combo meal to cart
+  void addComboToCart(ComboMeal combo) {
+    addToCart(
+      combo.mainItem,
+      comboMeal: combo,
+    );
+  }
 
+  /// Check if an item is eligible for combo upgrade
+  bool isComboEligible(MenuItem item) {
+    return ComboConfiguration.isComboEligible(item);
+  }
+
+  /// Create a combo from a menu item
+  ComboMeal createCombo(MenuItem item, {String? selectedSize}) {
+    return ComboConfiguration.createCombo(item, selectedSize: selectedSize);
+  }
 }

@@ -4,19 +4,18 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+// NOTE: Uncomment when packages are installed
+// import 'package:device_info_plus/device_info_plus.dart';
+// import 'package:package_info_plus/package_info_plus.dart';
 
-// Sentry for crash reporting
-import 'package:sentry_flutter/sentry_flutter.dart';
+// NOTE: Uncomment when Sentry is properly configured
+// import 'package:sentry_flutter/sentry_flutter.dart';
 
 // NOTE: Uncomment when implementing Firebase Crashlytics
 // import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 /// 🚨 Crash Reporting Service
-/// 
+///
 /// Provides comprehensive error tracking and crash reporting capabilities:
 /// - Automatic crash detection and reporting
 /// - Custom error logging with context
@@ -25,13 +24,14 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 /// - Device and app information collection
 class CrashReportingService {
   static CrashReportingService? _instance;
-  static CrashReportingService get instance => _instance ??= CrashReportingService._();
+  static CrashReportingService get instance =>
+      _instance ??= CrashReportingService._();
   CrashReportingService._();
 
   bool _isInitialized = false;
   String? _userId;
   Map<String, dynamic> _userContext = {};
-  
+
   /// 🚀 Initialize crash reporting service
   static Future<void> initialize({
     String? sentryDsn,
@@ -40,32 +40,31 @@ class CrashReportingService {
   }) async {
     try {
       final service = CrashReportingService.instance;
-      
+
       // Initialize Sentry (if DSN provided)
       if (sentryDsn != null && sentryDsn.isNotEmpty) {
         await _initializeSentry(sentryDsn, environment);
       }
-      
+
       // Initialize Firebase Crashlytics (if enabled)
       if (enableFirebaseCrashlytics) {
         await _initializeFirebaseCrashlytics();
       }
-      
+
       // Set up Flutter error handlers
       await service._setupFlutterErrorHandlers();
-      
+
       // Collect device information
       await service._collectDeviceInfo();
-      
+
       service._isInitialized = true;
       debugPrint('🚨 Crash Reporting Service initialized');
-      
     } catch (e, stackTrace) {
       debugPrint('❌ Failed to initialize crash reporting: $e');
       debugPrint('Stack trace: $stackTrace');
     }
   }
-  
+
   /// 🔧 Initialize Sentry crash reporting
   static Future<void> _initializeSentry(String dsn, String environment) async {
     try {
@@ -97,7 +96,7 @@ class CrashReportingService {
       debugPrint('❌ Sentry initialization failed: $e');
     }
   }
-  
+
   /// 🔥 Initialize Firebase Crashlytics
   static Future<void> _initializeFirebaseCrashlytics() async {
     try {
@@ -122,7 +121,7 @@ class CrashReportingService {
       debugPrint('❌ Firebase Crashlytics initialization failed: $e');
     }
   }
-  
+
   /// 🛠️ Set up Flutter error handlers
   Future<void> _setupFlutterErrorHandlers() async {
     // Capture Flutter framework errors
@@ -131,29 +130,31 @@ class CrashReportingService {
       if (kDebugMode) {
         FlutterError.presentError(details);
       }
-      
+
       // Report to crash reporting services
       _reportFlutterError(details);
     };
-    
+
     // Capture errors outside of Flutter framework
     PlatformDispatcher.instance.onError = (error, stack) {
       _reportPlatformError(error, stack);
       return true;
     };
-    
+
     // Capture unhandled async errors
     runZonedGuarded(() {}, (error, stack) {
       _reportAsyncError(error, stack);
     });
   }
-  
+
   /// 📱 Collect device and app information
   Future<void> _collectDeviceInfo() async {
     try {
+      // NOTE: Uncomment when device_info_plus and package_info_plus are available
+      /*
       final deviceInfo = DeviceInfoPlugin();
       final packageInfo = await PackageInfo.fromPlatform();
-      
+
       _userContext = {
         'app_version': packageInfo.version,
         'app_build': packageInfo.buildNumber,
@@ -161,7 +162,7 @@ class CrashReportingService {
         'platform': Platform.operatingSystem,
         'platform_version': Platform.operatingSystemVersion,
       };
-      
+
       // Platform-specific device info
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;
@@ -180,43 +181,54 @@ class CrashReportingService {
           'is_physical_device': iosInfo.isPhysicalDevice,
         });
       }
-      
+      */
+
+      // Fallback basic info
+      _userContext = {
+        'platform': Platform.operatingSystem,
+        'platform_version': Platform.operatingSystemVersion,
+        'app_version': '1.0.0', // Placeholder
+      };
     } catch (e) {
       debugPrint('❌ Failed to collect device info: $e');
     }
   }
-  
+
   /// 🆔 Set user identifier for crash reports
   void setUserIdentifier(String userId, {Map<String, dynamic>? userInfo}) {
     _userId = userId;
-    
+
     if (userInfo != null) {
       _userContext.addAll(userInfo);
     }
-    
+
     // Update crash reporting services
     _updateUserContext();
   }
-  
+
   /// 🏷️ Add custom tags for better error categorization
   void addTag(String key, String value) {
     _userContext[key] = value;
     _updateUserContext();
   }
-  
+
   /// 📝 Add breadcrumb for error context
-  void addBreadcrumb(String message, {String? category, Map<String, dynamic>? data}) {
+  void addBreadcrumb(
+    String message, {
+    String? category,
+    Map<String, dynamic>? data,
+  }) {
     final breadcrumb = {
       'message': message,
       'category': category ?? 'custom',
       'timestamp': DateTime.now().toIso8601String(),
       'data': data,
     };
-    
+
     // NOTE: Implement breadcrumb tracking
     debugPrint('🍞 Breadcrumb: $breadcrumb');
   }
-  
+
   /// ⚠️ Log non-fatal error
   void logError(
     dynamic error,
@@ -234,7 +246,7 @@ class CrashReportingService {
         'timestamp': DateTime.now().toIso8601String(),
         ..._userContext,
       };
-      
+
       // Log to console in debug mode
       if (kDebugMode) {
         debugPrint('🚨 Error logged: $errorInfo');
@@ -242,15 +254,14 @@ class CrashReportingService {
           debugPrint('Stack trace: $stackTrace');
         }
       }
-      
+
       // Report to crash reporting services
       _reportCustomError(error, stackTrace, errorInfo, fatal);
-      
     } catch (e) {
       debugPrint('❌ Failed to log error: $e');
     }
   }
-  
+
   /// 📊 Log performance issue
   void logPerformanceIssue(
     String operation,
@@ -263,7 +274,7 @@ class CrashReportingService {
       'metadata': metadata,
       'timestamp': DateTime.now().toIso8601String(),
     };
-    
+
     // Log slow operations
     if (duration.inMilliseconds > 1000) {
       logError(
@@ -273,10 +284,10 @@ class CrashReportingService {
         extra: performanceData,
       );
     }
-    
+
     debugPrint('📊 Performance: $performanceData');
   }
-  
+
   /// 💬 Submit user feedback with crash context
   Future<void> submitUserFeedback({
     required String feedback,
@@ -294,22 +305,21 @@ class CrashReportingService {
         'device_context': _userContext,
         'timestamp': DateTime.now().toIso8601String(),
       };
-      
+
       // NOTE: Submit to feedback collection service
       debugPrint('💬 User feedback submitted: $feedbackData');
-      
+
       // Also log as breadcrumb for future crash context
       addBreadcrumb(
         'User submitted feedback',
         category: 'user_feedback',
         data: {'feedback_length': feedback.length},
       );
-      
     } catch (e, stackTrace) {
       logError(e, stackTrace, context: 'feedback_submission');
     }
   }
-  
+
   /// 🔄 Update user context in crash reporting services
   void _updateUserContext() {
     // NOTE: Update Sentry user context
@@ -321,7 +331,7 @@ class CrashReportingService {
       ));
     });
     */
-    
+
     // NOTE: Update Firebase Crashlytics user context
     /*
     if (_userId != null) {
@@ -333,7 +343,7 @@ class CrashReportingService {
     });
     */
   }
-  
+
   /// 📱 Report Flutter framework errors
   void _reportFlutterError(FlutterErrorDetails details) {
     // NOTE: Report to Sentry
@@ -350,25 +360,25 @@ class CrashReportingService {
       },
     );
     */
-    
+
     // NOTE: Report to Firebase Crashlytics
     /*
     FirebaseCrashlytics.instance.recordFlutterFatalError(details);
     */
   }
-  
+
   /// 🖥️ Report platform-specific errors
   void _reportPlatformError(Object error, StackTrace stack) {
     // NOTE: Report to crash reporting services
     debugPrint('🖥️ Platform error: $error');
   }
-  
+
   /// ⏰ Report async errors
   void _reportAsyncError(Object error, StackTrace stack) {
     // NOTE: Report to crash reporting services
     debugPrint('⏰ Async error: $error');
   }
-  
+
   /// 🎯 Report custom errors
   void _reportCustomError(
     dynamic error,
@@ -379,17 +389,14 @@ class CrashReportingService {
     // NOTE: Report to crash reporting services
     debugPrint('🎯 Custom error: $error');
   }
-  
-  /// 📱 Get app version (helper method)
-  static String _getAppVersion() {
-    // This would be populated during initialization
-    return '1.0.0'; // Placeholder
-  }
-  
+
   /// 🧪 Test crash reporting (for testing purposes only)
   void testCrashReporting() {
-    if (kDebugMode) {
+    if (kDebugMode && _isInitialized) {
       throw Exception('Test crash for crash reporting verification');
     }
   }
+
+  /// 📊 Check if service is initialized
+  bool get isInitialized => _isInitialized;
 }

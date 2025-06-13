@@ -7,8 +7,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+// NOTE: Uncomment when packages are installed
+// import 'package:device_info_plus/device_info_plus.dart';
+// import 'package:package_info_plus/package_info_plus.dart';
 
 /// 👥 UAT Feedback Service
 /// 
@@ -355,16 +356,18 @@ class UATFeedbackService {
   /// 📱 Collect device information
   Future<void> _collectDeviceInfo() async {
     try {
+      // NOTE: Uncomment when packages are available
+      /*
       final deviceInfo = DeviceInfoPlugin();
       final packageInfo = await PackageInfo.fromPlatform();
-      
+
       _deviceInfo = {
         'app_version': packageInfo.version,
         'app_build': packageInfo.buildNumber,
         'platform': Platform.operatingSystem,
         'platform_version': Platform.operatingSystemVersion,
       };
-      
+
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;
         _deviceInfo.addAll({
@@ -380,6 +383,14 @@ class UATFeedbackService {
           'ios_version': iosInfo.systemVersion,
         });
       }
+      */
+
+      // Fallback basic info
+      _deviceInfo = {
+        'platform': Platform.operatingSystem,
+        'platform_version': Platform.operatingSystemVersion,
+        'app_version': '1.0.0', // Placeholder
+      };
     } catch (e) {
       debugPrint('❌ Failed to collect device info: $e');
     }
@@ -411,8 +422,10 @@ class UATFeedbackService {
   /// 📱 Get app version
   Future<String> _getAppVersion() async {
     try {
-      final packageInfo = await PackageInfo.fromPlatform();
-      return '${packageInfo.version}+${packageInfo.buildNumber}';
+      // NOTE: Uncomment when package_info_plus is available
+      // final packageInfo = await PackageInfo.fromPlatform();
+      // return '${packageInfo.version}+${packageInfo.buildNumber}';
+      return '1.0.0+1'; // Placeholder
     } catch (e) {
       return '1.0.0+1';
     }

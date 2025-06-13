@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import '../services/cart_service.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onItemSelected;
+  final CartService? cartService;
 
   const CustomBottomNavBar({
     Key? key,
     required this.selectedIndex,
     required this.onItemSelected,
+    this.cartService,
   }) : super(key: key);
 
   @override
@@ -39,28 +42,28 @@ class CustomBottomNavBar extends StatelessWidget {
             unselectedItemColor: Colors.black54,
             elevation: 0,
             backgroundColor: Colors.white,
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
+            items: <BottomNavigationBarItem>[
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.local_offer),
                 activeIcon: Icon(Icons.local_offer, size: 28),
                 label: 'HOME',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.sports_esports),
                 activeIcon: Icon(Icons.sports_esports, size: 28),
                 label: 'GAMES',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.restaurant_menu),
                 activeIcon: Icon(Icons.restaurant_menu, size: 28),
                 label: 'MENU',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart),
-                activeIcon: Icon(Icons.shopping_cart, size: 28),
+                icon: _buildCartIcon(false),
+                activeIcon: _buildCartIcon(true),
                 label: 'CART',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.stars),
                 activeIcon: Icon(Icons.stars, size: 28),
                 label: 'LOYALTY',
@@ -72,6 +75,45 @@ class CustomBottomNavBar extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCartIcon(bool isActive) {
+    final itemCount = cartService?.itemCount ?? 0;
+
+    return Stack(
+      children: [
+        Icon(
+          Icons.shopping_cart,
+          size: isActive ? 28 : 24,
+        ),
+        if (itemCount > 0)
+          Positioned(
+            right: 0,
+            top: 0,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF5C22),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.white, width: 1),
+              ),
+              constraints: const BoxConstraints(
+                minWidth: 16,
+                minHeight: 16,
+              ),
+              child: Text(
+                itemCount > 99 ? '99+' : itemCount.toString(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/menu_item.dart';
 import '../models/menu_extras.dart';
+import '../models/combo_selection.dart';
+import '../screens/combo_selection_screen.dart';
 
 /// 🍗 Menu Item Extras Selection Screen
 /// 
@@ -14,11 +16,13 @@ import '../models/menu_extras.dart';
 class MenuItemExtrasScreen extends StatefulWidget {
   final MenuItem menuItem;
   final MenuItemExtras? initialExtras;
+  final String? initialSelectedSize;
 
   const MenuItemExtrasScreen({
     super.key,
     required this.menuItem,
     this.initialExtras,
+    this.initialSelectedSize,
   });
 
   @override
@@ -27,21 +31,26 @@ class MenuItemExtrasScreen extends StatefulWidget {
 
 class _MenuItemExtrasScreenState extends State<MenuItemExtrasScreen> {
   late MenuItemExtras _extras;
+  ComboMeal? _selectedCombo;
+  String? _selectedSize;
   final TextEditingController _instructionsController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    
+
+    // Initialize selected size from initial parameter
+    _selectedSize = widget.initialSelectedSize;
+
     // Initialize extras based on menu item category
     final sections = MenuExtrasData.getExtrasForCategory(widget.menuItem.category);
-    
+
     if (widget.initialExtras != null) {
       _extras = widget.initialExtras!.clone();
     } else {
       _extras = MenuItemExtras(sections: sections);
     }
-    
+
     _instructionsController.text = _extras.specialInstructions ?? '';
   }
 
@@ -508,6 +517,12 @@ class _MenuItemExtrasScreenState extends State<MenuItemExtrasScreen> {
   }
 
   void _updateExtraQuantity(MenuExtraSection section, MenuExtra extra, int quantity) {
+    // Check if this is a combo extra
+    if (extra.id == 'combo_upgrade' && quantity > 0) {
+      _handleComboSelection();
+      return;
+    }
+
     setState(() {
       if (quantity <= 0) {
         _extras.removeExtra(section.id, extra.id);
@@ -520,7 +535,47 @@ class _MenuItemExtrasScreenState extends State<MenuItemExtrasScreen> {
     });
   }
 
+  /// Handle combo selection by navigating to combo selection screen
+  Future<void> _handleComboSelection() async {
+    // Create a combo with the current menu item and selected size
+    final combo = ComboConfiguration.createCombo(widget.menuItem, selectedSize: _selectedSize);
+
+    final result = await Navigator.of(context).push<ComboMeal>(
+      MaterialPageRoute(
+        builder: (context) => ComboSelectionScreen(combo: combo),
+      ),
+    );
+
+    if (result != null && mounted) {
+      // Store the combo selection and continue with extras
+      setState(() {
+        _selectedCombo = result;
+        // Remove the combo extra from selection since it's now configured
+        _extras.removeExtra('combo', 'combo_upgrade');
+      });
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Combo configured! Add more extras or tap "Add to Cart"'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   void _confirmExtras() {
-    Navigator.of(context).pop(_extras);
+    // If combo is selected, return the combo instead of extras
+    if (_selectedCombo != null) {
+      Navigator.of(context).pop(_selectedCombo);
+    } else {
+      // Create a map to return both extras and selected size
+      final result = {
+        'extras': _extras,
+        'selectedSize': _selectedSize,
+      };
+      Navigator.of(context).pop(result);
+    }
   }
 }

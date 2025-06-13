@@ -238,7 +238,7 @@ class _CartScreenState extends State<CartScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      cartItem.menuItem.name,
+                                      cartItem.displayName,
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -314,9 +314,77 @@ class _CartScreenState extends State<CartScreen> {
                                 overflow: TextOverflow.ellipsis,
                               ),
 
-                              // Customizations and Extras
+                              // Combo Meal Details
+                              if (cartItem.isCombo) ...[
+                                const SizedBox(height: 12),
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.green[200]!),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.local_offer, color: Colors.green[600], size: 16),
+                                          const SizedBox(width: 6),
+                                          const Text(
+                                            'COMBO MEAL',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Main: ${cartItem.comboMeal!.mainItem.name}',
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                      // Show bun selection for sandwiches in combos
+                                      if (cartItem.comboMeal!.mainItem.category.toLowerCase().contains('sandwich') &&
+                                          cartItem.comboMeal!.mainItem.selectedBunType != null)
+                                        Text(
+                                          'Bun: ${cartItem.comboMeal!.mainItem.selectedBunType}',
+                                          style: const TextStyle(fontSize: 11, color: Colors.grey),
+                                        ),
+                                      if (cartItem.comboMeal!.selectedDrink != null)
+                                        Text(
+                                          'Drink: ${cartItem.comboMeal!.selectedDrink!.name}${cartItem.comboMeal!.selectedDrinkSize != null ? ' (${cartItem.comboMeal!.selectedDrinkSize})' : ''}',
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                      if (cartItem.comboMeal!.selectedSide != null)
+                                        Text(
+                                          'Side: ${cartItem.comboMeal!.selectedSide!.name}${cartItem.comboMeal!.selectedSideSize != null ? ' (${cartItem.comboMeal!.selectedSideSize})' : ''}',
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                      if (cartItem.comboMeal!.savings > 0) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'You Save: \$${cartItem.comboMeal!.savings.toStringAsFixed(2)}',
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ],
+
+                              // Customizations and Extras (show for all items including combos)
                               if (cartItem.menuItem.selectedSauces?.isNotEmpty == true ||
-                                  cartItem.menuItem.selectedBunType != null ||
+                                  (cartItem.comboMeal == null && cartItem.menuItem.selectedBunType != null) ||
+                                  (cartItem.comboMeal == null && cartItem.menuItem.selectedHeatLevel != null) ||
+                                  (cartItem.comboMeal?.mainItem.selectedHeatLevel != null) ||
+                                  (cartItem.comboMeal?.mainItem.selectedBunType != null) ||
                                   cartItem.selectedSize != null ||
                                   cartItem.crewPackCustomization != null ||
                                   cartItem.customizations != null ||
@@ -385,8 +453,8 @@ class _CartScreenState extends State<CartScreen> {
                                     ),
                                   ),
 
-                                // Selected bun type
-                                if (cartItem.menuItem.selectedBunType != null)
+                                // Selected bun type (only for non-combo items)
+                                if (cartItem.menuItem.selectedBunType != null && cartItem.comboMeal == null)
                                   Container(
                                     margin: const EdgeInsets.only(bottom: 8),
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -412,8 +480,35 @@ class _CartScreenState extends State<CartScreen> {
                                     ),
                                   ),
 
-                                // Selected heat level
-                                if (cartItem.menuItem.selectedHeatLevel != null)
+                                // Selected bun type for combo items
+                                if (cartItem.comboMeal?.mainItem.selectedBunType != null)
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green[50],
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: Colors.green[200]!),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.bakery_dining, size: 12, color: Colors.green),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          'Bun: ${cartItem.comboMeal!.mainItem.selectedBunType}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                // Selected heat level (only for non-combo items)
+                                if (cartItem.menuItem.selectedHeatLevel != null && cartItem.comboMeal == null)
                                   Container(
                                     margin: const EdgeInsets.only(bottom: 8),
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -429,6 +524,33 @@ class _CartScreenState extends State<CartScreen> {
                                         const SizedBox(width: 6),
                                         Text(
                                           'Heat: ${cartItem.menuItem.selectedHeatLevel}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                // Selected heat level for combo items
+                                if (cartItem.comboMeal?.mainItem.selectedHeatLevel != null)
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red[50],
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: Colors.red[200]!),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.whatshot, size: 12, color: Colors.red),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          'Heat: ${cartItem.comboMeal!.mainItem.selectedHeatLevel}',
                                           style: const TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,

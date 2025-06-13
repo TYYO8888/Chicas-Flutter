@@ -11,6 +11,7 @@ import 'package:qsr_app/screens/crew_pack_customization_screen.dart';
 import 'package:qsr_app/models/crew_pack_selection.dart';
 import 'package:qsr_app/screens/menu_item_extras_screen.dart';
 import 'package:qsr_app/models/menu_extras.dart';
+import 'package:qsr_app/models/combo_selection.dart';
 
 class MenuItemScreen extends StatefulWidget {
   final String category;
@@ -173,7 +174,13 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
       return;
     }
 
-    // Check if sauce selection is required
+    // ✅ NEW: Enhanced validation for items requiring heat level
+    if (menuItem.allowsHeatLevelSelection) {
+      _validateHeatLevelItemRequirements(menuItem, selectedSize);
+      return;
+    }
+
+    // Check if sauce selection is required (for non-heat level items)
     if (menuItem.allowsSauceSelection &&
         (menuItem.selectedSauces == null ||
             menuItem.selectedSauces!.length != menuItem.includedSauceCount)) {
@@ -186,6 +193,103 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
     } else {
       _checkHeatLevelAndAddToCart(menuItem, selectedSize);
     }
+  }
+
+  /// ✅ NEW: Enhanced validation for heat level items requiring BOTH sauce AND heat level
+  void _validateHeatLevelItemRequirements(MenuItem menuItem, String? selectedSize) {
+    final bool needsSauce = menuItem.allowsSauceSelection &&
+        (menuItem.selectedSauces == null || menuItem.selectedSauces!.length != menuItem.includedSauceCount);
+    final bool needsHeatLevel = menuItem.selectedHeatLevel == null;
+
+    if (needsSauce && needsHeatLevel) {
+      // Both sauce and heat level are missing
+      _showRequirementDialog(
+        title: 'Selection Required',
+        message: 'Please select both sauce and heat level for ${menuItem.name}.',
+        onConfirm: () => _handleSauceSelectionFirst(menuItem, selectedSize),
+      );
+    } else if (needsSauce) {
+      // Only sauce is missing
+      _showRequirementDialog(
+        title: 'Sauce Selection Required',
+        message: 'Please select a sauce for ${menuItem.name}.',
+        onConfirm: () => _handleSauceSelection(menuItem).then((_) {
+          if (menuItem.selectedSauces?.length == menuItem.includedSauceCount) {
+            _finalizeAddToCart(menuItem, selectedSize);
+          }
+        }),
+      );
+    } else if (needsHeatLevel) {
+      // Only heat level is missing
+      _showRequirementDialog(
+        title: 'Heat Level Selection Required',
+        message: 'Please select a heat level for ${menuItem.name}.',
+        onConfirm: () => _handleHeatLevelSelection(menuItem).then((_) {
+          if (menuItem.selectedHeatLevel != null) {
+            _finalizeAddToCart(menuItem, selectedSize);
+          }
+        }),
+      );
+    } else {
+      // Both are selected, proceed to cart
+      _finalizeAddToCart(menuItem, selectedSize);
+    }
+  }
+
+  /// Handle sauce selection first, then heat level for items requiring both
+  Future<void> _handleSauceSelectionFirst(MenuItem menuItem, String? selectedSize) async {
+    await _handleSauceSelection(menuItem);
+
+    if (menuItem.selectedSauces?.length == menuItem.includedSauceCount) {
+      // Sauce selected, now check heat level
+      if (menuItem.selectedHeatLevel == null) {
+        await _handleHeatLevelSelection(menuItem);
+      }
+
+      // Check if both are now selected
+      if (menuItem.selectedSauces?.length == menuItem.includedSauceCount &&
+          menuItem.selectedHeatLevel != null) {
+        _finalizeAddToCart(menuItem, selectedSize);
+      }
+    }
+  }
+
+  /// Show requirement dialog with custom message
+  void _showRequirementDialog({
+    required String title,
+    required String message,
+    required VoidCallback onConfirm,
+  }) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.deepOrange,
+          ),
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('CANCEL'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              onConfirm();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepOrange,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('SELECT'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _checkHeatLevelAndAddToCart(MenuItem menuItem, String? selectedSize) {
@@ -219,6 +323,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
       'crew packs',
       'whole wings',
       'chicken pieces',
+      'chicken bites',
     ];
     return extrasCategories.contains(category.toLowerCase());
   }
@@ -227,27 +332,169 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
     // Store ScaffoldMessenger reference before async operation
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-    final result = await Navigator.of(context).push<MenuItemExtras>(
+    final result = await Navigator.of(context).push<dynamic>(
       MaterialPageRoute(
-        builder: (context) => MenuItemExtrasScreen(menuItem: menuItem),
+        builder: (context) => MenuItemExtrasScreen(
+          menuItem: menuItem,
+          initialSelectedSize: selectedSize,
+        ),
       ),
     );
 
     if (result != null && mounted) {
-      // Add item with extras to cart
-      widget.cartService.addToCart(
-        menuItem,
-        selectedSize: selectedSize,
-        extras: result,
-      );
+      if (result is ComboMeal) {
+        // Add combo meal to cart
+        widget.cartService.addComboToCart(result);
 
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('${menuItem.name} added to cart'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text('${result.name} added to cart'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      } else if (result is MenuItemExtras) {
+        // ✅ Validate heat level items before adding to cart
+        if (menuItem.allowsHeatLevelSelection) {
+          _validateHeatLevelItemBeforeAddingToCart(
+            menuItem,
+            selectedSize,
+            result,
+            scaffoldMessenger,
+          );
+        } else {
+          // Add item with extras to cart (non-heat level items)
+          widget.cartService.addToCart(
+            menuItem,
+            selectedSize: selectedSize,
+            extras: result,
+          );
+
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text('${menuItem.name} added to cart'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      } else if (result is Map<String, dynamic>) {
+        // Handle new format with extras and selected size
+        final extras = result['extras'] as MenuItemExtras?;
+        final resultSelectedSize = result['selectedSize'] as String?;
+
+        // ✅ Validate heat level items before adding to cart
+        if (menuItem.allowsHeatLevelSelection) {
+          _validateHeatLevelItemBeforeAddingToCart(
+            menuItem,
+            resultSelectedSize ?? selectedSize,
+            extras,
+            scaffoldMessenger,
+          );
+        } else {
+          widget.cartService.addToCart(
+            menuItem,
+            selectedSize: resultSelectedSize ?? selectedSize,
+            extras: extras,
+          );
+
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text('${menuItem.name} added to cart'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
     }
+  }
+
+  /// ✅ Validate heat level items from extras screen before adding to cart
+  void _validateHeatLevelItemBeforeAddingToCart(
+    MenuItem menuItem,
+    String? selectedSize,
+    MenuItemExtras? extras,
+    ScaffoldMessengerState scaffoldMessenger,
+  ) {
+    final bool needsSauce = menuItem.allowsSauceSelection &&
+        (menuItem.selectedSauces == null || menuItem.selectedSauces!.length != menuItem.includedSauceCount);
+    final bool needsHeatLevel = menuItem.selectedHeatLevel == null;
+
+    if (needsSauce && needsHeatLevel) {
+      // Both sauce and heat level are missing
+      _showRequirementDialog(
+        title: 'Selection Required',
+        message: 'Please select both sauce and heat level for ${menuItem.name}.',
+        onConfirm: () => _handleSauceAndHeatForExtras(menuItem, selectedSize, extras, scaffoldMessenger),
+      );
+    } else if (needsSauce) {
+      // Only sauce is missing
+      _showRequirementDialog(
+        title: 'Sauce Selection Required',
+        message: 'Please select a sauce for ${menuItem.name}.',
+        onConfirm: () => _handleSauceSelection(menuItem).then((_) {
+          if (menuItem.selectedSauces?.length == menuItem.includedSauceCount) {
+            _addToCartWithExtras(menuItem, selectedSize, extras, scaffoldMessenger);
+          }
+        }),
+      );
+    } else if (needsHeatLevel) {
+      // Only heat level is missing
+      _showRequirementDialog(
+        title: 'Heat Level Selection Required',
+        message: 'Please select a heat level for ${menuItem.name}.',
+        onConfirm: () => _handleHeatLevelSelection(menuItem).then((_) {
+          if (menuItem.selectedHeatLevel != null) {
+            _addToCartWithExtras(menuItem, selectedSize, extras, scaffoldMessenger);
+          }
+        }),
+      );
+    } else {
+      // Both are selected, proceed to cart
+      _addToCartWithExtras(menuItem, selectedSize, extras, scaffoldMessenger);
+    }
+  }
+
+  /// Handle sauce and heat level selection for extras items
+  Future<void> _handleSauceAndHeatForExtras(
+    MenuItem menuItem,
+    String? selectedSize,
+    MenuItemExtras? extras,
+    ScaffoldMessengerState scaffoldMessenger,
+  ) async {
+    await _handleSauceSelection(menuItem);
+
+    if (menuItem.selectedSauces?.length == menuItem.includedSauceCount) {
+      // Sauce selected, now check heat level
+      if (menuItem.selectedHeatLevel == null) {
+        await _handleHeatLevelSelection(menuItem);
+      }
+
+      // Check if both are now selected
+      if (menuItem.selectedSauces?.length == menuItem.includedSauceCount &&
+          menuItem.selectedHeatLevel != null) {
+        _addToCartWithExtras(menuItem, selectedSize, extras, scaffoldMessenger);
+      }
+    }
+  }
+
+  /// Add item with extras to cart after validation
+  void _addToCartWithExtras(
+    MenuItem menuItem,
+    String? selectedSize,
+    MenuItemExtras? extras,
+    ScaffoldMessengerState scaffoldMessenger,
+  ) {
+    widget.cartService.addToCart(
+      menuItem,
+      selectedSize: selectedSize,
+      extras: extras,
+    );
+
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Text('${menuItem.name} added to cart'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -259,8 +506,8 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Navigate back to main menu page
-            NavigationService.navigateToMenu();
+            // Navigate back to previous screen (main menu)
+            Navigator.of(context).pop();
           },
         ),
       ),
@@ -516,6 +763,23 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                                               fontSize: 14,
                                             ),
                                           ),
+                                          const Spacer(),
+                                          // ✅ Required indicator
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: const Text(
+                                              'REQUIRED',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       const SizedBox(height: 8),
@@ -548,6 +812,96 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                                                     : 'SELECT HEAT LEVEL',
                                                 style: TextStyle(
                                                   color: Colors.red[600],
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+
+                              // ✅ Sauce Selection (for heat level items)
+                              if (menuItem.allowsHeatLevelSelection && menuItem.allowsSauceSelection) ...[
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.orange[200]!),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.water_drop,
+                                            color: Colors.orange[600],
+                                            size: 18,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          const Text(
+                                            'SAUCE:',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          // ✅ Required indicator
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: const Text(
+                                              'REQUIRED',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      GestureDetector(
+                                        onTap: () => _handleSauceSelection(menuItem),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: menuItem.selectedSauces?.isNotEmpty == true ? Colors.orange[100] : Colors.white,
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(color: Colors.orange[300]!),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                menuItem.selectedSauces?.isNotEmpty == true
+                                                    ? Icons.check_circle
+                                                    : Icons.add,
+                                                color: Colors.orange[600],
+                                                size: 16,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                menuItem.selectedSauces?.isNotEmpty == true
+                                                    ? '${menuItem.selectedSauces!.join(", ")} (TAP TO CHANGE)'
+                                                    : 'SELECT SAUCE',
+                                                style: TextStyle(
+                                                  color: Colors.orange[600],
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 12,
                                                 ),
@@ -624,6 +978,7 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
       ),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 2, // Menu is selected (now at index 2)
+        cartService: widget.cartService,
         onItemSelected: (index) {
           // Navigate to the correct page using navigation service
           switch (index) {

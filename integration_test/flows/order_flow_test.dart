@@ -3,12 +3,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
+// NOTE: Uncomment when integration_test package is available
+// import 'package:integration_test/integration_test.dart';
 import 'package:qsr_app/main.dart' as app;
 import 'package:qsr_app/services/theme_service.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  // NOTE: Uncomment when integration_test package is available
+  // IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('🛒 Order Placement Flow Tests', () {
     late ThemeService themeService;

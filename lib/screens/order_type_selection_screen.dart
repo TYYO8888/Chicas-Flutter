@@ -248,8 +248,8 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
           child: FadeTransition(
             opacity: _fadeAnimation,
             child: Container(
-              height: 180, // Reduced height to prevent overflow
-              margin: const EdgeInsets.symmetric(horizontal: 4),
+              height: 160, // Further reduced height to prevent overflow
+              margin: const EdgeInsets.symmetric(horizontal: 8),
               child: _buildPickupOption(),
             ),
           ),
@@ -267,8 +267,8 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
           child: FadeTransition(
             opacity: _fadeAnimation,
             child: Container(
-              height: 180, // Same reduced height for consistency
-              margin: const EdgeInsets.symmetric(horizontal: 4),
+              height: 160, // Same reduced height for consistency
+              margin: const EdgeInsets.symmetric(horizontal: 8),
               child: _buildDeliveryOption(),
             ),
           ),
@@ -294,7 +294,7 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
           duration: const Duration(milliseconds: 200),
           transform: Matrix4.identity()
             ..scale(_isPickupPressed ? 0.95 : (_isPickupHovered ? 1.02 : 1.0)),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
@@ -326,11 +326,11 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
           children: [
             // Icon with glow effect
             Container(
-              width: 60,
-              height: 60,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(25),
                 border: Border.all(
                   color: Colors.white.withValues(alpha: 0.3),
                   width: 2,
@@ -338,19 +338,19 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
               ),
               child: const Icon(
                 Icons.store_outlined,
-                size: 30,
+                size: 24,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             // Title
             const Text(
               'PICKUP',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.w900,
                 color: Colors.white,
-                letterSpacing: 2,
+                letterSpacing: 1.5,
                 shadows: [
                   Shadow(
                     offset: Offset(0, 2),
@@ -360,7 +360,7 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             // Status - always shows "Browse Menu"
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -378,13 +378,13 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             // Description
             Text(
-              'SELECT YOUR PICKUP LOCATION',
+              'SELECT LOCATION',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: Colors.white.withValues(alpha: 0.9),
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.5,
@@ -414,7 +414,7 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
           duration: const Duration(milliseconds: 200),
           transform: Matrix4.identity()
             ..scale(_isDeliveryPressed ? 0.95 : (_isDeliveryHovered ? 1.02 : 1.0)),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
@@ -446,11 +446,11 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
           children: [
             // Icon with glow effect
             Container(
-              width: 60,
-              height: 60,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(25),
                 border: Border.all(
                   color: Colors.white.withValues(alpha: 0.3),
                   width: 2,
@@ -458,19 +458,19 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
               ),
               child: const Icon(
                 Icons.delivery_dining_outlined,
-                size: 30,
+                size: 24,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             // Title
             const Text(
               'DELIVERY',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.w900,
                 color: Colors.white,
-                letterSpacing: 2,
+                letterSpacing: 1.5,
                 shadows: [
                   Shadow(
                     offset: Offset(0, 2),
@@ -480,7 +480,7 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             // Cities count
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -498,13 +498,13 @@ class _OrderTypeSelectionScreenState extends State<OrderTypeSelectionScreen>
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             // Description
             Text(
-              'SELECT YOUR CITY FOR DELIVERY',
+              'SELECT YOUR CITY',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: Colors.white.withValues(alpha: 0.9),
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.5,

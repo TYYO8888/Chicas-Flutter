@@ -97,6 +97,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         onItemSelected: (index) {
           _handleNavigation(index);
         },
+        cartService: null, // ✅ No cart service in game context
       ),
     );
   }

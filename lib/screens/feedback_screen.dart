@@ -283,6 +283,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               break;
           }
         },
+        cartService: null, // ✅ No cart service in feedback context
       ),
     );
   }

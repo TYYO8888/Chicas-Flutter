@@ -146,6 +146,7 @@ class _MainLayoutState extends State<MainLayout> {
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: _selectedIndex,
         onItemSelected: _onItemTapped,
+        cartService: _cartService, // ✅ Pass cart service for consistent badge display
       ),
     );
   }

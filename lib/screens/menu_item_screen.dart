@@ -180,7 +180,13 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
       return;
     }
 
-    // Check if sauce selection is required (for non-heat level items)
+    // ✅ NEW: Enhanced validation for items requiring sauce selection (chicken bites, whole wings)
+    if (_requiresSauceSelection(menuItem)) {
+      _validateSauceRequiredItemRequirements(menuItem, selectedSize);
+      return;
+    }
+
+    // Check if sauce selection is required (for other items)
     if (menuItem.allowsSauceSelection &&
         (menuItem.selectedSauces == null ||
             menuItem.selectedSauces!.length != menuItem.includedSauceCount)) {
@@ -192,6 +198,43 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
       });
     } else {
       _checkHeatLevelAndAddToCart(menuItem, selectedSize);
+    }
+  }
+
+  /// ✅ Check if item requires sauce selection (chicken bites, whole wings)
+  /// Note: Items with heat level selection are handled by heat level validation instead
+  bool _requiresSauceSelection(MenuItem menuItem) {
+    // If item has heat level selection, it's handled by heat level validation
+    if (menuItem.allowsHeatLevelSelection) {
+      return false;
+    }
+
+    final category = menuItem.category.toLowerCase();
+    return (category.contains('chicken bites') ||
+            category.contains('whole wings') ||
+            category == 'chicken bites' ||
+            category == 'whole wings') &&
+           menuItem.allowsSauceSelection;
+  }
+
+  /// ✅ NEW: Enhanced validation for items requiring sauce selection (chicken bites, whole wings)
+  void _validateSauceRequiredItemRequirements(MenuItem menuItem, String? selectedSize) {
+    final bool needsSauce = menuItem.selectedSauces == null ||
+        menuItem.selectedSauces!.length != menuItem.includedSauceCount;
+
+    if (needsSauce) {
+      _showRequirementDialog(
+        title: 'Sauce Selection Required',
+        message: 'Please select ${menuItem.includedSauceCount} sauce${menuItem.includedSauceCount! > 1 ? 's' : ''} for ${menuItem.name}.',
+        onConfirm: () => _handleSauceSelection(menuItem).then((_) {
+          if (menuItem.selectedSauces?.length == menuItem.includedSauceCount) {
+            _finalizeAddToCart(menuItem, selectedSize);
+          }
+        }),
+      );
+    } else {
+      // Sauce is selected, proceed to cart
+      _finalizeAddToCart(menuItem, selectedSize);
     }
   }
 
@@ -361,8 +404,16 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
             result,
             scaffoldMessenger,
           );
+        } else if (_requiresSauceSelection(menuItem)) {
+          // ✅ Validate sauce-required items before adding to cart
+          _validateSauceRequiredItemBeforeAddingToCart(
+            menuItem,
+            selectedSize,
+            result,
+            scaffoldMessenger,
+          );
         } else {
-          // Add item with extras to cart (non-heat level items)
+          // Add item with extras to cart (non-heat level, non-sauce-required items)
           widget.cartService.addToCart(
             menuItem,
             selectedSize: selectedSize,
@@ -384,6 +435,14 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
         // ✅ Validate heat level items before adding to cart
         if (menuItem.allowsHeatLevelSelection) {
           _validateHeatLevelItemBeforeAddingToCart(
+            menuItem,
+            resultSelectedSize ?? selectedSize,
+            extras,
+            scaffoldMessenger,
+          );
+        } else if (_requiresSauceSelection(menuItem)) {
+          // ✅ Validate sauce-required items before adding to cart
+          _validateSauceRequiredItemBeforeAddingToCart(
             menuItem,
             resultSelectedSize ?? selectedSize,
             extras,
@@ -473,6 +532,32 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
           menuItem.selectedHeatLevel != null) {
         _addToCartWithExtras(menuItem, selectedSize, extras, scaffoldMessenger);
       }
+    }
+  }
+
+  /// ✅ Validate sauce-required items from extras screen before adding to cart
+  void _validateSauceRequiredItemBeforeAddingToCart(
+    MenuItem menuItem,
+    String? selectedSize,
+    MenuItemExtras? extras,
+    ScaffoldMessengerState scaffoldMessenger,
+  ) {
+    final bool needsSauce = menuItem.selectedSauces == null ||
+        menuItem.selectedSauces!.length != menuItem.includedSauceCount;
+
+    if (needsSauce) {
+      _showRequirementDialog(
+        title: 'Sauce Selection Required',
+        message: 'Please select ${menuItem.includedSauceCount} sauce${menuItem.includedSauceCount! > 1 ? 's' : ''} for ${menuItem.name}.',
+        onConfirm: () => _handleSauceSelection(menuItem).then((_) {
+          if (menuItem.selectedSauces?.length == menuItem.includedSauceCount) {
+            _addToCartWithExtras(menuItem, selectedSize, extras, scaffoldMessenger);
+          }
+        }),
+      );
+    } else {
+      // Sauce is selected, proceed to cart
+      _addToCartWithExtras(menuItem, selectedSize, extras, scaffoldMessenger);
     }
   }
 
@@ -904,6 +989,98 @@ class _MenuItemScreenState extends State<MenuItemScreen> {
                                                   color: Colors.orange[600],
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+
+                              // ✅ Sauce Selection (for sauce-required items: chicken bites, whole wings)
+                              if (_requiresSauceSelection(menuItem)) ...[
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.orange[200]!),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.water_drop,
+                                            color: Colors.orange[600],
+                                            size: 18,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'SAUCE (${menuItem.includedSauceCount}):',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          // ✅ Required indicator
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: const Text(
+                                              'REQUIRED',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      GestureDetector(
+                                        onTap: () => _handleSauceSelection(menuItem),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: menuItem.selectedSauces?.isNotEmpty == true ? Colors.orange[100] : Colors.white,
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(color: Colors.orange[300]!),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                menuItem.selectedSauces?.isNotEmpty == true
+                                                    ? Icons.check_circle
+                                                    : Icons.add,
+                                                color: Colors.orange[600],
+                                                size: 16,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Expanded(
+                                                child: Text(
+                                                  menuItem.selectedSauces?.isNotEmpty == true
+                                                      ? '${menuItem.selectedSauces!.join(", ")} (TAP TO CHANGE)'
+                                                      : 'SELECT ${menuItem.includedSauceCount} SAUCE${menuItem.includedSauceCount! > 1 ? 'S' : ''}',
+                                                  style: TextStyle(
+                                                    color: Colors.orange[600],
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 12,
+                                                  ),
                                                 ),
                                               ),
                                             ],

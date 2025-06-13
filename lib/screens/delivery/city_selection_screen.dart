@@ -293,6 +293,7 @@ class _CitySelectionScreenState extends State<CitySelectionScreen>
               break;
           }
         },
+        cartService: null, // ✅ No cart service in city selection context
       ),
     );
   }

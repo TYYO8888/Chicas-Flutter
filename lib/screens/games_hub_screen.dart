@@ -63,6 +63,7 @@ class _GamesHubScreenState extends State<GamesHubScreen> with TickerProviderStat
         onItemSelected: (index) {
           _handleNavigation(index);
         },
+        cartService: null, // ✅ No cart service in games hub context
       ),
     );
   }

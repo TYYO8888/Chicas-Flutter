@@ -233,4 +233,35 @@ class CartService {
   ComboMeal createCombo(MenuItem item, {String? selectedSize}) {
     return ComboConfiguration.createCombo(item, selectedSize: selectedSize);
   }
+
+  /// ✅ Update heat level for a cart item
+  void updateHeatLevel(CartItem cartItem, String newHeatLevel) {
+    // Find the cart item in the list
+    final itemIndex = _cart.items.indexOf(cartItem);
+    if (itemIndex != -1) {
+      if (cartItem.comboMeal != null) {
+        // Update heat level for combo meal main item
+        cartItem.comboMeal!.mainItem.selectedHeatLevel = newHeatLevel;
+      } else {
+        // Update heat level for regular item
+        cartItem.menuItem.selectedHeatLevel = newHeatLevel;
+      }
+    }
+  }
+
+  /// ✅ Check if cart item has heat level selection capability
+  bool canEditHeatLevel(CartItem cartItem) {
+    if (cartItem.comboMeal != null) {
+      return cartItem.comboMeal!.mainItem.allowsHeatLevelSelection;
+    }
+    return cartItem.menuItem.allowsHeatLevelSelection;
+  }
+
+  /// ✅ Get current heat level for cart item
+  String? getCurrentHeatLevel(CartItem cartItem) {
+    if (cartItem.comboMeal != null) {
+      return cartItem.comboMeal!.mainItem.selectedHeatLevel;
+    }
+    return cartItem.menuItem.selectedHeatLevel;
+  }
 }

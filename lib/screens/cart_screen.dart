@@ -5,6 +5,7 @@ import 'package:qsr_app/services/cart_service.dart';
 import '../constants/typography.dart';
 import '../constants/colors.dart';
 import '../widgets/cart_item_edit_dialog.dart';
+import '../widgets/heat_level_dialog.dart';
 
 class CartScreen extends StatefulWidget {
   final CartService cartService;
@@ -16,6 +17,29 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+
+  /// ✅ Show heat level editing dialog
+  void _showHeatLevelDialog(cartItem, String itemName) {
+    if (!widget.cartService.canEditHeatLevel(cartItem)) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => HeatLevelDialog(
+        currentHeatLevel: widget.cartService.getCurrentHeatLevel(cartItem),
+        itemName: itemName,
+        onHeatLevelSelected: (newHeatLevel) {
+          widget.cartService.updateHeatLevel(cartItem, newHeatLevel);
+          setState(() {});
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Heat level updated to $newHeatLevel'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   void _showEditDialog(BuildContext context, cartItem, int index) {
     showDialog(
@@ -530,6 +554,35 @@ class _CartScreenState extends State<CartScreen> {
                                             color: Colors.red,
                                           ),
                                         ),
+                                        // ✅ Edit heat level button
+                                        if (widget.cartService.canEditHeatLevel(cartItem)) ...[
+                                          const SizedBox(width: 8),
+                                          GestureDetector(
+                                            onTap: () => _showHeatLevelDialog(cartItem, cartItem.displayName),
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.red[100],
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              child: const Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(Icons.edit, size: 10, color: Colors.red),
+                                                  SizedBox(width: 2),
+                                                  Text(
+                                                    'EDIT',
+                                                    style: TextStyle(
+                                                      fontSize: 9,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ],
                                     ),
                                   ),
@@ -557,6 +610,35 @@ class _CartScreenState extends State<CartScreen> {
                                             color: Colors.red,
                                           ),
                                         ),
+                                        // ✅ Edit heat level button for combo items
+                                        if (widget.cartService.canEditHeatLevel(cartItem)) ...[
+                                          const SizedBox(width: 8),
+                                          GestureDetector(
+                                            onTap: () => _showHeatLevelDialog(cartItem, '${cartItem.displayName} (Main Item)'),
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.red[100],
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              child: const Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(Icons.edit, size: 10, color: Colors.red),
+                                                  SizedBox(width: 2),
+                                                  Text(
+                                                    'EDIT',
+                                                    style: TextStyle(
+                                                      fontSize: 9,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ],
                                     ),
                                   ),

@@ -102,13 +102,13 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
           end: Alignment.bottomRight,
           colors: [
             _getTierColor(_account!.tier),
-            _getTierColor(_account!.tier).withValues(alpha: 0.8),
+            _getTierColor(_account!.tier).withOpacity(0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: _getTierColor(_account!.tier).withValues(alpha: 0.3),
+            color: _getTierColor(_account!.tier).withOpacity(0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -145,7 +145,7 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -164,7 +164,7 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
           Text(
             'Worth \$${_account!.dollarValue.toStringAsFixed(2)} • ${_account!.daysAsMember} days member',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
+              color: Colors.white.withOpacity(0.9),
               fontSize: 14,
             ),
           ),
@@ -186,7 +186,7 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -228,7 +228,7 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
           const SizedBox(height: 12),
           LinearProgressIndicator(
             value: gamePoints / 500, // Daily game limit
-            backgroundColor: Colors.grey.withValues(alpha: 0.2),
+            backgroundColor: Colors.grey.withOpacity(0.2),
             valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFF6B35)),
           ),
           const SizedBox(height: 8),
@@ -255,9 +255,9 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         children: [
@@ -293,7 +293,7 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -324,14 +324,14 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: challenge.isCompleted 
-            ? Colors.green.withValues(alpha: 0.1)
-            : Colors.grey.withValues(alpha: 0.1),
+        color: challenge.isCompleted
+            ? Colors.green.withOpacity(0.1)
+            : Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: challenge.isCompleted 
-              ? Colors.green.withValues(alpha: 0.3)
-              : Colors.grey.withValues(alpha: 0.3),
+          color: challenge.isCompleted
+              ? Colors.green.withOpacity(0.3)
+              : Colors.grey.withOpacity(0.3),
         ),
       ),
       child: Row(
@@ -389,7 +389,7 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -441,9 +441,9 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Row(
         children: [
@@ -485,7 +485,7 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -528,7 +528,7 @@ class _UnifiedLoyaltyDashboardState extends State<UnifiedLoyaltyDashboard> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

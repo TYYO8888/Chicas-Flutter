@@ -1,4 +1,5 @@
 import 'package:qsr_app/models/menu_item.dart';
+import 'package:qsr_app/models/menu_category.dart';
 import 'package:qsr_app/services/api_service.dart';
 import 'package:qsr_app/utils/logger.dart';
 
